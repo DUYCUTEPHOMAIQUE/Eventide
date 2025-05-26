@@ -1,0 +1,96 @@
+{
+  "appTitle": "Invites",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  
+  "birthdayParty": "Birthday Party",
+  "@birthdayParty": {
+    "description": "Title for birthday party invitation"
+  },
+  
+  "birthdayDate": "August 28 at 7:00 PM",
+  "@birthdayDate": {
+    "description": "Date for birthday party"
+  },
+  
+  "birthdayLocation": "Central Park, New York",
+  "@birthdayLocation": {
+    "description": "Location for birthday party"
+  },
+  
+  "weddingCeremony": "Wedding Ceremony",
+  "@weddingCeremony": {
+    "description": "Title for wedding ceremony invitation"
+  },
+  
+  "weddingDate": "September 15 at 4:00 PM",
+  "@weddingDate": {
+    "description": "Date for wedding ceremony"
+  },
+  
+  "weddingLocation": "Grand Hotel & Resort",
+  "@weddingLocation": {
+    "description": "Location for wedding ceremony"
+  },
+  
+  "holidayParty": "Holiday Party",
+  "@holidayParty": {
+    "description": "Title for holiday party invitation"
+  },
+  
+  "holidayDate": "December 24 at 8:00 PM",
+  "@holidayDate": {
+    "description": "Date for holiday party"
+  },
+  
+  "holidayLocation": "Winter Wonderland",
+  "@holidayLocation": {
+    "description": "Location for holiday party"
+  },
+  
+  "addNewInvitation": "Add New Invitation",
+  "@addNewInvitation": {
+    "description": "Button to add a new invitation"
+  },
+  
+  "viewInvitation": "View Invitation",
+  "@viewInvitation": {
+    "description": "Button to view invitation details"
+  },
+  
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile section title"
+  },
+  
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings section title"
+  },
+  
+  "language": "Language",
+  "@language": {
+    "description": "Language section title"
+  },
+  
+  "english": "English",
+  "@english": {
+    "description": "English language option"
+  },
+  
+  "vietnamese": "Vietnamese",
+  "@vietnamese": {
+    "description": "Vietnamese language option"
+  },
+  
+  "darkMode": "Dark Mode",
+  "@darkMode": {
+    "description": "Dark mode option"
+  },
+  
+  "lightMode": "Light Mode",
+  "@lightMode": {
+    "description": "Light mode option"
+  }
+}
