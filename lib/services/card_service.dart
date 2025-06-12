@@ -7,40 +7,87 @@ class CardService {
   final SupabaseClient _supabase = Supabase.instance.client;
   final InviteService _inviteService = InviteService();
 
-  // Get all cards with participant information
+  // Get all cards with participant information (owned + accepted invitations)
   Future<List<CardModel>> getAllCards() async {
     try {
-      print('Getting all cards with participants');
-      final response = await _supabase
-          .from('cards')
-          .select('*')
-          .order('created_at', ascending: false);
+      print('Getting all cards (owned + accepted invitations)');
 
-      print('Raw cards response: $response');
-
-      if (response == null) {
-        print('No cards found');
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        print('No current user found');
         return [];
       }
 
-      List<CardModel> cards = [];
-      for (var cardData in response) {
-        print('Processing card: ${cardData['id']}');
+      // Get cards owned by current user
+      final ownedResponse = await _supabase
+          .from('cards')
+          .select('*')
+          .eq('owner_id', currentUser.id)
+          .order('created_at', ascending: false);
 
-        // Get accepted participants for this card
-        final participants =
-            await _inviteService.getAcceptedParticipants(cardData['id']);
+      print('Raw owned cards response: $ownedResponse');
 
-        // Create card model with participants
-        final card = CardModel.fromJson(cardData);
-        card.participants = participants;
+      // Get cards where user is accepted participant
+      final acceptedResponse = await _supabase.from('invites').select('''
+            card_id,
+            cards!inner(*)
+          ''').eq('receiver_id', currentUser.id);
 
-        cards.add(card);
-        print('Added card with ${participants.length} participants');
+      print('Raw accepted invitations response: $acceptedResponse');
+
+      List<CardModel> allCards = [];
+
+      // Process owned cards
+      if (ownedResponse != null) {
+        for (var cardData in ownedResponse) {
+          print('Processing owned card: ${cardData['id']}');
+
+          // Get accepted participants for this card
+          final participants =
+              await _inviteService.getAcceptedParticipants(cardData['id']);
+
+          // Create card model with participants
+          final card = CardModel.fromJson(cardData);
+          card.participants = participants;
+
+          allCards.add(card);
+          print('Added owned card with ${participants.length} participants');
+        }
       }
 
-      print('Total cards processed: ${cards.length}');
-      return cards;
+      // Process accepted invitation cards
+      if (acceptedResponse != null) {
+        for (var inviteData in acceptedResponse) {
+          if (inviteData['cards'] != null) {
+            final cardData = inviteData['cards'];
+            final cardId = cardData['id'];
+
+            // Skip if already added (owned by user)
+            if (allCards.any((card) => card.id == cardId)) {
+              print('Skipping already added card: $cardId');
+              continue;
+            }
+
+            print('Processing accepted invitation card: $cardId');
+
+            final participants =
+                await _inviteService.getAcceptedParticipants(cardId);
+
+            final card = CardModel.fromJson(cardData);
+            card.participants = participants;
+
+            allCards.add(card);
+            print(
+                'Added accepted invitation card with ${participants.length} participants');
+          }
+        }
+      }
+
+      // Sort by created_at descending
+      allCards.sort((a, b) => b.created_at.compareTo(a.created_at));
+
+      print('Total all cards: ${allCards.length}');
+      return allCards;
     } catch (e) {
       print('Error getting all cards: $e');
       return [];
@@ -275,6 +322,153 @@ class CardService {
       return cards;
     } catch (e) {
       print('Error getting cards user participates: $e');
+      return [];
+    }
+  }
+
+  // Get pending invitation cards for current user
+  Future<List<CardModel>> getPendingInvitationCards() async {
+    try {
+      print('Getting pending invitation cards');
+
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        print('No current user found');
+        return [];
+      }
+
+      final response = await _supabase.from('invites').select('''
+            card_id,
+            cards!inner(*)
+          ''').eq('receiver_id', currentUser.id).eq('status', 'pending');
+
+      print('Raw pending invitations response: $response');
+
+      if (response == null) {
+        print('No pending invitations found for user: ${currentUser.id}');
+        return [];
+      }
+
+      List<CardModel> cards = [];
+      for (var inviteData in response) {
+        if (inviteData['cards'] != null) {
+          final cardData = inviteData['cards'];
+          print('Processing pending invitation card: ${cardData['id']}');
+
+          final participants =
+              await _inviteService.getAcceptedParticipants(cardData['id']);
+
+          final card = CardModel.fromJson(cardData);
+          card.participants = participants;
+
+          cards.add(card);
+          print(
+              'Added pending invitation card with ${participants.length} participants');
+        }
+      }
+
+      print('Total pending invitation cards: ${cards.length}');
+      return cards;
+    } catch (e) {
+      print('Error getting pending invitation cards: $e');
+      return [];
+    }
+  }
+
+  // Get accepted invitation cards for current user
+  Future<List<CardModel>> getAcceptedInvitationCards() async {
+    try {
+      print('Getting accepted invitation cards');
+
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        print('No current user found');
+        return [];
+      }
+
+      final response = await _supabase.from('invites').select('''
+            card_id,
+            cards!inner(*)
+          ''').eq('receiver_id', currentUser.id).eq('status', 'accepted');
+
+      print('Raw accepted invitations response: $response');
+
+      if (response == null) {
+        print('No accepted invitations found for user: ${currentUser.id}');
+        return [];
+      }
+
+      List<CardModel> cards = [];
+      for (var inviteData in response) {
+        if (inviteData['cards'] != null) {
+          final cardData = inviteData['cards'];
+          print('Processing accepted invitation card: ${cardData['id']}');
+
+          final participants =
+              await _inviteService.getAcceptedParticipants(cardData['id']);
+
+          final card = CardModel.fromJson(cardData);
+          card.participants = participants;
+
+          cards.add(card);
+          print(
+              'Added accepted invitation card with ${participants.length} participants');
+        }
+      }
+
+      print('Total accepted invitation cards: ${cards.length}');
+      return cards;
+    } catch (e) {
+      print('Error getting accepted invitation cards: $e');
+      return [];
+    }
+  }
+
+  // Get declined invitation cards for current user
+  Future<List<CardModel>> getDeclinedInvitationCards() async {
+    try {
+      print('Getting declined invitation cards');
+
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        print('No current user found');
+        return [];
+      }
+
+      final response = await _supabase.from('invites').select('''
+            card_id,
+            cards!inner(*)
+          ''').eq('receiver_id', currentUser.id).eq('status', 'declined');
+
+      print('Raw declined invitations response: $response');
+
+      if (response == null) {
+        print('No declined invitations found for user: ${currentUser.id}');
+        return [];
+      }
+
+      List<CardModel> cards = [];
+      for (var inviteData in response) {
+        if (inviteData['cards'] != null) {
+          final cardData = inviteData['cards'];
+          print('Processing declined invitation card: ${cardData['id']}');
+
+          final participants =
+              await _inviteService.getAcceptedParticipants(cardData['id']);
+
+          final card = CardModel.fromJson(cardData);
+          card.participants = participants;
+
+          cards.add(card);
+          print(
+              'Added declined invitation card with ${participants.length} participants');
+        }
+      }
+
+      print('Total declined invitation cards: ${cards.length}');
+      return cards;
+    } catch (e) {
+      print('Error getting declined invitation cards: $e');
       return [];
     }
   }

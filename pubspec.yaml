@@ -17,6 +17,7 @@ dependencies:
   flutter_bloc: ^9.0.0
   flutter_dotenv: ^5.2.1
   flutter_facebook_auth: ^7.1.1
+  flutter_local_notifications: ^19.2.1
   flutter_secure_storage: ^9.2.4
   fluttertoast: ^8.2.11
   google_sign_in: ^6.3.0

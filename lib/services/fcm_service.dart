@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'user_device_service.dart';
+import 'local_notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class FCMService {
@@ -22,6 +23,9 @@ class FCMService {
 
     try {
       print('Initializing FCM Service');
+
+      // Initialize local notifications first
+      await LocalNotificationService.initialize();
 
       // Check if Firebase is properly initialized
       if (!await _checkFirebaseInitialized()) {
@@ -63,7 +67,7 @@ class FCMService {
 
         // Handle background messages
         FirebaseMessaging.onBackgroundMessage(
-            _firebaseMessagingBackgroundHandler);
+            LocalNotificationService.firebaseMessagingBackgroundHandler);
 
         // Handle notification tap when app is in background
         FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -194,8 +198,8 @@ class FCMService {
     print('Body: ${message.notification?.body}');
     print('Data: ${message.data}');
 
-    // Here you can show a local notification or update UI
-    // For now, just print the message
+    // Show local notification using LocalNotificationService
+    LocalNotificationService.handleForegroundMessage(message);
   }
 
   // Handle notification tap
@@ -284,14 +288,4 @@ class FCMService {
 
   // Check if FCM is initialized
   bool get isInitialized => _isInitialized;
-}
-
-// Background message handler
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('Handling background message: ${message.notification?.title}');
-  print('Data: ${message.data}');
-
-  // This function must be top-level and annotated with @pragma('vm:entry-point')
-  // It will be called when the app is in the background
 }
