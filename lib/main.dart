@@ -1,6 +1,7 @@
 import 'package:enva/blocs/blocs.dart';
 import 'package:enva/models/models.dart';
 import 'package:enva/screens/screens.dart';
+import 'package:enva/theme/minimalist_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -8,6 +9,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'services/auth_listener_service.dart';
+import 'services/fcm_service.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,10 +25,27 @@ Future main() async {
   );
   await Hive.initFlutter();
   Hive.registerAdapter(CardModelAdapter());
-  Hive.registerAdapter(InviteModelAdapter());
   await Hive.openBox<CardModel>('cards');
-  await Hive.openBox<InviteModel>('invites');
+
+  // Initialize AuthListenerService to handle automatic profile creation
+  AuthListenerService.initialize();
+
+  // Initialize FCM Service for push notifications (async, non-blocking)
+  _initializeFCMAsync();
+
   runApp(const EnvaApp());
+}
+
+// Initialize FCM asynchronously without blocking app startup
+void _initializeFCMAsync() async {
+  try {
+    print('Starting FCM initialization...');
+    await FCMService().initialize();
+    print('FCM initialization completed successfully');
+  } catch (e) {
+    print('FCM initialization failed: $e');
+    // Don't crash the app if FCM fails to initialize
+  }
 }
 
 class EnvaApp extends StatelessWidget {
@@ -37,20 +57,18 @@ class EnvaApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => AuthBloc()),
         BlocProvider(create: (_) => ThemeCubit()..loadThemePreference()),
-        BlocProvider(create: (_) => LocaleCubit()),
       ],
       child: Builder(
         builder: (context) {
           final themeMode = context.watch<ThemeCubit>().state;
-          final locale = context.watch<LocaleCubit>().state.locale;
+
           return MaterialApp(
             title: 'Enva',
             debugShowCheckedModeBanner: false,
-            locale: locale,
 
-            theme: ThemeData.light(),
-            darkTheme: ThemeData.dark(),
-            themeMode: themeMode, // Áp dụng ThemeMode từ ThemeCubit
+            theme: MinimalistTheme.lightTheme,
+            darkTheme: MinimalistTheme.darkTheme,
+            themeMode: themeMode, // Supports light/dark/system modes
             home: const AuthWrapper(),
           );
         },

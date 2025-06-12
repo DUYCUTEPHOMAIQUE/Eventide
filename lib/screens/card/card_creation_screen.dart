@@ -1,810 +1,417 @@
-import 'dart:io';
 import 'dart:ui';
-
-import 'package:enva/blocs/blocs.dart';
-import 'package:enva/screens/card/card_preview_screen.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:enva/screens/card/widgets/card_preview_component.dart';
+import 'package:provider/provider.dart';
+import 'package:enva/viewmodels/card_creation_viewmodel.dart';
+import 'package:enva/widgets/custom_text_field.dart';
+import 'package:enva/widgets/location_picker.dart';
 
 class CardCreationScreen extends StatelessWidget {
-  const CardCreationScreen({super.key});
+  const CardCreationScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CardCreationBloc(),
+    return ChangeNotifierProvider(
+      create: (context) => CardCreationViewModel(),
       child: const _CardCreationView(),
     );
   }
 }
 
-class _CardCreationView extends StatelessWidget {
+class _CardCreationView extends StatefulWidget {
   const _CardCreationView();
 
   @override
+  State<_CardCreationView> createState() => _CardCreationViewState();
+}
+
+class _CardCreationViewState extends State<_CardCreationView> {
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CardCreationBloc, CardCreationState>(
-      builder: (context, state) {
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light.copyWith(
-            statusBarColor: Colors.transparent,
-            systemNavigationBarColor: Colors.black,
-          ),
-          child: Scaffold(
-            backgroundColor: Colors.black,
-            extendBodyBehindAppBar: true,
-            body: _buildBody(context, state),
-          ),
+    return Consumer<CardCreationViewModel>(
+      builder: (context, viewModel, child) {
+        return Scaffold(
+          backgroundColor: Colors.black,
+          appBar: _buildAppBar(context),
+          body: _buildBody(context, viewModel),
         );
       },
     );
   }
 
-  Widget _buildBody(BuildContext context, CardCreationState state) {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: const Text(
+        'Create Card',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      centerTitle: true,
+    );
+  }
+
+  Widget _buildBody(BuildContext context, CardCreationViewModel viewModel) {
     return Stack(
       children: [
-        _buildBackgroundLayer(context, state),
-        SafeArea(
-          child: Column(
-            children: [
-              _buildAppBar(context, state),
-              Expanded(
-                child: _buildContentArea(context, state),
-              ),
+        _buildBackground(context, viewModel),
+        _buildContent(context, viewModel),
+        if (viewModel.isCreatingCard) _buildLoadingOverlay(viewModel),
+      ],
+    );
+  }
+
+  Widget _buildBackground(
+      BuildContext context, CardCreationViewModel viewModel) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.4,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: _getBackgroundImage(viewModel),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.transparent,
+              Colors.black.withOpacity(0.7),
             ],
           ),
         ),
-        if (state.status == CardCreationStatus.loading)
-          _buildLoadingOverlay(context),
-      ],
+      ),
     );
   }
 
-  Widget _buildLoadingOverlay(BuildContext context) {
-    return Container(
-      color: Colors.black.withOpacity(0.5),
-      child: const Center(
-        child: CircularProgressIndicator(
-          color: Colors.white,
+  ImageProvider _getBackgroundImage(CardCreationViewModel viewModel) {
+    // Priority: File -> Default asset
+    if (viewModel.backgroundImageFile != null) {
+      return FileImage(viewModel.backgroundImageFile!);
+    } else {
+      return const AssetImage('assets/frieren.jpg');
+    }
+  }
+
+  Widget _buildContent(BuildContext context, CardCreationViewModel viewModel) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+          _buildFormCard(context, viewModel),
+          const SizedBox(height: 20),
+          _buildCreateButton(context, viewModel),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormCard(BuildContext context, CardCreationViewModel viewModel) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+          ),
+          child: Column(
+            children: [
+              // Title field
+              CustomTextField(
+                label: 'Title',
+                value: viewModel.title,
+                onChanged: (value) {
+                  viewModel.setTitle(value);
+                  _titleController.value =
+                      _titleController.value.copyWith(text: value);
+                },
+                hintText: 'Enter event title',
+              ),
+              const SizedBox(height: 16),
+
+              // Description field
+              CustomTextField(
+                label: 'Description',
+                value: viewModel.description,
+                onChanged: (value) {
+                  viewModel.setDescription(value);
+                  _descriptionController.value =
+                      _descriptionController.value.copyWith(text: value);
+                },
+                maxLines: 3,
+                hintText: 'Enter event description',
+              ),
+              const SizedBox(height: 20),
+
+              // Location field with map picker
+              LocationPickerWidget(
+                location: viewModel.location,
+                selectedLocation: viewModel.selectedLocation,
+                onLocationChanged: viewModel.setLocation,
+                onLocationSelected: viewModel.setSelectedLocation,
+                onGetCurrentLocation: viewModel.getCurrentLocation,
+              ),
+              const SizedBox(height: 20),
+
+              // Background Image Section
+              _buildImagePickerSection(
+                context,
+                title: 'Background Image',
+                imageFile: viewModel.backgroundImageFile,
+                onPickImage: () => viewModel.pickBackgroundImage(context),
+                onRemoveImage: viewModel.removeBackgroundImage,
+              ),
+              const SizedBox(height: 20),
+
+              // Card Image Section
+              _buildImagePickerSection(
+                context,
+                title: 'Card Image',
+                imageFile: viewModel.cardImageFile,
+                onPickImage: () => viewModel.pickCardImage(context),
+                onRemoveImage: viewModel.removeCardImage,
+              ),
+
+              // Error message
+              if (viewModel.errorMessage != null &&
+                  viewModel.errorMessage!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _buildErrorMessage(viewModel),
+              ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildBackgroundLayer(BuildContext context, CardCreationState state) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final double headerHeight = screenSize.height * 0.4;
-
-    return Stack(
+  Widget _buildImagePickerSection(
+    BuildContext context, {
+    required String title,
+    required File? imageFile,
+    required VoidCallback onPickImage,
+    required VoidCallback onRemoveImage,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: headerHeight,
-          width: double.infinity,
-          child: state.backgroundImage != null
-              ? Image.file(
-                  state.backgroundImage!,
-                  fit: BoxFit.cover,
-                )
-              : Image.asset(
-                  'assets/frieren.jpg',
-                  fit: BoxFit.cover,
-                ),
-        ),
-        Positioned(
-          top: headerHeight - 40,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: ClipRRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.2),
-                      Colors.black.withOpacity(0.6),
-                    ],
-                    stops: const [0.0, 0.3, 1.0],
-                  ),
-                ),
-              ),
-            ),
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
         ),
+        const SizedBox(height: 8),
         Container(
-          height: double.infinity,
+          height: 120,
           width: double.infinity,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                Colors.black.withOpacity(0.1),
-                Colors.black.withOpacity(0.4),
-                Colors.black.withOpacity(0.7),
-              ],
-              stops: const [0.0, 0.4, 0.7, 0.9],
-            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withOpacity(0.3)),
+            color: Colors.white.withOpacity(0.05),
           ),
+          child: imageFile != null
+              ? Stack(
+                  children: [
+                    // Image display
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        imageFile,
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+
+                    // Remove button
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: GestureDetector(
+                        onTap: onRemoveImage,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : InkWell(
+                  onTap: onPickImage,
+                  child: const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.add_photo_alternate,
+                          size: 32,
+                          color: Colors.white54,
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Tap to select image',
+                          style: TextStyle(
+                            color: Colors.white54,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
         ),
       ],
     );
   }
 
-  Widget _buildSelectBackgroundButton(
-      BuildContext context, CardCreationState state) {
-    return ElevatedButton.icon(
-      onPressed: () => context.read<CardCreationBloc>().pickBackgroundImage(),
-      icon: Icon(
-        state.backgroundImage == null ? Icons.add_photo_alternate : Icons.edit,
-        color: Colors.white,
-        size: 20,
+  Widget _buildErrorMessage(CardCreationViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.red.withOpacity(0.3)),
       ),
-      label: Text(
-        state.backgroundImage == null
-            ? 'Select Background'
-            : 'Change Background',
-        style: GoogleFonts.poppins(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black.withOpacity(0.5),
-        foregroundColor: Colors.white,
-        elevation: 4,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.white.withOpacity(0.2)),
-        ),
-        shadowColor: Colors.black.withOpacity(0.3),
-      ),
-    );
-  }
-
-  Widget _buildAppBar(BuildContext context, CardCreationState state) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildIconButton(
-            context: context,
-            icon: Icons.close,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.visibility, size: 18),
-            label: Text(
-              'Preview',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-              ),
+          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              viewModel.errorMessage ?? '',
+              style: const TextStyle(color: Colors.red, fontSize: 14),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CardPreviewScreen(state: state),
-                ),
-              );
-            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildIconButton({
-    required BuildContext context,
-    required IconData icon,
-    required VoidCallback onPressed,
-    double size = 36,
-  }) {
-    return Container(
-      height: size,
-      width: size,
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.4),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
-      ),
-      child: IconButton(
-        padding: EdgeInsets.zero,
-        icon: Icon(icon, color: Colors.white, size: size * 0.5),
-        onPressed: onPressed,
-        iconSize: size * 0.5,
-        splashRadius: size * 0.5,
-      ),
-    );
-  }
-
-  Widget _buildContentArea(BuildContext context, CardCreationState state) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          const SizedBox(height: 80),
-          _buildSelectBackgroundButton(context, state),
-          const SizedBox(height: 40),
-          _buildCard(
-            child: _buildEventDetailsBlock(context, state),
-          ),
-          const SizedBox(height: 20),
-          _buildCard(
-            child: _buildHostBlock(context, state),
-          ),
-          const SizedBox(height: 20),
-          _buildCard(
-            child: _buildMemoriesBlock(context, state),
-          ),
-          const SizedBox(height: 20),
-          _buildCreateButton(context),
-          const SizedBox(height: 30),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCard({required Widget child}) {
-    return Container(
+  Widget _buildCreateButton(
+      BuildContext context, CardCreationViewModel viewModel) {
+    return SizedBox(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+      height: 50,
+      child: ElevatedButton(
+        onPressed: viewModel.isFormValid && !viewModel.isCreatingCard
+            ? () => _handleCreateCard(context, viewModel)
+            : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: viewModel.isFormValid
+              ? Colors.blue
+              : Colors.grey.withOpacity(0.3),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
-      ),
-      child: child,
-    );
-  }
-
-  Widget _buildEventDetailsBlock(
-      BuildContext context, CardCreationState state) {
-    final cardBloc = context.read<CardCreationBloc>();
-
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
-            ),
-            child: Center(
-              child: state.isPreviewMode
-                  ? Text(
-                      state.title.isEmpty ? 'Event Title' : state.title,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                      textAlign: TextAlign.center,
-                    )
-                  : TextField(
-                      onChanged: (value) => cardBloc.add(TitleChanged(value)),
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        hintText: 'Event Title',
-                        hintStyle: GoogleFonts.poppins(
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 24,
-                        ),
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildInfoListTile(
-            context: context,
-            icon: Icons.calendar_today_rounded,
-            title: 'Date & Time',
-            value: state.formattedDateTime,
-            onTap: state.isPreviewMode
-                ? null
-                : () async {
-                    final DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: state.dateTime ??
-                          DateTime.now().add(const Duration(days: 1)),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 365)),
-                      builder: (context, child) => Theme(
-                        data: ThemeData.dark().copyWith(
-                          colorScheme: ColorScheme.dark(
-                            primary: Theme.of(context).primaryColor,
-                            surface: const Color(0xFF202020),
-                          ),
-                          dialogBackgroundColor: const Color(0xFF121212),
-                        ),
-                        child: child!,
-                      ),
-                    );
-
-                    if (pickedDate != null) {
-                      final TimeOfDay? pickedTime = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                        builder: (context, child) => Theme(
-                          data: ThemeData.dark().copyWith(
-                            colorScheme: ColorScheme.dark(
-                              primary: Theme.of(context).primaryColor,
-                              surface: const Color(0xFF202020),
-                            ),
-                            dialogBackgroundColor: const Color(0xFF121212),
-                          ),
-                          child: child!,
-                        ),
-                      );
-
-                      if (context.mounted) {
-                        cardBloc.selectDateTime(pickedDate, pickedTime);
-                      }
-                    }
-                  },
-          ),
-          const SizedBox(height: 12),
-          _buildInfoListTile(
-            context: context,
-            icon: Icons.location_on_rounded,
-            title: 'Location',
-            value: state.location.isEmpty ? 'Add Location' : state.location,
-            onTap: state.isPreviewMode
-                ? null
-                : () async {
-                    final TextEditingController locationController =
-                        TextEditingController(text: state.location);
-
-                    await showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        backgroundColor: const Color(0xFF202020),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        title: Text(
-                          'Event Location',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        content: TextField(
-                          controller: locationController,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: 'Enter location',
-                            hintStyle:
-                                TextStyle(color: Colors.white.withOpacity(0.6)),
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white38),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Theme.of(context).primaryColor),
-                            ),
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              'CANCEL',
-                              style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7)),
-                            ),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onPressed: () {
-                              if (locationController.text.isNotEmpty) {
-                                cardBloc.add(
-                                    LocationChanged(locationController.text));
-                              }
-                              Navigator.pop(context);
-                            },
-                            child: const Text('SAVE'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoListTile({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required String value,
-    VoidCallback? onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          elevation: 0,
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    value,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (onTap != null)
-              Icon(
-                Icons.chevron_right_rounded,
-                color: Colors.white.withOpacity(0.7),
-                size: 20,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHostBlock(BuildContext context, CardCreationState state) {
-    final cardBloc = context.read<CardCreationBloc>();
-
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Theme.of(context).primaryColor.withOpacity(0.7),
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).primaryColor.withOpacity(0.2),
-                  blurRadius: 15,
-                  spreadRadius: 2,
+        child: viewModel.isCreatingCard
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
-              ],
-            ),
-            child: const CircleAvatar(
-              radius: 40,
-              backgroundImage: NetworkImage(
-                  'https://source.unsplash.com/random/100x100?face'),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Hosted by Andre Lorico',
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
-            ),
-            child: state.isPreviewMode
-                ? Text(
-                    state.description.isEmpty
-                        ? 'No description provided'
-                        : state.description,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 15,
-                      height: 1.5,
-                    ),
-                  )
-                : TextField(
-                    onChanged: (value) =>
-                        cardBloc.add(DescriptionChanged(value)),
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 15,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      hintText: 'Add a description for your event...',
-                      hintStyle: GoogleFonts.poppins(
-                        color: Colors.white.withOpacity(0.5),
-                        fontSize: 15,
-                      ),
-                      border: InputBorder.none,
-                    ),
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMemoriesBlock(BuildContext context, CardCreationState state) {
-    final cardBloc = context.read<CardCreationBloc>();
-
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.photo_library,
-                    color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Memories',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 18,
+              )
+            : const Text(
+                'Create Card',
+                style: TextStyle(
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const Spacer(),
-              if (!state.isPreviewMode)
-                _buildAddPhotoButton(context,
-                    onTap: () => cardBloc.pickMemoryImage()),
-            ],
-          ),
-          const SizedBox(height: 20),
-          if (state.memoryImages.isEmpty)
-            _buildEmptyMemoriesState(
-                onTap: !state.isPreviewMode
-                    ? () => cardBloc.pickMemoryImage()
-                    : null)
-          else
-            _buildMemoriesGrid(state.memoryImages),
-        ],
       ),
     );
   }
 
-  Widget _buildAddPhotoButton(BuildContext context,
-      {required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(30),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.add_photo_alternate,
-                color: Colors.white, size: 16),
-            const SizedBox(width: 6),
-            Text(
-              'Add',
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyMemoriesState({VoidCallback? onTap}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 5,
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Icon(
-              Icons.photo_library_outlined,
-              size: 48,
-              color: Colors.white.withOpacity(0.6),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Add photos to remember your event',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                color: Colors.white.withOpacity(0.7),
-                fontSize: 16,
-              ),
-            ),
-            if (onTap != null) ...[
-              const SizedBox(height: 24),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: Colors.white.withOpacity(0.3)),
-                ),
-                child: Text(
-                  '+ Add Photos',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMemoriesGrid(List<File> images) {
-    return GridView.builder(
-      shrinkWrap: true,
-      padding: EdgeInsets.zero,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
-      itemCount: images.length,
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 5.0,
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.file(
-              images[index],
-              fit: BoxFit.cover,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildCreateButton(BuildContext context) {
+  Widget _buildLoadingOverlay(CardCreationViewModel viewModel) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.only(top: 10),
-      child: ElevatedButton(
-        onPressed: () {
-          context.read<CardCreationBloc>().add(const SubmitCard());
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).primaryColor,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 10,
-          shadowColor: Theme.of(context).primaryColor.withOpacity(0.5),
-        ),
-        child: Text(
-          'Create Invitation',
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+      color: Colors.black.withOpacity(0.8),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          margin: const EdgeInsets.symmetric(horizontal: 32),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 3,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                viewModel.progressMessage,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _handleCreateCard(
+      BuildContext context, CardCreationViewModel viewModel) async {
+    final success = await viewModel.createCard();
+    if (success && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Card created successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pop(context, true); // Return true to indicate success
+    }
   }
 }

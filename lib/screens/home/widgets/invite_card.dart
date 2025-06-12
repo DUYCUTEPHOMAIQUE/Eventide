@@ -30,9 +30,12 @@ class InviteCard extends StatelessWidget {
         image: DecorationImage(
           image: card.backgroundImageUrl == 'default'
               ? AssetImage(
-                  'assets/default_background.jpg') // Ảnh mặc định nếu không có backgroundImageUrl
+                  'assets/frieren.jpg') // Ảnh mặc định nếu không có backgroundImageUrl
               : NetworkImage(card.backgroundImageUrl) as ImageProvider,
           fit: BoxFit.cover,
+          onError: (error, stackTrace) {
+            // Handle network image error silently
+          },
           colorFilter: ColorFilter.mode(
             Colors.black.withOpacity(0.3), // Lớp phủ tối để chữ dễ đọc
             BlendMode.dstATop,

@@ -1,38 +1,85 @@
-import 'package:equatable/equatable.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-
-part 'invite_model.g.dart';
-
-@HiveType(typeId: 1)
-class InviteModel extends HiveObject with EquatableMixin {
-  @HiveField(0)
-  final String id = '';
-  @HiveField(1)
+class InviteModel {
+  final String id;
   final String cardId;
-  @HiveField(2)
   final String senderId;
-  @HiveField(3)
   final String receiverId;
-  @HiveField(4)
-  final String status = 'pending';
-  @HiveField(5)
-  final String sent_at = DateTime.now().toIso8601String();
-  @HiveField(6)
-  final String expired_at = '';
-  @HiveField(7)
-  final String accepted_at = '';
+  final String status; // pending, accepted, declined, cancelled, undecided
+  final DateTime sentAt;
 
   InviteModel({
+    required this.id,
     required this.cardId,
     required this.senderId,
     required this.receiverId,
+    required this.status,
+    required this.sentAt,
   });
+
+  factory InviteModel.fromJson(Map<String, dynamic> json) {
+    return InviteModel(
+      id: json['id'] ?? '',
+      cardId: json['card_id'] ?? '',
+      senderId: json['sender_id'] ?? '',
+      receiverId: json['receiver_id'] ?? '',
+      status: json['status'] ?? 'pending',
+      sentAt:
+          DateTime.parse(json['sent_at'] ?? DateTime.now().toIso8601String()),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'card_id': cardId,
+      'sender_id': senderId,
+      'receiver_id': receiverId,
+      'status': status,
+      'sent_at': sentAt.toIso8601String(),
+    };
+  }
+
+  InviteModel copyWith({
+    String? id,
+    String? cardId,
+    String? senderId,
+    String? receiverId,
+    String? status,
+    DateTime? sentAt,
+  }) {
+    return InviteModel(
+      id: id ?? this.id,
+      cardId: cardId ?? this.cardId,
+      senderId: senderId ?? this.senderId,
+      receiverId: receiverId ?? this.receiverId,
+      status: status ?? this.status,
+      sentAt: sentAt ?? this.sentAt,
+    );
+  }
+
   @override
-  // TODO: implement props
-  List<Object?> get props => <Object?>[
-        id,
-        cardId,
-        senderId,
-        receiverId,
-      ];
+  String toString() {
+    return 'InviteModel(id: $id, cardId: $cardId, senderId: $senderId, receiverId: $receiverId, status: $status, sentAt: $sentAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is InviteModel &&
+        other.id == id &&
+        other.cardId == cardId &&
+        other.senderId == senderId &&
+        other.receiverId == receiverId &&
+        other.status == status &&
+        other.sentAt == sentAt;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        cardId.hashCode ^
+        senderId.hashCode ^
+        receiverId.hashCode ^
+        status.hashCode ^
+        sentAt.hashCode;
+  }
 }

@@ -21,6 +21,17 @@ class AuthSuccess extends AuthState {
   List<Object?> get props => [user];
 }
 
+class AuthSignUpSuccess extends AuthState {
+  final User user;
+
+  const AuthSignUpSuccess(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}
+
+class AuthOTPResent extends AuthState {}
+
 class AuthError extends AuthState {
   final String message;
 

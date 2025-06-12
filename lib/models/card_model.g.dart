@@ -21,13 +21,19 @@ class CardModelAdapter extends TypeAdapter<CardModel> {
       description: fields[2] as String,
       imageUserUrl: fields[3] as String,
       ownerId: fields[4] as String,
+      imageUrl: fields[8] as String,
+      backgroundImageUrl: fields[5] as String,
+      location: fields[6] as String,
+      latitude: fields[9] as double?,
+      longitude: fields[10] as double?,
+      eventDateTime: fields[11] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, CardModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -43,7 +49,15 @@ class CardModelAdapter extends TypeAdapter<CardModel> {
       ..writeByte(6)
       ..write(obj.location)
       ..writeByte(7)
-      ..write(obj.created_at);
+      ..write(obj.created_at)
+      ..writeByte(8)
+      ..write(obj.imageUrl)
+      ..writeByte(9)
+      ..write(obj.latitude)
+      ..writeByte(10)
+      ..write(obj.longitude)
+      ..writeByte(11)
+      ..write(obj.eventDateTime);
   }
 
   @override
