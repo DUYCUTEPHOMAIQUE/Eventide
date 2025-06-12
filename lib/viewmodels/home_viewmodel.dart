@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import '../services/supabase_service.dart';
+import '../services/card_service.dart';
 import '../models/card_model.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  final SupabaseService _supabaseService = SupabaseService();
+  final CardService _cardService = CardService();
 
   // State
   List<CardModel> _cards = [];
@@ -45,16 +45,12 @@ class HomeViewModel extends ChangeNotifier {
   Future<void> loadCards() async {
     _setLoading(true);
     _clearError();
-    _setProgress('');
+    _setProgress('Đang tải danh sách thẻ...');
 
     try {
-      final cards = await _supabaseService.getAllCardForUser(
-        onProgress: (message) {
-          _setProgress(message);
-        },
-      );
-
+      final cards = await _cardService.getAllCards();
       _cards = cards;
+      _setProgress('Đã tải thành công ${cards.length} thẻ');
     } catch (e) {
       _setError('Không thể tải danh sách thẻ: $e');
     } finally {

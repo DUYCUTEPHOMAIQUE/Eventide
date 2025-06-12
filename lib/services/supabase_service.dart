@@ -102,30 +102,17 @@ class SupabaseService {
         return false;
       }
 
-      final newCard = CardModel(
-        title: title,
-        description: description,
-        imageUserUrl: user.userMetadata?['avatar_url'] ?? '',
-        ownerId: user.id,
-        imageUrl: cardImageUrl ?? '',
-        backgroundImageUrl: backgroundImageUrl ?? 'default',
-        location: location ?? '',
-        latitude: latitude,
-        longitude: longitude,
-        eventDateTime: eventDateTime,
-      );
-
       final response = await _supabase
           .from('cards')
           .insert({
-            'title': newCard.title,
-            'description': newCard.description,
-            'owner_id': newCard.ownerId,
-            'background_image_url': newCard.backgroundImageUrl,
-            'location': newCard.location,
-            'latitude': newCard.latitude,
-            'longitude': newCard.longitude,
-            'image_url': newCard.imageUrl,
+            'title': title,
+            'description': description,
+            'owner_id': user.id,
+            'background_image_url': backgroundImageUrl ?? 'default',
+            'location': location ?? '',
+            'latitude': latitude,
+            'longitude': longitude,
+            'image_url': cardImageUrl ?? '',
             'event_date_time': eventDateTime?.toIso8601String(),
             'created_at': DateTime.now().toIso8601String(),
           })
@@ -133,6 +120,21 @@ class SupabaseService {
           .single();
 
       if (response != null) {
+        // Create CardModel with the ID from response
+        final newCard = CardModel(
+          id: response['id'],
+          title: title,
+          description: description,
+          imageUserUrl: user.userMetadata?['avatar_url'] ?? '',
+          ownerId: user.id,
+          imageUrl: cardImageUrl ?? '',
+          backgroundImageUrl: backgroundImageUrl ?? 'default',
+          location: location ?? '',
+          latitude: latitude,
+          longitude: longitude,
+          eventDateTime: eventDateTime,
+        );
+
         onProgress('Đã tạo thẻ thành công!');
         return true;
       } else {

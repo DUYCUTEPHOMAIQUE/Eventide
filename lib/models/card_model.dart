@@ -7,7 +7,7 @@ part 'card_model.g.dart';
 @HiveType(typeId: 0)
 class CardModel extends HiveObject with EquatableMixin {
   @HiveField(0)
-  final String id = '';
+  final String id;
   @HiveField(1)
   final String title;
   @HiveField(2)
@@ -34,6 +34,7 @@ class CardModel extends HiveObject with EquatableMixin {
   List<UserModel> participants = [];
 
   CardModel({
+    required this.id,
     required this.title,
     required this.description,
     this.imageUserUrl = '',
@@ -65,6 +66,7 @@ class CardModel extends HiveObject with EquatableMixin {
     }
 
     return CardModel(
+      id: json['id'],
       title: json['title'],
       description: json['description'],
       imageUserUrl: json['image_user_url'] ?? '',
@@ -83,6 +85,7 @@ class CardModel extends HiveObject with EquatableMixin {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'title': title,
       'description': description,
       'image_user_url': imageUserUrl ?? '',
@@ -99,6 +102,7 @@ class CardModel extends HiveObject with EquatableMixin {
   }
 
   CardModel copyWith({
+    String? id,
     String? title,
     String? description,
     String? imageUserUrl,
@@ -111,6 +115,7 @@ class CardModel extends HiveObject with EquatableMixin {
     List<UserModel>? participants,
   }) {
     return CardModel(
+      id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
       imageUserUrl: imageUserUrl ?? this.imageUserUrl,

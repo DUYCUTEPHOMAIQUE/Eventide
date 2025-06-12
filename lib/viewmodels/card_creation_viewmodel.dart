@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import '../services/supabase_service.dart';
+import '../services/card_service.dart';
 import '../services/image_picker_service.dart';
+import '../services/cloudinary_service.dart';
+import '../services/supabase_services.dart';
 
 class CardCreationViewModel extends ChangeNotifier {
-  final SupabaseService _supabaseService = SupabaseService();
+  final CardService _cardService = CardService();
+  final CloudinaryService _cloudinaryService = CloudinaryService();
 
   // Form fields
   String _title = '';
@@ -226,7 +229,7 @@ class CardCreationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Create card method - calls SupabaseService
+  // Create card method - calls CardService
   Future<bool> createCard() async {
     if (!isFormValid) {
       _setError('Vui lòng điền đầy đủ thông tin');
@@ -239,21 +242,64 @@ class CardCreationViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final success = await _supabaseService.createCard(
+      // Get current user
+      final currentUser = SupabaseServices.client.auth.currentUser;
+      if (currentUser == null) {
+        _setError('Bạn chưa đăng nhập');
+        return false;
+      }
+
+      String? backgroundImageUrl;
+      String? cardImageUrl;
+
+      // Step 1: Upload background image if provided
+      if (_backgroundImageFile != null) {
+        _setProgress('Đang upload ảnh nền...');
+        backgroundImageUrl = await _cloudinaryService.uploadImageToCloudinary(
+          _backgroundImageFile!,
+          folder: 'card_backgrounds',
+        );
+
+        if (backgroundImageUrl != null) {
+          _setProgress('Đã upload ảnh nền thành công');
+        } else {
+          _setError('Lỗi upload ảnh nền');
+          return false;
+        }
+      }
+
+      // Step 2: Upload card image if provided
+      if (_cardImageFile != null) {
+        _setProgress('Đang upload ảnh kỷ niệm...');
+        cardImageUrl = await _cloudinaryService.uploadImageToCloudinary(
+          _cardImageFile!,
+          folder: 'card_images',
+        );
+
+        if (cardImageUrl != null) {
+          _setProgress('Đã upload ảnh kỷ niệm thành công');
+        } else {
+          _setError('Lỗi upload ảnh kỷ niệm');
+          return false;
+        }
+      }
+
+      // Step 3: Create card using CardService
+      _setProgress('Đang tạo thẻ...');
+      final card = await _cardService.createCard(
         title: _title,
         description: _description,
+        ownerId: currentUser.id,
+        imageUrl: cardImageUrl,
+        backgroundImageUrl: backgroundImageUrl,
         location: _location,
         latitude: _selectedLocation?.latitude,
         longitude: _selectedLocation?.longitude,
         eventDateTime: _eventDateTime,
-        backgroundImageFile: _backgroundImageFile,
-        cardImageFile: _cardImageFile,
-        onProgress: (message) {
-          _setProgress(message);
-        },
       );
 
-      if (success) {
+      if (card != null) {
+        _setProgress('Đã tạo thẻ thành công!');
         // Reset form after successful creation
         _resetForm();
         return true;

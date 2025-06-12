@@ -177,6 +177,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         return;
       }
 
+      // Debug: Check card ID
+      final cardId = widget.card.id;
+      print('Card ID from widget: "$cardId"');
+      print('Card ID length: ${cardId.length}');
+      print('Card ID is empty: ${cardId.isEmpty}');
+
+      if (cardId.isEmpty) {
+        print('Card ID is empty, cannot send invites');
+        _showErrorSnackBar('Lỗi: Không tìm thấy thông tin sự kiện');
+        return;
+      }
+
       print('Current user: ${currentUser.id}');
       print('Sending invites to ${_selectedUsers.length} users');
 
@@ -184,7 +196,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       print('Receiver IDs: $receiverIds');
 
       final success = await _inviteService.sendMultipleInvites(
-        cardId: widget.card.id,
+        cardId: cardId,
         senderId: currentUser.id,
         receiverIds: receiverIds,
       );
@@ -199,7 +211,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
         // Refresh card data
         print('Refreshing card data');
-        final updatedCard = await _cardService.getCardById(widget.card.id);
+        final updatedCard = await _cardService.getCardById(cardId);
         if (updatedCard != null) {
           setState(() {
             _currentCard = updatedCard;
