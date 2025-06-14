@@ -155,6 +155,67 @@ class InviteService {
       print(
           'Sending invite - Card: $cardId, Sender: $senderId, Receiver: $receiverId');
 
+      // Check if user is already invited
+      final isAlreadyInvited = await isUserInvited(
+        cardId: cardId,
+        userId: receiverId,
+      );
+
+      if (isAlreadyInvited) {
+        print(
+            'User $receiverId is already invited to card $cardId, only sending notification');
+
+        // Get sender profile for notification
+        UserModel? senderProfile;
+        try {
+          final senderResponse = await _supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', senderId)
+              .single();
+
+          if (senderResponse != null) {
+            senderProfile = UserModel.fromJson(senderResponse);
+            print(
+                'Sender profile: ${senderProfile.displayName ?? senderProfile.email}');
+          }
+        } catch (e) {
+          print('Error getting sender profile: $e');
+        }
+
+        // Get card title for notification
+        String cardTitle = 'Sự kiện';
+        try {
+          final cardResponse = await _supabase
+              .from('cards')
+              .select('title')
+              .eq('id', cardId)
+              .single();
+
+          if (cardResponse != null) {
+            cardTitle = cardResponse['title'] ?? 'Sự kiện';
+            print('Card title: $cardTitle');
+          }
+        } catch (e) {
+          print('Error getting card title: $e');
+        }
+
+        // Send push notification only
+        final senderName =
+            senderProfile?.displayName ?? senderProfile?.email ?? 'Người dùng';
+        final notificationSuccess =
+            await _notificationService.sendInviteNotification(
+          receiverId: receiverId,
+          senderName: senderName,
+          cardTitle: cardTitle,
+          cardId: cardId,
+        );
+
+        print(
+            'Notification sent for already invited user: $notificationSuccess');
+        return true; // Return true since notification was sent
+      }
+
       // Get sender profile for notification
       UserModel? senderProfile;
       try {
@@ -274,44 +335,89 @@ class InviteService {
         print('Error getting card title: $e');
       }
 
-      final invites = receiverIds
-          .map((receiverId) => {
-                'card_id': cardId,
-                'sender_id': senderId,
-                'receiver_id': receiverId,
-                'status': 'pending',
-                'sent_at': DateTime.now().toIso8601String(),
-              })
-          .toList();
+      // Separate already invited users from new users
+      List<String> alreadyInvitedUsers = [];
+      List<String> newUsers = [];
 
-      print('Invites to send: $invites');
+      for (String receiverId in receiverIds) {
+        final isAlreadyInvited = await isUserInvited(
+          cardId: cardId,
+          userId: receiverId,
+        );
 
-      final response = await _supabase.from('invites').insert(invites).select();
+        if (isAlreadyInvited) {
+          alreadyInvitedUsers.add(receiverId);
+          print('User $receiverId is already invited to card $cardId');
+        } else {
+          newUsers.add(receiverId);
+          print('User $receiverId is new, will be invited');
+        }
+      }
 
-      print('Send multiple invites response: $response');
-
-      final success = response != null && response.isNotEmpty;
-
-      if (success) {
-        print('Multiple invites sent successfully, sending notifications...');
-
-        // Send push notifications to all receivers
+      // Send notifications to already invited users
+      if (alreadyInvitedUsers.isNotEmpty) {
+        print(
+            'Sending notifications to ${alreadyInvitedUsers.length} already invited users');
         final senderName =
             senderProfile?.displayName ?? senderProfile?.email ?? 'Người dùng';
         final notificationSuccess =
             await _notificationService.sendInviteNotifications(
-          receiverIds: receiverIds,
+          receiverIds: alreadyInvitedUsers,
           senderName: senderName,
           cardTitle: cardTitle,
           cardId: cardId,
         );
-
-        print('Notifications sent: $notificationSuccess');
-      } else {
-        print('Failed to send multiple invites');
+        print(
+            'Notifications sent to already invited users: $notificationSuccess');
       }
 
-      return success;
+      // Insert new invites into database
+      if (newUsers.isNotEmpty) {
+        final invites = newUsers
+            .map((receiverId) => {
+                  'card_id': cardId,
+                  'sender_id': senderId,
+                  'receiver_id': receiverId,
+                  'status': 'pending',
+                  'sent_at': DateTime.now().toIso8601String(),
+                })
+            .toList();
+
+        print('Invites to send for new users: $invites');
+
+        final response =
+            await _supabase.from('invites').insert(invites).select();
+
+        print('Send multiple invites response: $response');
+
+        final success = response != null && response.isNotEmpty;
+
+        if (success) {
+          print('New invites sent successfully, sending notifications...');
+
+          // Send push notifications to new users
+          final senderName = senderProfile?.displayName ??
+              senderProfile?.email ??
+              'Người dùng';
+          final notificationSuccess =
+              await _notificationService.sendInviteNotifications(
+            receiverIds: newUsers,
+            senderName: senderName,
+            cardTitle: cardTitle,
+            cardId: cardId,
+          );
+
+          print('Notifications sent to new users: $notificationSuccess');
+        } else {
+          print('Failed to send new invites');
+          return false;
+        }
+      } else {
+        print(
+            'No new users to invite, only sent notifications to already invited users');
+      }
+
+      return true; // Return true if we processed all users (either sent invites or notifications)
     } catch (e) {
       print('Error sending multiple invites: $e');
       return false;

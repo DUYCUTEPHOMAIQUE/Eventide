@@ -1,5 +1,4 @@
 import 'package:enva/screens/home/enhanced_minimalist_home_screen.dart';
-import 'package:enva/screens/home/minimalist_home_screen.dart';
 import 'package:enva/screens/auth/minimalist_dashboard_screen.dart';
 import 'package:enva/screens/auth/complete_profile_screen.dart';
 import 'package:flutter/material.dart';

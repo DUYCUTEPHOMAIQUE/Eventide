@@ -32,6 +32,8 @@ class CardModel extends HiveObject with EquatableMixin {
   DateTime? eventDateTime;
   // Not using Hive for participants as it contains UserModel objects
   List<UserModel> participants = [];
+  // Not using Hive for invite status as it's only used for display
+  String? inviteStatus;
 
   CardModel({
     required this.id,
@@ -46,6 +48,7 @@ class CardModel extends HiveObject with EquatableMixin {
     this.longitude,
     this.eventDateTime,
     this.participants = const [],
+    this.inviteStatus,
   });
 
   @override
@@ -80,6 +83,7 @@ class CardModel extends HiveObject with EquatableMixin {
           ? DateTime.parse(json['event_date_time'])
           : null,
       participants: participants,
+      inviteStatus: json['invite_status'],
     );
   }
 
@@ -98,6 +102,7 @@ class CardModel extends HiveObject with EquatableMixin {
       'image_url': imageUrl,
       'event_date_time': eventDateTime?.toIso8601String(),
       'participants': participants.map((p) => p.toJson()).toList(),
+      'invite_status': inviteStatus,
     };
   }
 
@@ -113,6 +118,7 @@ class CardModel extends HiveObject with EquatableMixin {
     double? longitude,
     DateTime? eventDateTime,
     List<UserModel>? participants,
+    String? inviteStatus,
   }) {
     return CardModel(
       id: id ?? this.id,
@@ -127,6 +133,7 @@ class CardModel extends HiveObject with EquatableMixin {
       longitude: longitude ?? this.longitude,
       eventDateTime: eventDateTime ?? this.eventDateTime,
       participants: participants ?? this.participants,
+      inviteStatus: inviteStatus ?? this.inviteStatus,
     );
   }
 

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../models/card_model.dart';
 import '../models/user_model.dart';
 import '../services/card_service.dart';
 import '../services/invite_service.dart';
 import '../services/supabase_services.dart';
+import '../services/map_service.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final CardModel card;
@@ -267,19 +270,29 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Card Image
+            // Card Image with enhanced overlay
             Container(
-              height: 200,
+              height: 250, // Increased height
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20),
                 ),
-                image: DecorationImage(
-                  image: NetworkImage(card.backgroundImageUrl),
-                  fit: BoxFit.cover,
-                ),
+                image: card.backgroundImageUrl.isNotEmpty &&
+                        card.backgroundImageUrl != 'default'
+                    ? DecorationImage(
+                        image: NetworkImage(card.backgroundImageUrl),
+                        fit: BoxFit.cover,
+                        onError: (error, stackTrace) {
+                          // Handle error silently
+                        },
+                      )
+                    : null,
+                color: card.backgroundImageUrl.isEmpty ||
+                        card.backgroundImageUrl == 'default'
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                    : null,
               ),
               child: Container(
                 decoration: BoxDecoration(
@@ -292,6 +305,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
+                      Colors.black.withOpacity(0.3),
                       Colors.black.withOpacity(0.7),
                     ],
                   ),
@@ -306,17 +320,34 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         card.title,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       if (card.hasEventDateTime)
-                        Text(
-                          card.formattedEventDateTime,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 16,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.access_time,
+                                  color: Colors.white, size: 16),
+                              const SizedBox(width: 6),
+                              Text(
+                                card.formattedEventDateTime,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                     ],
@@ -330,128 +361,449 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Description
-                  const Text(
-                    'Mô tả',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    card.description,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Location
-                  if (card.location.isNotEmpty) ...[
-                    const Text(
-                      'Địa điểm',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  // Event Time Section (if available)
+                  if (card.hasEventDateTime) ...[
+                    _buildSectionHeader('Thời gian sự kiện', Icons.schedule),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, color: Colors.grey),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            card.location,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceVariant
+                            .withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .outline
+                              .withOpacity(0.2),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.event,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 24,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  card.formattedEventDateTime,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _getRelativeTime(card.eventDateTime),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                   ],
 
-                  // Participants
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Người tham gia',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  // Description Section
+                  if (card.description.isNotEmpty) ...[
+                    _buildSectionHeader('Mô tả', Icons.description),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceVariant
+                            .withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .outline
+                              .withOpacity(0.2),
                         ),
                       ),
-                      Text(
-                        '${card.participantCount} người',
+                      child: Text(
+                        card.description,
                         style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
+                          fontSize: 16,
+                          height: 1.5,
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Participants avatars
-                  if (card.participants.isNotEmpty)
-                    SizedBox(
-                      height: 50,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: card.participants.length,
-                        itemBuilder: (context, index) {
-                          final participant = card.participants[index];
-                          return Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundImage: participant.avatarUrl != null
-                                  ? NetworkImage(participant.avatarUrl!)
-                                  : null,
-                              child: participant.avatarUrl == null
-                                  ? Text(
-                                      participant.displayName
-                                              ?.substring(0, 1)
-                                              .toUpperCase() ??
-                                          participant.email
-                                              .substring(0, 1)
-                                              .toUpperCase(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    )
-                                  : null,
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  else
-                    const Text(
-                      'Chưa có người tham gia',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontStyle: FontStyle.italic,
                       ),
                     ),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Location Section
+                  if (card.location.isNotEmpty) ...[
+                    _buildSectionHeader('Địa điểm', Icons.location_on),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceVariant
+                            .withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .outline
+                              .withOpacity(0.2),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.place,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  card.location,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // Map preview if coordinates are available
+                          if (card.hasCoordinates) ...[
+                            const SizedBox(height: 16),
+                            Container(
+                              height: 200,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outline
+                                      .withOpacity(0.3),
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Stack(
+                                  children: [
+                                    // Interactive FlutterMap
+                                    FlutterMap(
+                                      options: MapOptions(
+                                        initialCenter: LatLng(
+                                            card.latitude!, card.longitude!),
+                                        initialZoom: 15,
+                                        interactionOptions:
+                                            const InteractionOptions(
+                                          flags: InteractiveFlag.pinchZoom |
+                                              InteractiveFlag.drag |
+                                              InteractiveFlag.doubleTapZoom,
+                                        ),
+                                      ),
+                                      children: [
+                                        TileLayer(
+                                          urlTemplate:
+                                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                          userAgentPackageName:
+                                              'com.example.enva',
+                                        ),
+                                        MarkerLayer(
+                                          markers: [
+                                            Marker(
+                                              point: LatLng(card.latitude!,
+                                                  card.longitude!),
+                                              width: 40,
+                                              height: 40,
+                                              child: const Icon(
+                                                Icons.location_pin,
+                                                color: Colors.red,
+                                                size: 40,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    // Coordinates overlay
+                                    Positioned(
+                                      bottom: 8,
+                                      left: 8,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.7),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          '${card.latitude!.toStringAsFixed(6)}, ${card.longitude!.toStringAsFixed(6)}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    // Tap overlay for opening in external maps
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: () => _openInMaps(card),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.7),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: const Icon(
+                                              Icons.open_in_new,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => _openInMaps(card),
+                                    icon:
+                                        const Icon(Icons.directions, size: 18),
+                                    label: const Text('Chỉ đường'),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => _shareLocation(card),
+                                    icon: const Icon(Icons.share, size: 18),
+                                    label: const Text('Chia sẻ'),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Participants Section
+                  _buildSectionHeader('Người tham gia', Icons.group),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceVariant
+                          .withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .outline
+                            .withOpacity(0.2),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${card.participantCount} người tham gia',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (card.participants.isNotEmpty)
+                              TextButton(
+                                onPressed: () =>
+                                    _showAllParticipants(card.participants),
+                                child: const Text('Xem tất cả'),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Participants avatars
+                        if (card.participants.isNotEmpty)
+                          SizedBox(
+                            height: 60,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: card.participants.length > 8
+                                  ? 8
+                                  : card.participants.length,
+                              itemBuilder: (context, index) {
+                                if (index == 7 &&
+                                    card.participants.length > 8) {
+                                  // Show "+X more" indicator
+                                  return Container(
+                                    margin: const EdgeInsets.only(right: 8),
+                                    child: CircleAvatar(
+                                      radius: 25,
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withOpacity(0.1),
+                                      child: Text(
+                                        '+${card.participants.length - 7}',
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                final participant = card.participants[index];
+                                return Container(
+                                  margin: const EdgeInsets.only(right: 8),
+                                  child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: participant.avatarUrl !=
+                                            null
+                                        ? NetworkImage(participant.avatarUrl!)
+                                        : null,
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withOpacity(0.1),
+                                    child: participant.avatarUrl == null
+                                        ? Text(
+                                            participant.displayName
+                                                    ?.substring(0, 1)
+                                                    .toUpperCase() ??
+                                                participant.email
+                                                    .substring(0, 1)
+                                                    .toUpperCase(),
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.people_outline,
+                                    size: 40,
+                                    color: Colors.grey[400],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Chưa có người tham gia',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: 30),
 
                   // Invite section
-                  const Text(
-                    'Mời người tham gia',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  _buildSectionHeader('Mời người tham gia', Icons.person_add),
                   const SizedBox(height: 12),
 
                   // Search input
@@ -669,6 +1021,290 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                   ],
                 ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getRelativeTime(DateTime? eventDateTime) {
+    if (eventDateTime == null) return '';
+
+    final now = DateTime.now();
+    final difference = eventDateTime.difference(now);
+
+    if (difference.isNegative) {
+      final pastDifference = now.difference(eventDateTime);
+      if (pastDifference.inDays > 0) {
+        return '${pastDifference.inDays} ngày trước';
+      } else if (pastDifference.inHours > 0) {
+        return '${pastDifference.inHours} giờ trước';
+      } else {
+        return 'Vừa kết thúc';
+      }
+    } else {
+      if (difference.inDays > 0) {
+        return 'Còn ${difference.inDays} ngày';
+      } else if (difference.inHours > 0) {
+        return 'Còn ${difference.inHours} giờ';
+      } else {
+        return 'Sắp bắt đầu';
+      }
+    }
+  }
+
+  void _openInMaps(CardModel card) {
+    if (!card.hasCoordinates) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Mở bản đồ',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${card.latitude!.toStringAsFixed(6)}, ${card.longitude!.toStringAsFixed(6)}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.map, color: Colors.green),
+              ),
+              title: const Text('Google Maps'),
+              subtitle: const Text('Xem vị trí trên Google Maps'),
+              onTap: () => _handleMapAction(() =>
+                  MapService.openGoogleMaps(card.latitude!, card.longitude!)),
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.directions, color: Colors.blue),
+              ),
+              title: const Text('Chỉ đường'),
+              subtitle: const Text('Mở Google Maps với chỉ đường'),
+              onTap: () => _handleMapAction(() =>
+                  MapService.openGoogleMapsDirections(
+                      card.latitude!, card.longitude!)),
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.purple.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.map_outlined, color: Colors.purple),
+              ),
+              title: const Text('Apple Maps'),
+              subtitle: const Text('Mở trong Apple Maps'),
+              onTap: () => _handleMapAction(() =>
+                  MapService.openAppleMaps(card.latitude!, card.longitude!)),
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.copy, color: Colors.orange),
+              ),
+              title: const Text('Sao chép tọa độ'),
+              subtitle: const Text('Sao chép vào clipboard'),
+              onTap: () =>
+                  _handleCopyCoordinates(card.latitude!, card.longitude!),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleMapAction(Future<bool> Function() mapAction) async {
+    Navigator.pop(context);
+
+    try {
+      final success = await mapAction();
+      if (!success && mounted) {
+        _showErrorSnackBar('Không thể mở ứng dụng bản đồ');
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackBar('Lỗi: $e');
+      }
+    }
+  }
+
+  void _handleCopyCoordinates(double latitude, double longitude) async {
+    Navigator.pop(context);
+
+    try {
+      await MapService.copyCoordinates(latitude, longitude);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đã sao chép tọa độ vào clipboard'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorSnackBar('Lỗi sao chép: $e');
+      }
+    }
+  }
+
+  void _shareLocation(CardModel card) {
+    if (!card.hasCoordinates) return;
+
+    // You can implement location sharing here
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Chia sẻ vị trí: ${card.latitude}, ${card.longitude}'),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {},
+        ),
+      ),
+    );
+  }
+
+  void _showAllParticipants(List participants) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Người tham gia (${participants.length})',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: participants.length,
+                itemBuilder: (context, index) {
+                  final participant = participants[index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: participant.avatarUrl != null
+                          ? NetworkImage(participant.avatarUrl!)
+                          : null,
+                      child: participant.avatarUrl == null
+                          ? Text(
+                              participant.displayName
+                                      ?.substring(0, 1)
+                                      .toUpperCase() ??
+                                  participant.email
+                                      .substring(0, 1)
+                                      .toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          : null,
+                    ),
+                    title: Text(
+                      participant.displayName ?? 'Không có tên',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(participant.email),
+                  );
+                },
               ),
             ),
           ],

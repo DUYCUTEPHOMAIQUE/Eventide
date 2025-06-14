@@ -1,27 +1,35 @@
 import 'package:flutter/material.dart';
 import '../models/card_model.dart';
+import '../models/invite_model.dart';
 import '../services/card_service.dart';
+import '../services/invite_service.dart';
 import '../services/supabase_services.dart';
 
 enum ViewMode { carousel, grid }
 
+enum InviteStatusFilter {
+  all,
+  pending,
+  accepted,
+  declined,
+  cancelled,
+  undecided
+}
+
+enum EventCategory { upcoming, hosting, invited, past }
+
 class HomeScreenProvider extends ChangeNotifier {
   final CardService _cardService = CardService();
+  final InviteService _inviteService = InviteService();
 
-  List<CardModel> _cards = [];
+  List<CardModel> _allCards = [];
+  List<CardModel> _invitationCards = [];
   bool _isLoading = false;
   String _error = '';
   ViewMode _viewMode = ViewMode.carousel;
-  int _selectedTabIndex = 0;
+  EventCategory _selectedCategory = EventCategory.upcoming;
+  InviteStatusFilter _inviteStatusFilter = InviteStatusFilter.all;
   PageController? _pageController;
-
-  // Tab configuration
-  final List<String> _tabTitles = ['Tất cả', 'Của tôi', 'Tham gia'];
-  final List<IconData> _tabIcons = [
-    Icons.home_rounded,
-    Icons.person_rounded,
-    Icons.group_rounded,
-  ];
 
   // Animation controllers
   AnimationController? _headerFadeAnimation;
@@ -29,18 +37,127 @@ class HomeScreenProvider extends ChangeNotifier {
   AnimationController? _contentAnimation;
 
   // Getters
-  List<CardModel> get cards => _cards;
+  List<CardModel> get allCards => _allCards;
+  List<CardModel> get invitationCards => _invitationCards;
   bool get isLoading => _isLoading;
   String get error => _error;
   ViewMode get viewMode => _viewMode;
-  int get selectedTabIndex => _selectedTabIndex;
-  int get selectedIndex => _selectedTabIndex; // Alias for compatibility
-  List<String> get tabTitles => _tabTitles;
-  List<IconData> get tabIcons => _tabIcons;
+  EventCategory get selectedCategory => _selectedCategory;
+  InviteStatusFilter get inviteStatusFilter => _inviteStatusFilter;
   PageController? get pageController => _pageController;
   AnimationController? get headerFadeAnimation => _headerFadeAnimation;
   AnimationController? get tabSelectorAnimation => _tabSelectorAnimation;
   AnimationController? get contentAnimation => _contentAnimation;
+
+  // Get category title
+  String getCategoryTitle() {
+    switch (_selectedCategory) {
+      case EventCategory.upcoming:
+        return 'Upcoming';
+      case EventCategory.hosting:
+        return 'Hosting';
+      case EventCategory.invited:
+        return 'Invited';
+      case EventCategory.past:
+        return 'Past';
+    }
+  }
+
+  // Get filtered cards based on selected category
+  List<CardModel> getFilteredCards() {
+    switch (_selectedCategory) {
+      case EventCategory.upcoming:
+        return _getUpcomingCards();
+      case EventCategory.hosting:
+        return _getHostingCards();
+      case EventCategory.invited:
+        return _getInvitedCards();
+      case EventCategory.past:
+        return _getPastCards();
+    }
+  }
+
+  // Get upcoming cards (events with future dates)
+  List<CardModel> _getUpcomingCards() {
+    final now = DateTime.now();
+    return _allCards.where((card) {
+      if (card.eventDateTime == null) return false;
+      return card.eventDateTime!.isAfter(now);
+    }).toList();
+  }
+
+  // Get hosting cards (cards owned by current user)
+  List<CardModel> _getHostingCards() {
+    final currentUser = SupabaseServices.client.auth.currentUser;
+    if (currentUser == null) return [];
+
+    return _allCards.where((card) => card.ownerId == currentUser.id).toList();
+  }
+
+  // Get invited cards (cards where user is receiver in invites)
+  List<CardModel> _getInvitedCards() {
+    if (_inviteStatusFilter == InviteStatusFilter.all) {
+      return _invitationCards;
+    }
+
+    final statusString = _getStatusString(_inviteStatusFilter);
+    return _invitationCards.where((card) {
+      return card.inviteStatus == statusString;
+    }).toList();
+  }
+
+  // Get past cards (events with past dates)
+  List<CardModel> _getPastCards() {
+    final now = DateTime.now();
+    return _allCards.where((card) {
+      if (card.eventDateTime == null) return false;
+      return card.eventDateTime!.isBefore(now);
+    }).toList();
+  }
+
+  // Get filtered invitation cards based on status filter
+  List<CardModel> _getFilteredInvitationCards() {
+    if (_inviteStatusFilter == InviteStatusFilter.all) {
+      return _invitationCards;
+    }
+
+    // Filter by status
+    final statusString = _getStatusString(_inviteStatusFilter);
+    return _invitationCards.where((card) {
+      return card.inviteStatus == statusString;
+    }).toList();
+  }
+
+  String _getStatusString(InviteStatusFilter filter) {
+    switch (filter) {
+      case InviteStatusFilter.pending:
+        return 'pending';
+      case InviteStatusFilter.accepted:
+        return 'accepted';
+      case InviteStatusFilter.declined:
+        return 'declined';
+      case InviteStatusFilter.cancelled:
+        return 'cancelled';
+      case InviteStatusFilter.undecided:
+        return 'undecided';
+      case InviteStatusFilter.all:
+        return 'all';
+    }
+  }
+
+  // Set event category
+  void setEventCategory(EventCategory category) {
+    if (_selectedCategory != category) {
+      _selectedCategory = category;
+      notifyListeners();
+    }
+  }
+
+  // Set invite status filter
+  void setInviteStatusFilter(InviteStatusFilter filter) {
+    _inviteStatusFilter = filter;
+    notifyListeners();
+  }
 
   // Initialize animations
   void initializeAnimations(TickerProvider vsync) {
@@ -84,7 +201,7 @@ class HomeScreenProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  // Load cards based on selected tab
+  // Load all cards
   Future<void> loadCards() async {
     _setLoading(true);
     _setError('');
@@ -96,26 +213,90 @@ class HomeScreenProvider extends ChangeNotifier {
         return;
       }
 
-      List<CardModel> loadedCards = [];
-
-      switch (_selectedTabIndex) {
-        case 0: // All cards
-          loadedCards = await _cardService.getAllCards();
-          break;
-        case 1: // My cards
-          loadedCards = await _cardService.getCardsByOwner(currentUser.id);
-          break;
-        case 2: // Participating
-          loadedCards =
-              await _cardService.getCardsUserParticipates(currentUser.id);
-          break;
-      }
-
-      _setCards(loadedCards);
+      await _loadAllCards(currentUser.id);
     } catch (e) {
       _setError('Lỗi tải dữ liệu: $e');
     } finally {
       _setLoading(false);
+    }
+  }
+
+  // Load all cards (owned + received invites)
+  Future<void> _loadAllCards(String userId) async {
+    try {
+      // Get cards owned by user
+      final ownedCards = await _cardService.getCardsByOwner(userId);
+
+      // Get cards where user is receiver in invites table
+      final receivedInviteCards = await _getCardsFromInvites(userId);
+
+      // Combine and remove duplicates
+      final allCardsMap = <String, CardModel>{};
+
+      for (var card in ownedCards) {
+        allCardsMap[card.id] = card;
+      }
+
+      for (var card in receivedInviteCards) {
+        allCardsMap[card.id] = card;
+      }
+
+      _allCards = allCardsMap.values.toList();
+      _allCards.sort((a, b) => b.created_at.compareTo(a.created_at));
+
+      // Also set invitation cards for invited category
+      _invitationCards = receivedInviteCards;
+      _invitationCards.sort((a, b) => b.created_at.compareTo(a.created_at));
+
+      print('Loaded ${_allCards.length} total cards');
+      print('Loaded ${_invitationCards.length} invitation cards');
+    } catch (e) {
+      print('Error loading all cards: $e');
+      _setError('Lỗi tải tất cả thẻ: $e');
+    }
+  }
+
+  // Get cards from invites table where user is receiver
+  Future<List<CardModel>> _getCardsFromInvites(String userId) async {
+    try {
+      final response = await SupabaseServices.client.from('invites').select('''
+            card_id,
+            status,
+            cards!inner(*)
+          ''').eq('receiver_id', userId);
+
+      if (response == null) {
+        return [];
+      }
+
+      List<CardModel> cards = [];
+      for (var inviteData in response) {
+        if (inviteData['cards'] != null) {
+          final cardData = inviteData['cards'];
+          final status = inviteData['status'] as String;
+
+          // Apply status filter if needed
+          if (_inviteStatusFilter != InviteStatusFilter.all) {
+            final filterStatus = _getStatusString(_inviteStatusFilter);
+            if (status != filterStatus) {
+              continue;
+            }
+          }
+
+          final participants =
+              await _inviteService.getAcceptedParticipants(cardData['id']);
+          final card = CardModel.fromJson(cardData);
+          card.participants = participants;
+          card.inviteStatus = status; // Set the invite status
+
+          cards.add(card);
+        }
+      }
+
+      return cards;
+    } catch (e) {
+      print('Error getting cards from invites: $e');
+      return [];
     }
   }
 
@@ -124,9 +305,11 @@ class HomeScreenProvider extends ChangeNotifier {
     await loadCards();
   }
 
-  // Get filtered cards (for compatibility)
-  List<CardModel> getFilteredCards() {
-    return _cards;
+  // Toggle view mode
+  void toggleViewMode() {
+    _viewMode =
+        _viewMode == ViewMode.carousel ? ViewMode.grid : ViewMode.carousel;
+    notifyListeners();
   }
 
   // Set view mode
@@ -138,17 +321,6 @@ class HomeScreenProvider extends ChangeNotifier {
   // Change view mode (alias for compatibility)
   void changeViewMode(ViewMode mode) {
     setViewMode(mode);
-  }
-
-  // Set selected tab
-  void setSelectedTab(int index) {
-    _selectedTabIndex = index;
-    loadCards();
-  }
-
-  // Change tab (alias for compatibility)
-  void changeTab(int index) {
-    setSelectedTab(index);
   }
 
   // Get greeting based on time
@@ -163,55 +335,21 @@ class HomeScreenProvider extends ChangeNotifier {
     }
   }
 
-  // Get status text based on selected tab
+  // Get status text based on selected category
   String getStatusText() {
-    switch (_selectedTabIndex) {
-      case 0:
-        return 'Tất cả sự kiện';
-      case 1:
-        return 'Sự kiện của tôi';
-      case 2:
-        return 'Đang tham gia';
-      default:
-        return 'Tất cả sự kiện';
+    switch (_selectedCategory) {
+      case EventCategory.upcoming:
+        return 'Sự kiện sắp diễn ra';
+      case EventCategory.hosting:
+        return 'Sự kiện bạn tổ chức';
+      case EventCategory.invited:
+        return 'Lời mời đến bạn';
+      case EventCategory.past:
+        return 'Sự kiện đã qua';
     }
   }
 
-  // Format event info
-  String formatEventInfo(CardModel card) {
-    final parts = <String>[];
-
-    if (card.hasEventDateTime) {
-      parts.add(card.formattedEventDateTime);
-    }
-
-    if (card.location.isNotEmpty) {
-      parts.add(card.location);
-    }
-
-    if (card.participantCount > 0) {
-      parts.add('${card.participantCount} người tham gia');
-    }
-
-    return parts.join(' • ');
-  }
-
-  // Format event info compact
-  String formatEventInfoCompact(CardModel card) {
-    final parts = <String>[];
-
-    if (card.hasEventDateTime) {
-      parts.add(card.formattedEventDateTime);
-    }
-
-    if (card.location.isNotEmpty) {
-      parts.add(card.location);
-    }
-
-    return parts.join(' • ');
-  }
-
-  // Private methods
+  // Private methods for state management
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
@@ -223,7 +361,51 @@ class HomeScreenProvider extends ChangeNotifier {
   }
 
   void _setCards(List<CardModel> cards) {
-    _cards = cards;
+    _allCards = cards;
     notifyListeners();
+  }
+
+  // Format event info for display
+  String formatEventInfo(CardModel card) {
+    try {
+      final date = DateTime.parse(card.created_at);
+      final formattedDate = '${_getMonth(date.month)} ${date.day}';
+      return card.location.isNotEmpty
+          ? '$formattedDate • ${card.location}'
+          : formattedDate;
+    } catch (e) {
+      return card.location.isNotEmpty ? card.location : 'Sep 2';
+    }
+  }
+
+  String formatEventInfoCompact(CardModel card) {
+    try {
+      final date = DateTime.parse(card.created_at);
+      final formattedDate = '${_getMonth(date.month)} ${date.day}';
+      return card.location.isNotEmpty
+          ? '$formattedDate • ${card.location}'
+          : formattedDate;
+    } catch (e) {
+      return card.location.isNotEmpty ? card.location : 'Sep 2';
+    }
+  }
+
+  String _getMonth(int month) {
+    const months = [
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return months[month];
   }
 }
