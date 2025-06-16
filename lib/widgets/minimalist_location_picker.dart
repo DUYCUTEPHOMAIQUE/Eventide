@@ -223,7 +223,7 @@ class _MinimalistLocationPickerState extends State<MinimalistLocationPicker> {
                     TileLayer(
                       urlTemplate:
                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.enva',
+                      userAgentPackageName: 'com.example.eventide',
                     ),
                     MarkerLayer(
                       markers: [

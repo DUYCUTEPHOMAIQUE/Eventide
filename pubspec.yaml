@@ -56,6 +56,7 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   build_runner: ^2.4.6
   hive_generator: ^2.0.1
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
@@ -69,3 +70,18 @@ flutter:
       fonts:
         - asset: assets/fonts/Aldrich-Regular.ttf
           weight: 400
+    - family: SF Pro Rounded
+      fonts:
+        - asset: assets/fonts/SF-Pro-Rounded-Regular.otf
+          weight: 400
+        - asset: assets/fonts/SF-Pro-Rounded-Medium.otf
+          weight: 500
+        - asset: assets/fonts/SF-Pro-Rounded-Semibold.otf
+          weight: 600
+        - asset: assets/fonts/SF-Pro-Rounded-Bold.otf
+          weight: 700
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/icon.png" # Đường dẫn tới icon PNG của bạn

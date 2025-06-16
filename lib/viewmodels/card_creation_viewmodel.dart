@@ -8,6 +8,7 @@ import '../services/card_service.dart';
 import '../services/image_picker_service.dart';
 import '../services/cloudinary_service.dart';
 import '../services/supabase_services.dart';
+import '../models/card_model.dart';
 
 class CardCreationViewModel extends ChangeNotifier {
   final CardService _cardService = CardService();
@@ -24,6 +25,10 @@ class CardCreationViewModel extends ChangeNotifier {
   File? _backgroundImageFile;
   File? _cardImageFile;
 
+  // Current image URLs (for editing mode)
+  String _currentBackgroundImageUrl = '';
+  String _currentCardImageUrl = '';
+
   // Creation state
   bool _isCreatingCard = false;
   String _progressMessage = '';
@@ -39,13 +44,17 @@ class CardCreationViewModel extends ChangeNotifier {
   DateTime? get eventDateTime => _eventDateTime;
   File? get backgroundImageFile => _backgroundImageFile;
   File? get cardImageFile => _cardImageFile;
+  String get currentBackgroundImageUrl => _currentBackgroundImageUrl;
+  String get currentCardImageUrl => _currentCardImageUrl;
   bool get isCreatingCard => _isCreatingCard;
   String get progressMessage => _progressMessage;
   String? get errorMessage => _errorMessage;
 
   // Computed properties
-  bool get hasBackgroundImage => _backgroundImageFile != null;
-  bool get hasCardImage => _cardImageFile != null;
+  bool get hasBackgroundImage =>
+      _backgroundImageFile != null || _currentBackgroundImageUrl.isNotEmpty;
+  bool get hasCardImage =>
+      _cardImageFile != null || _currentCardImageUrl.isNotEmpty;
   bool get hasLocation => _selectedLocation != null || _location.isNotEmpty;
   bool get hasEventDateTime => _eventDateTime != null;
   bool get isFormValid => _title.isNotEmpty && _description.isNotEmpty;
@@ -219,12 +228,14 @@ class CardCreationViewModel extends ChangeNotifier {
   // Remove image methods
   void removeBackgroundImage() {
     _backgroundImageFile = null;
+    _currentBackgroundImageUrl = '';
     _clearError();
     notifyListeners();
   }
 
   void removeCardImage() {
     _cardImageFile = null;
+    _currentCardImageUrl = '';
     _clearError();
     notifyListeners();
   }
@@ -252,7 +263,7 @@ class CardCreationViewModel extends ChangeNotifier {
       String? backgroundImageUrl;
       String? cardImageUrl;
 
-      // Step 1: Upload background image if provided
+      // Step 1: Upload background image if provided, otherwise use current
       if (_backgroundImageFile != null) {
         _setProgress('Đang upload ảnh nền...');
         backgroundImageUrl = await _cloudinaryService.uploadImageToCloudinary(
@@ -266,9 +277,12 @@ class CardCreationViewModel extends ChangeNotifier {
           _setError('Lỗi upload ảnh nền');
           return false;
         }
+      } else if (_currentBackgroundImageUrl.isNotEmpty) {
+        // Keep current background image
+        backgroundImageUrl = _currentBackgroundImageUrl;
       }
 
-      // Step 2: Upload card image if provided
+      // Step 2: Upload card image if provided, otherwise use current
       if (_cardImageFile != null) {
         _setProgress('Đang upload ảnh kỷ niệm...');
         cardImageUrl = await _cloudinaryService.uploadImageToCloudinary(
@@ -282,6 +296,9 @@ class CardCreationViewModel extends ChangeNotifier {
           _setError('Lỗi upload ảnh kỷ niệm');
           return false;
         }
+      } else if (_currentCardImageUrl.isNotEmpty) {
+        // Keep current card image
+        cardImageUrl = _currentCardImageUrl;
       }
 
       // Step 3: Create card using CardService
@@ -326,6 +343,8 @@ class CardCreationViewModel extends ChangeNotifier {
     _eventDateTime = null;
     _backgroundImageFile = null;
     _cardImageFile = null;
+    _currentBackgroundImageUrl = '';
+    _currentCardImageUrl = '';
     _errorMessage = null;
     _progressMessage = '';
     notifyListeners();
@@ -333,6 +352,121 @@ class CardCreationViewModel extends ChangeNotifier {
 
   void clearForm() {
     _resetForm();
+  }
+
+  // Load card data for editing
+  void loadCardForEditing(CardModel card) {
+    _title = card.title;
+    _description = card.description;
+    _location = card.location;
+    _selectedLocation = card.latitude != null && card.longitude != null
+        ? LatLng(card.latitude!, card.longitude!)
+        : null;
+    _eventDateTime = card.eventDateTime;
+
+    // Load current image URLs
+    _currentBackgroundImageUrl = card.backgroundImageUrl;
+    _currentCardImageUrl = card.imageUrl;
+
+    // Reset new image files
+    _backgroundImageFile = null;
+    _cardImageFile = null;
+
+    _errorMessage = null;
+    _progressMessage = '';
+    notifyListeners();
+  }
+
+  // Update card method
+  Future<bool> updateCard(String cardId) async {
+    if (!isFormValid) {
+      _setError('Vui lòng điền đầy đủ thông tin');
+      return false;
+    }
+
+    _isCreatingCard = true;
+    _clearError();
+    _setProgress('Bắt đầu cập nhật thẻ...');
+    notifyListeners();
+
+    try {
+      // Get current user
+      final currentUser = SupabaseServices.client.auth.currentUser;
+      if (currentUser == null) {
+        _setError('Bạn chưa đăng nhập');
+        return false;
+      }
+
+      String? backgroundImageUrl;
+      String? cardImageUrl;
+
+      // Step 1: Upload background image if provided, otherwise use current
+      if (_backgroundImageFile != null) {
+        _setProgress('Đang upload ảnh nền...');
+        backgroundImageUrl = await _cloudinaryService.uploadImageToCloudinary(
+          _backgroundImageFile!,
+          folder: 'card_backgrounds',
+        );
+
+        if (backgroundImageUrl != null) {
+          _setProgress('Đã upload ảnh nền thành công');
+        } else {
+          _setError('Lỗi upload ảnh nền');
+          return false;
+        }
+      } else if (_currentBackgroundImageUrl.isNotEmpty) {
+        // Keep current background image
+        backgroundImageUrl = _currentBackgroundImageUrl;
+      }
+
+      // Step 2: Upload card image if provided, otherwise use current
+      if (_cardImageFile != null) {
+        _setProgress('Đang upload ảnh kỷ niệm...');
+        cardImageUrl = await _cloudinaryService.uploadImageToCloudinary(
+          _cardImageFile!,
+          folder: 'card_images',
+        );
+
+        if (cardImageUrl != null) {
+          _setProgress('Đã upload ảnh kỷ niệm thành công');
+        } else {
+          _setError('Lỗi upload ảnh kỷ niệm');
+          return false;
+        }
+      } else if (_currentCardImageUrl.isNotEmpty) {
+        // Keep current card image
+        cardImageUrl = _currentCardImageUrl;
+      }
+
+      // Step 3: Update card using CardService
+      _setProgress('Đang cập nhật thẻ...');
+      final success = await _cardService.updateCard(
+        cardId: cardId,
+        title: _title,
+        description: _description,
+        imageUrl: cardImageUrl,
+        backgroundImageUrl: backgroundImageUrl,
+        location: _location,
+        latitude: _selectedLocation?.latitude,
+        longitude: _selectedLocation?.longitude,
+        eventDateTime: _eventDateTime,
+      );
+
+      if (success) {
+        _setProgress('Đã cập nhật thẻ thành công!');
+        return true;
+      } else {
+        _setError('Không thể cập nhật thẻ');
+        return false;
+      }
+    } catch (e) {
+      _setError('Lỗi cập nhật thẻ: $e');
+      return false;
+    } finally {
+      _isCreatingCard = false;
+      _progressMessage = '';
+      notifyListeners();
+    }
   }
 
   @override

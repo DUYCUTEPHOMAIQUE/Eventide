@@ -192,7 +192,7 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
                         TileLayer(
                           urlTemplate:
                               'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.example.enva',
+                          userAgentPackageName: 'com.example.eventide',
                         ),
 
                         // Marker for selected location

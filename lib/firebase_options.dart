@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '135461409715',
     projectId: 'enva-88ec8',
     storageBucket: 'enva-88ec8.firebasestorage.app',
-    iosBundleId: 'com.example.enva',
+    iosBundleId: 'com.example.eventide',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '135461409715',
     projectId: 'enva-88ec8',
     storageBucket: 'enva-88ec8.firebasestorage.app',
-    iosBundleId: 'com.example.enva',
+    iosBundleId: 'com.example.eventide',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

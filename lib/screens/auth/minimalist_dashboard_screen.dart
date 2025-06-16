@@ -128,7 +128,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
             ),
             const SizedBox(width: 12),
             Text(
-              'Enva',
+              'Eventide',
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onBackground,

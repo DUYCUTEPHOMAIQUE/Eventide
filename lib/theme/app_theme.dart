@@ -103,23 +103,66 @@ class AppTheme {
       background: lightBackgroundColor,
       surface: lightCardColor,
     ),
-    textTheme: GoogleFonts.robotoTextTheme(
-      const TextTheme(
-        displayLarge: TextStyle(color: lightTextColor),
-        displayMedium: TextStyle(color: lightTextColor),
-        displaySmall: TextStyle(color: lightTextColor),
-        headlineLarge: TextStyle(color: lightTextColor),
-        headlineMedium: TextStyle(color: lightTextColor),
-        headlineSmall: TextStyle(color: lightTextColor),
-        titleLarge: TextStyle(color: lightTextColor),
-        titleMedium: TextStyle(color: lightTextColor),
-        titleSmall: TextStyle(color: lightTextColor),
-        bodyLarge: TextStyle(color: lightTextColor),
-        bodyMedium: TextStyle(color: lightTextColor),
-        bodySmall: TextStyle(color: lightSecondaryTextColor),
-        labelLarge: TextStyle(color: lightTextColor),
-        labelMedium: TextStyle(color: lightTextColor),
-        labelSmall: TextStyle(color: lightSecondaryTextColor),
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      displayMedium: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      displaySmall: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      headlineLarge: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      headlineMedium: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      headlineSmall: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      titleLarge: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      titleMedium: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      titleSmall: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      bodyLarge: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      bodyMedium: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      bodySmall: TextStyle(
+        color: lightSecondaryTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      labelLarge: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      labelMedium: TextStyle(
+        color: lightTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      labelSmall: TextStyle(
+        color: lightSecondaryTextColor,
+        fontFamily: 'SF Pro Rounded',
       ),
     ),
     appBarTheme: const AppBarTheme(
@@ -187,23 +230,66 @@ class AppTheme {
       background: darkBackgroundColor,
       surface: darkCardColor,
     ),
-    textTheme: GoogleFonts.robotoTextTheme(
-      const TextTheme(
-        displayLarge: TextStyle(color: darkTextColor),
-        displayMedium: TextStyle(color: darkTextColor),
-        displaySmall: TextStyle(color: darkTextColor),
-        headlineLarge: TextStyle(color: darkTextColor),
-        headlineMedium: TextStyle(color: darkTextColor),
-        headlineSmall: TextStyle(color: darkTextColor),
-        titleLarge: TextStyle(color: darkTextColor),
-        titleMedium: TextStyle(color: darkTextColor),
-        titleSmall: TextStyle(color: darkTextColor),
-        bodyLarge: TextStyle(color: darkTextColor),
-        bodyMedium: TextStyle(color: darkTextColor),
-        bodySmall: TextStyle(color: darkSecondaryTextColor),
-        labelLarge: TextStyle(color: darkTextColor),
-        labelMedium: TextStyle(color: darkTextColor),
-        labelSmall: TextStyle(color: darkSecondaryTextColor),
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      displayMedium: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      displaySmall: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      headlineLarge: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      headlineMedium: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      headlineSmall: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      titleLarge: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      titleMedium: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      titleSmall: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      bodyLarge: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      bodyMedium: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      bodySmall: TextStyle(
+        color: darkSecondaryTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      labelLarge: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      labelMedium: TextStyle(
+        color: darkTextColor,
+        fontFamily: 'SF Pro Rounded',
+      ),
+      labelSmall: TextStyle(
+        color: darkSecondaryTextColor,
+        fontFamily: 'SF Pro Rounded',
       ),
     ),
     appBarTheme: const AppBarTheme(

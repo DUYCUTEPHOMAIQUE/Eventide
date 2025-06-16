@@ -31,70 +31,80 @@ class MinimalistTheme {
   static const Color red600 = Color(0xFFE53935);
 
   // Typography Scale (clear hierarchy)
-  static TextStyle get displayLarge => GoogleFonts.poppins(
+  static TextStyle get displayLarge => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 32,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.5,
         height: 1.2,
       );
 
-  static TextStyle get displayMedium => GoogleFonts.poppins(
+  static TextStyle get displayMedium => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 28,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.25,
         height: 1.2,
       );
 
-  static TextStyle get headlineLarge => GoogleFonts.poppins(
+  static TextStyle get headlineLarge => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 24,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.3,
         height: 1.3,
       );
 
-  static TextStyle get headlineMedium => GoogleFonts.poppins(
+  static TextStyle get headlineMedium => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 20,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.2,
         height: 1.3,
       );
 
-  static TextStyle get titleLarge => GoogleFonts.poppins(
+  static TextStyle get titleLarge => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 18,
         fontWeight: FontWeight.w600,
         letterSpacing: 0,
         height: 1.4,
       );
 
-  static TextStyle get titleMedium => GoogleFonts.poppins(
+  static TextStyle get titleMedium => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 16,
         fontWeight: FontWeight.w500,
         letterSpacing: 0,
         height: 1.4,
       );
 
-  static TextStyle get bodyLarge => GoogleFonts.poppins(
+  static TextStyle get bodyLarge => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 16,
         fontWeight: FontWeight.w400,
         letterSpacing: 0,
         height: 1.5,
       );
 
-  static TextStyle get bodyMedium => GoogleFonts.poppins(
+  static TextStyle get bodyMedium => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 14,
         fontWeight: FontWeight.w400,
         letterSpacing: 0.1,
         height: 1.4,
       );
 
-  static TextStyle get bodySmall => GoogleFonts.poppins(
+  static TextStyle get bodySmall => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 12,
         fontWeight: FontWeight.w400,
         letterSpacing: 0.4,
         height: 1.4,
       );
 
-  static TextStyle get labelLarge => GoogleFonts.poppins(
+  static TextStyle get labelLarge => const TextStyle(
+        fontFamily: 'SF Pro Rounded',
         fontSize: 14,
         fontWeight: FontWeight.w500,
         letterSpacing: 0.1,
@@ -141,7 +151,7 @@ class MinimalistTheme {
   static ThemeData get lightTheme => ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
-        fontFamily: GoogleFonts.poppins().fontFamily,
+        fontFamily: 'SF Pro Rounded',
 
         // Color Scheme
         colorScheme: const ColorScheme.light(
@@ -166,7 +176,8 @@ class MinimalistTheme {
           elevation: 0,
           backgroundColor: white,
           foregroundColor: gray900,
-          titleTextStyle: GoogleFonts.poppins(
+          titleTextStyle: const TextStyle(
+            fontFamily: 'SF Pro Rounded',
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: gray900,
@@ -208,7 +219,8 @@ class MinimalistTheme {
               vertical: 16,
             ),
             minimumSize: const Size(double.infinity, 56),
-            textStyle: GoogleFonts.poppins(
+            textStyle: const TextStyle(
+              fontFamily: 'SF Pro Rounded',
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -272,11 +284,13 @@ class MinimalistTheme {
             horizontal: 20,
             vertical: 16,
           ),
-          hintStyle: GoogleFonts.poppins(
+          hintStyle: const TextStyle(
+            fontFamily: 'SF Pro Rounded',
             fontSize: 16,
             color: gray500,
           ),
-          labelStyle: GoogleFonts.poppins(
+          labelStyle: const TextStyle(
+            fontFamily: 'SF Pro Rounded',
             fontSize: 16,
             fontWeight: FontWeight.w500,
             color: gray700,
@@ -284,53 +298,60 @@ class MinimalistTheme {
         ),
 
         // Text Theme
-        textTheme: GoogleFonts.poppinsTextTheme(
-          TextTheme(
-            displayLarge: GoogleFonts.poppins(
-              fontSize: 32,
-              fontWeight: FontWeight.w600,
-              color: gray900,
-            ),
-            headlineLarge: GoogleFonts.poppins(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              color: gray900,
-            ),
-            headlineMedium: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: gray900,
-            ),
-            titleLarge: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: gray900,
-            ),
-            titleMedium: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: gray800,
-            ),
-            bodyLarge: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: gray900,
-            ),
-            bodyMedium: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: gray700,
-            ),
-            bodySmall: GoogleFonts.poppins(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: gray600,
-            ),
-            labelLarge: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: gray800,
-            ),
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 32,
+            fontWeight: FontWeight.w600,
+            color: gray900,
+          ),
+          headlineLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: gray900,
+          ),
+          headlineMedium: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: gray900,
+          ),
+          titleLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: gray900,
+          ),
+          titleMedium: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: gray800,
+          ),
+          bodyLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: gray900,
+          ),
+          bodyMedium: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: gray700,
+          ),
+          bodySmall: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: gray600,
+          ),
+          labelLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: gray800,
           ),
         ),
 
@@ -384,7 +405,7 @@ class MinimalistTheme {
   static ThemeData get darkTheme => ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-        fontFamily: GoogleFonts.poppins().fontFamily,
+        fontFamily: 'SF Pro Rounded',
 
         // Color Scheme for Dark Mode
         colorScheme: const ColorScheme.dark(
@@ -412,7 +433,8 @@ class MinimalistTheme {
           elevation: 0,
           backgroundColor: gray900,
           foregroundColor: white,
-          titleTextStyle: GoogleFonts.poppins(
+          titleTextStyle: const TextStyle(
+            fontFamily: 'SF Pro Rounded',
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: white,
@@ -440,7 +462,8 @@ class MinimalistTheme {
               vertical: 16,
             ),
             minimumSize: const Size(double.infinity, 56),
-            textStyle: GoogleFonts.poppins(
+            textStyle: const TextStyle(
+              fontFamily: 'SF Pro Rounded',
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -462,7 +485,8 @@ class MinimalistTheme {
               vertical: 16,
             ),
             minimumSize: const Size(double.infinity, 56),
-            textStyle: GoogleFonts.poppins(
+            textStyle: const TextStyle(
+              fontFamily: 'SF Pro Rounded',
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -472,7 +496,8 @@ class MinimalistTheme {
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
             foregroundColor: gray300,
-            textStyle: GoogleFonts.poppins(
+            textStyle: const TextStyle(
+              fontFamily: 'SF Pro Rounded',
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -510,11 +535,13 @@ class MinimalistTheme {
             horizontal: 20,
             vertical: 16,
           ),
-          hintStyle: GoogleFonts.poppins(
+          hintStyle: const TextStyle(
+            fontFamily: 'SF Pro Rounded',
             fontSize: 16,
             color: gray500,
           ),
-          labelStyle: GoogleFonts.poppins(
+          labelStyle: const TextStyle(
+            fontFamily: 'SF Pro Rounded',
             fontSize: 16,
             fontWeight: FontWeight.w500,
             color: gray300,
@@ -522,53 +549,60 @@ class MinimalistTheme {
         ),
 
         // Text Theme
-        textTheme: GoogleFonts.poppinsTextTheme(
-          TextTheme(
-            displayLarge: GoogleFonts.poppins(
-              fontSize: 32,
-              fontWeight: FontWeight.w600,
-              color: white,
-            ),
-            headlineLarge: GoogleFonts.poppins(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              color: white,
-            ),
-            headlineMedium: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: white,
-            ),
-            titleLarge: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: white,
-            ),
-            titleMedium: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: gray200,
-            ),
-            bodyLarge: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: white,
-            ),
-            bodyMedium: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: gray300,
-            ),
-            bodySmall: GoogleFonts.poppins(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: gray400,
-            ),
-            labelLarge: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: gray200,
-            ),
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 32,
+            fontWeight: FontWeight.w600,
+            color: white,
+          ),
+          headlineLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: white,
+          ),
+          headlineMedium: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: white,
+          ),
+          titleLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: white,
+          ),
+          titleMedium: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: gray200,
+          ),
+          bodyLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: white,
+          ),
+          bodyMedium: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: gray300,
+          ),
+          bodySmall: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: gray400,
+          ),
+          labelLarge: TextStyle(
+            fontFamily: 'SF Pro Rounded',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: gray200,
           ),
         ),
 
