@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS public.invites (
   card_id UUID REFERENCES public.cards(id) ON DELETE CASCADE,
   sender_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   receiver_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined', 'cancelled', 'undecided')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'going', 'notgoing', 'maybe', 'cancelled')),
   sent_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(card_id, receiver_id)
 );

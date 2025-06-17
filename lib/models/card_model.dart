@@ -140,6 +140,9 @@ class CardModel extends HiveObject with EquatableMixin {
   // Helper methods for coordinates
   bool get hasCoordinates => latitude != null && longitude != null;
 
+  // Helper method for location
+  bool get hasLocation => location.isNotEmpty;
+
   String get coordinatesString => hasCoordinates
       ? '${latitude!.toStringAsFixed(6)}, ${longitude!.toStringAsFixed(6)}'
       : '';

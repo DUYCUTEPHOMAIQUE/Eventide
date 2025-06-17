@@ -596,4 +596,64 @@ class InviteService {
       return null;
     }
   }
+
+  // Get invite for current user and card
+  Future<InviteModel?> getInviteForCurrentUser(String cardId) async {
+    try {
+      print('Getting invite for current user and card: $cardId');
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        print('No current user found');
+        return null;
+      }
+
+      final response = await _supabase
+          .from('invites')
+          .select('*')
+          .eq('card_id', cardId)
+          .eq('receiver_id', currentUser.id)
+          .single();
+
+      print('Get invite response: $response');
+
+      if (response == null) {
+        print('No invite found');
+        return null;
+      }
+
+      final invite = InviteModel.fromJson(response);
+      print('Found invite with status: ${invite.status}');
+      return invite;
+    } catch (e) {
+      print('Error getting invite for current user: $e');
+      return null;
+    }
+  }
+
+  // Update RSVP status
+  Future<bool> updateRSVPStatus({
+    required String inviteId,
+    required String status,
+  }) async {
+    try {
+      print('Updating RSVP status - ID: $inviteId, Status: $status');
+
+      final response = await _supabase
+          .from('invites')
+          .update({'status': status})
+          .eq('id', inviteId)
+          .select();
+
+      print('Update RSVP status response: $response');
+
+      final success = response != null && response.isNotEmpty;
+      print(success
+          ? 'RSVP status updated successfully'
+          : 'Failed to update RSVP status');
+      return success;
+    } catch (e) {
+      print('Error updating RSVP status: $e');
+      return false;
+    }
+  }
 }

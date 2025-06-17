@@ -6,6 +6,7 @@ import 'package:enva/blocs/auth/auth_state.dart';
 import 'package:enva/widgets/theme_toggle_widget.dart';
 import 'package:enva/screens/auth/widgets/widgets.dart';
 import 'package:enva/screens/auth/otp_verification_screen.dart';
+import 'package:enva/screens/auth/complete_profile_screen.dart';
 
 class MinimalistDashboardScreen extends StatefulWidget {
   const MinimalistDashboardScreen({Key? key}) : super(key: key);
@@ -18,7 +19,6 @@ class MinimalistDashboardScreen extends StatefulWidget {
 class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
   bool _isSignUp = false;
   bool _isPasswordVisible = false;
 
@@ -26,7 +26,6 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _nameController.dispose();
     super.dispose();
   }
 
@@ -48,18 +47,17 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
                 ),
               ),
             );
-          } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red[600],
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                margin: const EdgeInsets.all(16),
+          } else if (state is AuthOTPVerified) {
+            // OTP verification thành công, chuyển sang màn hình complete profile
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CompleteProfileScreen(),
               ),
             );
+          } else if (state is AuthError) {
+            // Hiển thị thông báo lỗi thân thiện
+            _showFriendlyErrorMessage(state.message);
           }
         },
         builder: (context, state) {
@@ -260,17 +258,6 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
   Widget _buildFormFields() {
     return Column(
       children: [
-        // Name field (only for sign up)
-        if (_isSignUp) ...[
-          _buildTextField(
-            controller: _nameController,
-            label: 'Họ và tên',
-            hint: 'Nhập họ và tên của bạn',
-            icon: Icons.person_outline,
-          ),
-          const SizedBox(height: 16),
-        ],
-
         // Email field
         _buildTextField(
           controller: _emailController,
@@ -503,23 +490,151 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
     );
   }
 
+  // Validation functions
+  String? _validateEmail(String email) {
+    if (email.isEmpty) {
+      return 'Vui lòng nhập email';
+    }
+
+    return null; // Hợp lệ
+  }
+
+  String? _validatePassword(String password) {
+    if (password.isEmpty) {
+      return 'Vui lòng nhập mật khẩu';
+    }
+    if (password.length < 6) {
+      return 'Mật khẩu phải có ít nhất 6 ký tự';
+    }
+    if (_isSignUp) {
+      // Kiểm tra mật khẩu mạnh cho đăng ký
+      if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(password)) {
+        return 'Mật khẩu yêu cầu: ít nhất 1 chữ hoa, 1 chữ thường và 1 số. Ví dụ: Password123';
+      }
+    }
+    return null;
+  }
+
+  // Hiển thị thông báo lỗi thân thiện
+  void _showFriendlyErrorMessage(String errorMessage) {
+    String friendlyMessage = _getFriendlyErrorMessage(errorMessage);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(friendlyMessage),
+        backgroundColor: Colors.red[600],
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
+  // Chuyển đổi lỗi kỹ thuật thành thông báo thân thiện
+  String _getFriendlyErrorMessage(String errorMessage) {
+    final lowerError = errorMessage.toLowerCase();
+
+    // Lỗi mật khẩu
+    if (lowerError.contains('password') || lowerError.contains('mật khẩu')) {
+      if (lowerError.contains('weak') || lowerError.contains('yếu')) {
+        return 'Mật khẩu yêu cầu: ít nhất 6 ký tự, bao gồm 1 chữ hoa, 1 chữ thường và 1 số. Ví dụ: Password123';
+      }
+      if (lowerError.contains('incorrect') || lowerError.contains('sai')) {
+        return 'Mật khẩu không đúng. Vui lòng kiểm tra lại hoặc sử dụng "Quên mật khẩu"';
+      }
+      if (lowerError.contains('too short') || lowerError.contains('ngắn')) {
+        return 'Mật khẩu quá ngắn. Yêu cầu ít nhất 6 ký tự';
+      }
+      return 'Mật khẩu yêu cầu: ít nhất 6 ký tự, bao gồm 1 chữ hoa, 1 chữ thường và 1 số. Ví dụ: Password123';
+    }
+
+    // Lỗi email đã tồn tại (từ AuthBloc)
+    if (lowerError.contains('đã được đăng ký')) {
+      return 'Email đã được đăng ký. Vui lòng đăng nhập hoặc sử dụng email khác';
+    }
+
+    // Lỗi email chưa đăng ký (từ AuthBloc)
+    if (lowerError.contains('chưa được đăng ký')) {
+      return 'Email chưa được đăng ký. Vui lòng kiểm tra lại hoặc chuyển sang đăng ký tài khoản mới';
+    }
+
+    // Lỗi email
+    if (lowerError.contains('email')) {
+      if (lowerError.contains('not found') ||
+          lowerError.contains('không tìm thấy')) {
+        return 'Email chưa được đăng ký. Vui lòng kiểm tra lại hoặc chuyển sang đăng ký tài khoản mới';
+      }
+      if (lowerError.contains('already exists') ||
+          lowerError.contains('đã tồn tại')) {
+        return 'Email đã được đăng ký. Vui lòng đăng nhập hoặc sử dụng email khác';
+      }
+      if (lowerError.contains('not confirmed') ||
+          lowerError.contains('chưa xác thực')) {
+        return 'Email chưa được xác thực. Vui lòng kiểm tra email và nhấp vào link xác thực';
+      }
+      return 'Lỗi email. Vui lòng kiểm tra lại';
+    }
+
+    // Lỗi mạng
+    if (lowerError.contains('network') ||
+        lowerError.contains('connection') ||
+        lowerError.contains('timeout')) {
+      return 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet và thử lại';
+    }
+
+    // Lỗi server
+    if (lowerError.contains('server') ||
+        lowerError.contains('500') ||
+        lowerError.contains('503')) {
+      return 'Lỗi hệ thống. Vui lòng thử lại sau vài phút';
+    }
+
+    // Lỗi xác thực
+    if (lowerError.contains('auth') || lowerError.contains('authentication')) {
+      return 'Lỗi xác thực. Vui lòng đăng nhập lại';
+    }
+
+    // Lỗi OTP
+    if (lowerError.contains('otp') || lowerError.contains('token')) {
+      if (lowerError.contains('invalid') || lowerError.contains('không đúng')) {
+        return 'Mã OTP không đúng. Vui lòng kiểm tra lại mã 6 chữ số';
+      }
+      if (lowerError.contains('expired') || lowerError.contains('hết hạn')) {
+        return 'Mã OTP đã hết hạn. Vui lòng nhấn "Gửi lại mã" để nhận mã mới';
+      }
+      return 'Lỗi xác thực OTP. Vui lòng thử lại';
+    }
+
+    // Lỗi Google Sign In
+    if (lowerError.contains('google')) {
+      if (lowerError.contains('cancelled')) {
+        return 'Đăng nhập Google bị hủy. Vui lòng thử lại';
+      }
+      return 'Lỗi đăng nhập Google. Vui lòng thử lại hoặc sử dụng đăng nhập email';
+    }
+
+    // Lỗi mặc định - hiển thị lỗi gốc nếu không nhận diện được
+    return 'Lỗi: $errorMessage. Vui lòng thử lại';
+  }
+
   void _handlePrimaryAction() {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-    final name = _nameController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Vui lòng điền đầy đủ thông tin'),
-          backgroundColor: Colors.red[600],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.all(16),
-        ),
-      );
+    // Validate email
+    final emailError = _validateEmail(email);
+    if (emailError != null) {
+      _showFriendlyErrorMessage(emailError);
+      return;
+    }
+
+    // Validate password
+    final passwordError = _validatePassword(password);
+    if (passwordError != null) {
+      _showFriendlyErrorMessage(passwordError);
       return;
     }
 

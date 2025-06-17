@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:enva/services/auth_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:enva/blocs/auth/auth_bloc.dart';
+import 'package:enva/blocs/auth/auth_event.dart';
+import 'package:enva/blocs/auth/auth_state.dart';
 import 'package:enva/screens/auth/otp_verification_screen.dart';
 
 class EmailSignupScreen extends StatefulWidget {
@@ -14,7 +17,6 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _authService = AuthService();
 
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -30,46 +32,71 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 40),
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthSignUpSuccess) {
+          // Đăng ký thành công, chuyển sang màn hình OTP verification
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OTPVerificationScreen(
+                email: _emailController.text.trim(),
+              ),
+            ),
+          );
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.background,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 40),
 
-                // Header
-                _buildHeader(),
+                  // Header
+                  _buildHeader(),
 
-                const SizedBox(height: 48),
+                  const SizedBox(height: 48),
 
-                // Email Field
-                _buildEmailField(),
+                  // Email Field
+                  _buildEmailField(),
 
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                // Password Field
-                _buildPasswordField(),
+                  // Password Field
+                  _buildPasswordField(),
 
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                // Confirm Password Field
-                _buildConfirmPasswordField(),
+                  // Confirm Password Field
+                  _buildConfirmPasswordField(),
 
-                const SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
-                // Sign Up Button
-                _buildSignUpButton(),
+                  // Sign Up Button
+                  _buildSignUpButton(),
 
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                // Login Link
-                _buildLoginLink(),
-              ],
+                  // Login Link
+                  _buildLoginLink(),
+                ],
+              ),
             ),
           ),
         ),
@@ -376,48 +403,12 @@ class _EmailSignupScreenState extends State<EmailSignupScreen> {
       _isLoading = true;
     });
 
-    try {
-      final response = await _authService.signUpWithEmail(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-
-      if (response.user != null && mounted) {
-        // Chuyển sang màn hình verify OTP
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OTPVerificationScreen(
-              email: _emailController.text.trim(),
-            ),
+    // Sử dụng BLoC để đăng ký
+    context.read<AuthBloc>().add(
+          EmailSignUpRequested(
+            _emailController.text.trim(),
+            _passwordController.text,
           ),
         );
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Đăng ký thất bại: ${response.user?.email ?? "Unknown error"}'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
   }
 }

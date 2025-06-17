@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:enva/services/supabase_services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:enva/blocs/auth/auth_bloc.dart';
+import 'package:enva/blocs/auth/auth_event.dart';
+import 'package:enva/blocs/auth/auth_state.dart';
 import 'package:enva/screens/auth/complete_profile_screen.dart';
+import 'package:enva/screens/auth/minimalist_dashboard_screen.dart';
+import 'dart:async';
 
 class OTPVerificationScreen extends StatefulWidget {
   final String email;
@@ -29,6 +34,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   bool _isResending = false;
   int _resendCountdown = 60;
   bool _canResend = false;
+  Timer? _countdownTimer;
 
   @override
   void initState() {
@@ -38,6 +44,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     for (var controller in _otpControllers) {
       controller.dispose();
     }
@@ -53,62 +60,156 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       _resendCountdown = 60;
     });
 
-    Future.delayed(const Duration(seconds: 1), () {
+    _countdownTimer?.cancel();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         setState(() {
           _resendCountdown--;
         });
-        if (_resendCountdown > 0) {
-          _startResendCountdown();
-        } else {
+        if (_resendCountdown <= 0) {
           setState(() {
             _canResend = true;
           });
+          timer.cancel();
         }
+      } else {
+        timer.cancel();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthOTPVerified) {
+          // OTP verification thành công, chuyển sang màn hình complete profile
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CompleteProfileScreen(),
+            ),
+            (route) => false, // Xóa tất cả route cũ
+          );
+        } else if (state is AuthOTPResent) {
+          // OTP đã được gửi lại thành công
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Mã OTP mới đã được gửi đến email của bạn'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+          );
 
-              // Header
-              _buildHeader(),
+          // Clear OTP fields
+          for (var controller in _otpControllers) {
+            controller.clear();
+          }
 
-              const SizedBox(height: 48),
+          // Focus on first field
+          _focusNodes[0].requestFocus();
 
-              // Email display
-              _buildEmailDisplay(),
+          // Start countdown again
+          _startResendCountdown();
 
-              const SizedBox(height: 32),
+          setState(() {
+            _isResending = false;
+          });
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+            _isResending = false;
+          });
+        }
+      },
+      child: WillPopScope(
+        onWillPop: () async {
+          // Hiển thị dialog xác nhận khi user muốn quay lại
+          final shouldPop = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Xác nhận'),
+              content: const Text(
+                  'Bạn có chắc muốn quay lại? Quá trình đăng ký sẽ bị hủy.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Hủy'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Đồng ý'),
+                ),
+              ],
+            ),
+          );
 
-              // OTP Input
-              _buildOTPInput(),
+          if (shouldPop == true) {
+            // Reset BLoC state về initial
+            context.read<AuthBloc>().add(SignOutRequested());
 
-              const SizedBox(height: 32),
+            // Đợi một chút để BLoC xử lý xong
+            await Future.delayed(const Duration(milliseconds: 100));
 
-              // Verify Button
-              _buildVerifyButton(),
+            // Xóa tất cả route và quay về màn hình đăng nhập
+            if (mounted) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MinimalistDashboardScreen(),
+                ),
+                (route) => false,
+              );
+            }
+          }
 
-              const SizedBox(height: 24),
+          return false; // Không cho phép back tự nhiên
+        },
+        child: Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.background,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 40),
 
-              // Resend OTP
-              _buildResendOTP(),
+                  // Header
+                  _buildHeader(),
 
-              const SizedBox(height: 24),
+                  const SizedBox(height: 48),
 
-              // Back to signup
-              _buildBackToSignup(),
-            ],
+                  // Email display
+                  _buildEmailDisplay(),
+
+                  const SizedBox(height: 32),
+
+                  // OTP Input
+                  _buildOTPInput(),
+
+                  const SizedBox(height: 32),
+
+                  // Verify Button
+                  _buildVerifyButton(),
+
+                  const SizedBox(height: 24),
+
+                  // Resend OTP
+                  _buildResendOTP(),
+
+                  const SizedBox(height: 24),
+
+                  // Back to signup
+                  _buildBackToSignup(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -120,7 +221,45 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () async {
+            // Hiển thị dialog xác nhận khi user muốn quay lại
+            final shouldPop = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Xác nhận'),
+                content: const Text(
+                    'Bạn có chắc muốn quay lại? Quá trình đăng ký sẽ bị hủy.'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Hủy'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text('Đồng ý'),
+                  ),
+                ],
+              ),
+            );
+            if (shouldPop == true && mounted) {
+              // Reset BLoC state về initial
+              context.read<AuthBloc>().add(SignOutRequested());
+
+              // Đợi một chút để BLoC xử lý xong
+              await Future.delayed(const Duration(milliseconds: 100));
+
+              // Xóa tất cả route và quay về màn hình đăng nhập
+              if (mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MinimalistDashboardScreen(),
+                  ),
+                  (route) => false,
+                );
+              }
+            }
+          },
           icon: Icon(
             Icons.arrow_back_ios_rounded,
             color: Theme.of(context).colorScheme.onBackground,
@@ -313,14 +452,14 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     return Center(
       child: Column(
         children: [
-          Text(
-            'Không nhận được mã?',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-          const SizedBox(height: 8),
-          if (_canResend)
+          if (!_canResend) ...[
+            Text(
+              'Gửi lại mã sau ${_resendCountdown}s',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ] else ...[
             TextButton(
               onPressed: _isResending ? null : _handleResendOTP,
               child: _isResending
@@ -341,14 +480,8 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                             color: Theme.of(context).colorScheme.primary,
                           ),
                     ),
-            )
-          else
-            Text(
-              'Gửi lại mã sau $_resendCountdown giây',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
             ),
+          ],
         ],
       ),
     );
@@ -357,11 +490,50 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   Widget _buildBackToSignup() {
     return Center(
       child: TextButton(
-        onPressed: () => Navigator.pop(context),
+        onPressed: () async {
+          // Hiển thị dialog xác nhận khi user muốn quay lại
+          final shouldPop = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Xác nhận'),
+              content: const Text(
+                  'Bạn có chắc muốn quay lại? Quá trình đăng ký sẽ bị hủy.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Hủy'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Đồng ý'),
+                ),
+              ],
+            ),
+          );
+          if (shouldPop == true && mounted) {
+            // Reset BLoC state về initial
+            context.read<AuthBloc>().add(SignOutRequested());
+
+            // Đợi một chút để BLoC xử lý xong
+            await Future.delayed(const Duration(milliseconds: 100));
+
+            // Xóa tất cả route và quay về màn hình đăng nhập
+            if (mounted) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MinimalistDashboardScreen(),
+                ),
+                (route) => false,
+              );
+            }
+          }
+        },
         child: Text(
           'Quay lại đăng ký',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.primary,
               ),
         ),
       ),
@@ -389,46 +561,8 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       _isLoading = true;
     });
 
-    try {
-      final response = await SupabaseServices.verifyOTP(
-        widget.email,
-        otpCode,
-      );
-
-      if (response.user != null && mounted) {
-        // Chuyển sang màn hình hoàn tất profile
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const CompleteProfileScreen(),
-          ),
-        );
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Mã OTP không đúng hoặc đã hết hạn'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+    // Sử dụng BLoC để verify OTP
+    context.read<AuthBloc>().add(VerifyOTPRequested(widget.email, otpCode));
   }
 
   Future<void> _handleResendOTP() async {
@@ -436,43 +570,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
       _isResending = true;
     });
 
-    try {
-      await SupabaseServices.resendOTP(widget.email);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Mã OTP mới đã được gửi đến email của bạn'),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
-        );
-
-        // Clear OTP fields
-        for (var controller in _otpControllers) {
-          controller.clear();
-        }
-
-        // Focus on first field
-        _focusNodes[0].requestFocus();
-
-        // Start countdown again
-        _startResendCountdown();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi gửi lại mã: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isResending = false;
-        });
-      }
-    }
+    // Sử dụng BLoC để resend OTP
+    context.read<AuthBloc>().add(ResendOTPRequested(widget.email));
   }
 }

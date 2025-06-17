@@ -30,6 +30,15 @@ class AuthSignUpSuccess extends AuthState {
   List<Object?> get props => [user];
 }
 
+class AuthOTPVerified extends AuthState {
+  final User user;
+
+  const AuthOTPVerified(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}
+
 class AuthOTPResent extends AuthState {}
 
 class AuthError extends AuthState {

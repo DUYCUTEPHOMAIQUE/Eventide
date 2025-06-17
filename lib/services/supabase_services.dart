@@ -285,4 +285,30 @@ class SupabaseServices {
       return null;
     }
   }
+
+  // Kiểm tra email đã tồn tại trong database chưa
+  static Future<bool> checkEmailExists(String email) async {
+    try {
+      print('Checking if email exists: $email');
+
+      // Kiểm tra trong bảng profiles
+      final response = await client
+          .from('profiles')
+          .select('email')
+          .eq('email', email)
+          .limit(1);
+
+      print('Email check response: $response');
+
+      // Nếu có kết quả trả về, email đã tồn tại
+      final exists = response.isNotEmpty;
+      print('Email exists: $exists');
+
+      return exists;
+    } catch (e) {
+      print('Error checking email existence: $e');
+      // Nếu có lỗi, giả sử email không tồn tại để tránh chặn user
+      return false;
+    }
+  }
 }
