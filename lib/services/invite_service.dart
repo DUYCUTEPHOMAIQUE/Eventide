@@ -90,17 +90,17 @@ class InviteService {
     try {
       print('Getting accepted participants for card: $cardId');
 
-      // Get invites with status 'accepted'
+      // Get invites with status 'going'
       final response = await _supabase
           .from('invites')
           .select('receiver_id')
           .eq('card_id', cardId)
-          .eq('status', 'accepted');
+          .eq('status', 'going');
 
-      print('Accepted invites response: $response');
+      print('Going invites response: $response');
 
       if (response == null || response.isEmpty) {
-        print('No accepted participants found for card: $cardId');
+        print('No going participants found for card: $cardId');
         return [];
       }
 
@@ -109,14 +109,14 @@ class InviteService {
           .map((invite) => invite['receiver_id'] as String)
           .toList();
 
-      print('Accepted receiver IDs: $receiverIds');
+      print('Going receiver IDs: $receiverIds');
 
-      // Query user information for each accepted participant
+      // Query user information for each going participant
       List<UserModel> participants = [];
 
       for (String receiverId in receiverIds) {
         try {
-          print('Querying accepted user info for ID: $receiverId');
+          print('Querying going user info for ID: $receiverId');
 
           final userResponse = await _supabase
               .from('profiles')
@@ -124,23 +124,22 @@ class InviteService {
               .eq('id', receiverId)
               .single();
 
-          print('Accepted user response for $receiverId: $userResponse');
+          print('Going user response for $receiverId: $userResponse');
 
           if (userResponse != null) {
             final user = UserModel.fromJson(userResponse);
             participants.add(user);
-            print(
-                'Added accepted participant: ${user.displayName ?? user.email}');
+            print('Added going participant: ${user.displayName ?? user.email}');
           }
         } catch (e) {
-          print('Error getting accepted user info for $receiverId: $e');
+          print('Error getting going user info for $receiverId: $e');
         }
       }
 
-      print('Total accepted participants: ${participants.length}');
+      print('Total going participants: ${participants.length}');
       return participants;
     } catch (e) {
-      print('Error getting accepted participants: $e');
+      print('Error getting going participants: $e');
       return [];
     }
   }
@@ -630,6 +629,37 @@ class InviteService {
     }
   }
 
+  // Get invite for a specific user and card
+  Future<InviteModel?> getInviteByUserAndCard({
+    required String userId,
+    required String cardId,
+  }) async {
+    try {
+      print('Getting invite for user $userId and card: $cardId');
+
+      final response = await _supabase
+          .from('invites')
+          .select('*')
+          .eq('card_id', cardId)
+          .eq('receiver_id', userId)
+          .single();
+
+      print('Get invite response: $response');
+
+      if (response == null) {
+        print('No invite found');
+        return null;
+      }
+
+      final invite = InviteModel.fromJson(response);
+      print('Found invite with status: ${invite.status}');
+      return invite;
+    } catch (e) {
+      print('Error getting invite for user and card: $e');
+      return null;
+    }
+  }
+
   // Update RSVP status
   Future<bool> updateRSVPStatus({
     required String inviteId,
@@ -654,6 +684,38 @@ class InviteService {
     } catch (e) {
       print('Error updating RSVP status: $e');
       return false;
+    }
+  }
+
+  // Get all invites for a card with status information
+  Future<Map<String, String>> getAllInviteStatuses(String cardId) async {
+    try {
+      print('Getting all invite statuses for card: $cardId');
+
+      final response = await _supabase
+          .from('invites')
+          .select('receiver_id, status')
+          .eq('card_id', cardId);
+
+      print('Get all invite statuses response: $response');
+
+      if (response == null) {
+        print('No invites found for card: $cardId');
+        return {};
+      }
+
+      Map<String, String> statuses = {};
+      for (var invite in response) {
+        final receiverId = invite['receiver_id'] as String;
+        final status = invite['status'] as String;
+        statuses[receiverId] = status;
+      }
+
+      print('Found ${statuses.length} invite statuses');
+      return statuses;
+    } catch (e) {
+      print('Error getting all invite statuses: $e');
+      return {};
     }
   }
 }

@@ -1,34 +1,21 @@
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter/widgets.dart';
 import 'user_model.dart';
+import 'package:enva/l10n/app_localizations.dart';
 
-part 'card_model.g.dart';
-
-@HiveType(typeId: 0)
-class CardModel extends HiveObject with EquatableMixin {
-  @HiveField(0)
+class CardModel extends Equatable {
   final String id;
-  @HiveField(1)
   final String title;
-  @HiveField(2)
   final String description;
-  @HiveField(3)
   String imageUserUrl;
-  @HiveField(4)
   final String ownerId;
-  @HiveField(5)
   String backgroundImageUrl = 'default';
-  @HiveField(6)
   String location = '';
-  @HiveField(7)
   final String created_at = DateTime.now().toIso8601String();
-  @HiveField(8)
   String imageUrl = '';
-  @HiveField(9)
   double? latitude;
-  @HiveField(10)
   double? longitude;
-  @HiveField(11)
+
   DateTime? eventDateTime;
   // Not using Hive for participants as it contains UserModel objects
   List<UserModel> participants = [];
@@ -159,9 +146,19 @@ class CardModel extends HiveObject with EquatableMixin {
   // Helper method for event date time
   bool get hasEventDateTime => eventDateTime != null;
 
-  String get formattedEventDateTime {
+  String getFormattedEventDateTime(BuildContext context) {
     if (eventDateTime == null) return '';
-    return '${_getWeekday(eventDateTime!.weekday)}, ${_getMonth(eventDateTime!.month)} ${eventDateTime!.day}, ${_formatTime(eventDateTime!)}';
+    final l10n = AppLocalizations.of(context)!;
+
+    // Check if current locale is Vietnamese
+    final locale = Localizations.localeOf(context).languageCode;
+    if (locale == 'vi') {
+      // Vietnamese format: "Thứ 2, ngày 28 tháng 6, 2:30 PM"
+      return '${_getWeekday(context, eventDateTime!.weekday)}, ngày ${eventDateTime!.day} ${_getMonth(context, eventDateTime!.month)}, ${_formatTime(eventDateTime!)}';
+    } else {
+      // English format: "Mon, Jun 28, 2:30 PM"
+      return '${_getWeekday(context, eventDateTime!.weekday)}, ${_getMonth(context, eventDateTime!.month)} ${eventDateTime!.day}, ${_formatTime(eventDateTime!)}';
+    }
   }
 
   // Get accepted participants (those who have accepted the invite)
@@ -170,28 +167,56 @@ class CardModel extends HiveObject with EquatableMixin {
   // Get participant count
   int get participantCount => participants.length;
 
-  String _getWeekday(int weekday) {
-    const weekdays = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return weekdays[weekday];
+  String _getWeekday(BuildContext context, int weekday) {
+    final locale = Localizations.localeOf(context).languageCode;
+    if (locale == 'vi') {
+      const weekdays = [
+        '',
+        'Thứ 2',
+        'Thứ 3',
+        'Thứ 4',
+        'Thứ 5',
+        'Thứ 6',
+        'Thứ 7',
+        'Chủ nhật'
+      ];
+      return weekdays[weekday];
+    } else {
+      const weekdays = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      return weekdays[weekday];
+    }
   }
 
-  String _getMonth(int month) {
-    const months = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month];
+  String _getMonth(BuildContext context, int month) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (month) {
+      case 1:
+        return l10n.month_jan;
+      case 2:
+        return l10n.month_feb;
+      case 3:
+        return l10n.month_mar;
+      case 4:
+        return l10n.month_apr;
+      case 5:
+        return l10n.month_may;
+      case 6:
+        return l10n.month_jun;
+      case 7:
+        return l10n.month_jul;
+      case 8:
+        return l10n.month_aug;
+      case 9:
+        return l10n.month_sep;
+      case 10:
+        return l10n.month_oct;
+      case 11:
+        return l10n.month_nov;
+      case 12:
+        return l10n.month_dec;
+      default:
+        return '';
+    }
   }
 
   String _formatTime(DateTime dateTime) {

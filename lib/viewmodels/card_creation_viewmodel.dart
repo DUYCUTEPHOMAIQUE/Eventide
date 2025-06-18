@@ -9,6 +9,7 @@ import '../services/image_picker_service.dart';
 import '../services/cloudinary_service.dart';
 import '../services/supabase_services.dart';
 import '../models/card_model.dart';
+import '../l10n/app_localizations.dart';
 
 class CardCreationViewModel extends ChangeNotifier {
   final CardService _cardService = CardService();
@@ -60,9 +61,18 @@ class CardCreationViewModel extends ChangeNotifier {
   bool get isFormValid => _title.isNotEmpty && _description.isNotEmpty;
 
   // Helper method for formatted event date time
-  String get formattedEventDateTime {
+  String getFormattedEventDateTime(BuildContext context) {
     if (_eventDateTime == null) return '';
-    return '${_getWeekday(_eventDateTime!.weekday)}, ${_getMonth(_eventDateTime!.month)} ${_eventDateTime!.day}, ${_formatTime(_eventDateTime!)}';
+
+    // Check if current locale is Vietnamese
+    final locale = Localizations.localeOf(context).languageCode;
+    if (locale == 'vi') {
+      // Vietnamese format: "Thứ 2, ngày 28 tháng 6, 2:30 PM"
+      return '${_getWeekday(context, _eventDateTime!.weekday)}, ngày ${_eventDateTime!.day} ${_getMonth(context, _eventDateTime!.month)}, ${_formatTime(_eventDateTime!)}';
+    } else {
+      // English format: "Mon, Jun 28, 2:30 PM"
+      return '${_getWeekday(context, _eventDateTime!.weekday)}, ${_getMonth(context, _eventDateTime!.month)} ${_eventDateTime!.day}, ${_formatTime(_eventDateTime!)}';
+    }
   }
 
   // Form setters
@@ -104,28 +114,56 @@ class CardCreationViewModel extends ChangeNotifier {
   }
 
   // Helper methods for date formatting
-  String _getWeekday(int weekday) {
-    const weekdays = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return weekdays[weekday];
+  String _getWeekday(BuildContext context, int weekday) {
+    final locale = Localizations.localeOf(context).languageCode;
+    if (locale == 'vi') {
+      const weekdays = [
+        '',
+        'Thứ 2',
+        'Thứ 3',
+        'Thứ 4',
+        'Thứ 5',
+        'Thứ 6',
+        'Thứ 7',
+        'Chủ nhật'
+      ];
+      return weekdays[weekday];
+    } else {
+      const weekdays = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      return weekdays[weekday];
+    }
   }
 
-  String _getMonth(int month) {
-    const months = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month];
+  String _getMonth(BuildContext context, int month) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (month) {
+      case 1:
+        return l10n.month_jan;
+      case 2:
+        return l10n.month_feb;
+      case 3:
+        return l10n.month_mar;
+      case 4:
+        return l10n.month_apr;
+      case 5:
+        return l10n.month_may;
+      case 6:
+        return l10n.month_jun;
+      case 7:
+        return l10n.month_jul;
+      case 8:
+        return l10n.month_aug;
+      case 9:
+        return l10n.month_sep;
+      case 10:
+        return l10n.month_oct;
+      case 11:
+        return l10n.month_nov;
+      case 12:
+        return l10n.month_dec;
+      default:
+        return '';
+    }
   }
 
   String _formatTime(DateTime dateTime) {

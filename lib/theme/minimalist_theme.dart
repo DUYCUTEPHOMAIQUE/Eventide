@@ -265,19 +265,19 @@ class MinimalistTheme {
           filled: true,
           fillColor: gray50,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(32),
             borderSide: BorderSide(color: gray200, width: 1.5),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(32),
             borderSide: BorderSide(color: gray200, width: 1.5),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(32),
             borderSide: BorderSide(color: blue200, width: 1.5),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(32),
             borderSide: BorderSide(color: red600, width: 1.5),
           ),
           contentPadding: const EdgeInsets.symmetric(
@@ -516,19 +516,19 @@ class MinimalistTheme {
           filled: true,
           fillColor: gray800,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(32),
             borderSide: BorderSide(color: gray600, width: 1.5),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(32),
             borderSide: BorderSide(color: gray600, width: 1.5),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(32),
             borderSide: BorderSide(color: blue200, width: 1.5),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(32),
             borderSide: BorderSide(color: red600, width: 1.5),
           ),
           contentPadding: const EdgeInsets.symmetric(

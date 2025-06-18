@@ -40,6 +40,7 @@ class ParticipantsAvatarList extends StatelessWidget {
     ];
 
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Show participant avatars
         ...List.generate(displayCount, (index) {

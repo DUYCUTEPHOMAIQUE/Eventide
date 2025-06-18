@@ -10,6 +10,7 @@ import 'package:enva/screens/event_detail_screen.dart';
 import 'package:enva/widgets/participants_avatar_list.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:math';
+import 'package:enva/l10n/app_localizations.dart';
 
 class EnhancedMinimalistHomeScreen extends StatelessWidget {
   const EnhancedMinimalistHomeScreen({super.key});
@@ -94,8 +95,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
               // Semi-transparent overlay
               Positioned.fill(
                 child: Container(
-                  color: Colors.white
-                      .withOpacity(0.85), // Semi-transparent white overlay
+                  color: Colors
+                      .white, // Fully white overlay instead of semi-transparent
                 ),
               ),
 
@@ -126,12 +127,6 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-            width: 1,
-          ),
-        ),
       ),
       child: Row(
         children: [
@@ -143,7 +138,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    provider.getCategoryTitle(),
+                    provider.getCategoryTitle(context),
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
@@ -298,9 +293,9 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const Text(
-              'Chọn danh mục',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.selectCategory,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -310,32 +305,32 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
               context,
               provider,
               EventCategory.upcoming,
-              'Upcoming',
-              'Sự kiện sắp diễn ra',
+              AppLocalizations.of(context)!.upcoming,
+              AppLocalizations.of(context)!.upcomingEvents,
               Icons.event,
             ),
             _buildCategoryOption(
               context,
               provider,
               EventCategory.hosting,
-              'Hosting',
-              'Sự kiện bạn tổ chức',
+              AppLocalizations.of(context)!.hosting,
+              AppLocalizations.of(context)!.eventsYouHost,
               Icons.star,
             ),
             _buildCategoryOption(
               context,
               provider,
               EventCategory.invited,
-              'Invited',
-              'Lời mời đến bạn',
+              AppLocalizations.of(context)!.invited,
+              AppLocalizations.of(context)!.invitationsToYou,
               Icons.mail,
             ),
             _buildCategoryOption(
               context,
               provider,
               EventCategory.past,
-              'Past',
-              'Sự kiện đã qua',
+              AppLocalizations.of(context)!.past,
+              AppLocalizations.of(context)!.pastEvents,
               Icons.history,
             ),
             const SizedBox(height: 20),
@@ -411,31 +406,39 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
             onRefresh: () => provider.refreshCards(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              child: Container(
-                height: 700, // Fixed height for all content
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (provider.isLoading)
-                      _buildLoadingState(context)
-                    else if (provider.getFilteredCards().isEmpty)
-                      _buildEmptyState(context, provider)
-                    else ...[
-                      // Filter dropdown for invited category
-                      if (provider.selectedCategory == EventCategory.invited)
-                        _buildInviteStatusFilter(context, provider),
-                      Expanded(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: provider.viewMode == ViewMode.carousel
-                              ? _buildCarouselView(provider.getPageController(),
-                                  provider.getFilteredCards())
-                              : _buildGridView(provider.getFilteredCards()),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+              child: Column(
+                children: [
+                  // Filter dropdown for invited category - always show when in invited tab
+                  if (provider.selectedCategory == EventCategory.invited)
+                    _buildInviteStatusFilter(context, provider),
+
+                  // Content area - use Expanded to fill remaining space
+                  Container(
+                    height: MediaQuery.of(context).size.height -
+                        200, // Adjust height for filter
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (provider.isLoading)
+                          _buildLoadingState(context)
+                        else if (provider.getFilteredCards().isEmpty)
+                          _buildEmptyState(context, provider)
+                        else ...[
+                          Expanded(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              child: provider.viewMode == ViewMode.carousel
+                                  ? _buildCarouselView(
+                                      provider.getPageController(),
+                                      provider.getFilteredCards())
+                                  : _buildGridView(provider.getFilteredCards()),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -448,81 +451,131 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
       BuildContext context, HomeScreenProvider provider) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _buildFilterChip(
+              context,
+              provider,
+              InviteStatusFilter.all,
+              AppLocalizations.of(context)!.all,
+              Icons.all_inclusive,
+            ),
+            const SizedBox(width: 8),
+            _buildFilterChip(
+              context,
+              provider,
+              InviteStatusFilter.pending,
+              AppLocalizations.of(context)!.pending,
+              Icons.schedule,
+            ),
+            const SizedBox(width: 8),
+            _buildFilterChip(
+              context,
+              provider,
+              InviteStatusFilter.going,
+              AppLocalizations.of(context)!.going,
+              Icons.check_circle,
+            ),
+            const SizedBox(width: 8),
+            _buildFilterChip(
+              context,
+              provider,
+              InviteStatusFilter.notgoing,
+              AppLocalizations.of(context)!.notGoing,
+              Icons.cancel,
+            ),
+            const SizedBox(width: 8),
+            _buildFilterChip(
+              context,
+              provider,
+              InviteStatusFilter.maybe,
+              AppLocalizations.of(context)!.maybe,
+              Icons.help,
+            ),
+            const SizedBox(width: 8),
+            _buildFilterChip(
+              context,
+              provider,
+              InviteStatusFilter.cancelled,
+              AppLocalizations.of(context)!.cancelled,
+              Icons.block,
+            ),
+          ],
         ),
       ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.filter_list,
-            size: 20,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+    );
+  }
+
+  Widget _buildFilterChip(
+    BuildContext context,
+    HomeScreenProvider provider,
+    InviteStatusFilter filter,
+    String label,
+    IconData icon,
+  ) {
+    final isSelected = provider.inviteStatusFilter == filter;
+
+    return GestureDetector(
+      onTap: () => provider.setInviteStatusFilter(filter),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            width: 1.5,
           ),
-          const SizedBox(width: 8),
-          Text(
-            'Lọc theo:',
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color:
+                        Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected
+                  ? Colors.white
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<InviteStatusFilter>(
-                value: provider.inviteStatusFilter,
-                isExpanded: true,
-                icon: Icon(
-                  Icons.keyboard_arrow_down,
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                ),
-                items: [
-                  DropdownMenuItem(
-                    value: InviteStatusFilter.all,
-                    child: Text('Tất cả trạng thái'),
-                  ),
-                  DropdownMenuItem(
-                    value: InviteStatusFilter.pending,
-                    child: Text('Đang chờ'),
-                  ),
-                  DropdownMenuItem(
-                    value: InviteStatusFilter.accepted,
-                    child: Text('Đã chấp nhận'),
-                  ),
-                  DropdownMenuItem(
-                    value: InviteStatusFilter.declined,
-                    child: Text('Đã từ chối'),
-                  ),
-                  DropdownMenuItem(
-                    value: InviteStatusFilter.cancelled,
-                    child: Text('Đã hủy'),
-                  ),
-                  DropdownMenuItem(
-                    value: InviteStatusFilter.undecided,
-                    child: Text('Chưa quyết định'),
-                  ),
-                ],
-                onChanged: (InviteStatusFilter? newValue) {
-                  if (newValue != null) {
-                    provider.setInviteStatusFilter(newValue);
-                  }
-                },
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isSelected
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildCarouselView(
       PageController pageController, List<CardModel> cards) {
+    if (cards.isEmpty) {
+      return const SizedBox.shrink();
+    }
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -631,7 +684,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
       child: Container(
         // Height will be set by parent container
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(37),
           boxShadow: [
             BoxShadow(
               color: Theme.of(context).colorScheme.shadow.withOpacity(0.15),
@@ -645,7 +698,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
             // Background
             Positioned.fill(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(37),
                 child: _buildCardBackground(card),
               ),
             ),
@@ -654,7 +707,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(37),
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -731,7 +784,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
 
             // Attendees
             Positioned(
-              left: 24,
+              left: 0,
+              right: 0,
               bottom: 120,
               child: ParticipantsAvatarList(participants: card.participants),
             ),
@@ -759,9 +813,9 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
                   ),
                   const SizedBox(height: 12),
                   // Time - only show if available
-                  if (_formatEventTime(card).isNotEmpty) ...[
+                  if (_formatEventTime(context, card).isNotEmpty) ...[
                     Text(
-                      _formatEventTime(card),
+                      _formatEventTime(context, card),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -802,7 +856,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
       child: Container(
         height: 200, // Fixed height for compact cards
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(37),
           boxShadow: [
             BoxShadow(
               color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
@@ -816,7 +870,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
             // Background
             Positioned.fill(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(37),
                 child: _buildCardBackground(card),
               ),
             ),
@@ -825,7 +879,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(37),
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -897,7 +951,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
             // Participants (smaller)
             if (card.participants.isNotEmpty)
               Positioned(
-                left: 12,
+                left: 0,
+                right: 0,
                 bottom: 60,
                 child: ParticipantsAvatarList(
                   participants: card.participants,
@@ -931,9 +986,9 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
                   ),
                   const SizedBox(height: 6),
                   // Time - only show if available
-                  if (_formatEventTimeCompact(card).isNotEmpty) ...[
+                  if (_formatEventTimeCompact(context, card).isNotEmpty) ...[
                     Text(
-                      _formatEventTimeCompact(card),
+                      _formatEventTimeCompact(context, card),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -1074,7 +1129,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(32),
                 border: Border.all(
                   color: Colors.white.withOpacity(0.2),
                   width: 1,
@@ -1093,23 +1148,20 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
   }
 
   Widget _buildLoadingState(BuildContext context) {
-    return const SizedBox(
-      height: 400, // Fixed height for loading state
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 24),
-            Text(
-              'Đang tải dữ liệu...',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 16),
+          Text(
+            AppLocalizations.of(context)!.loadingData,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1118,97 +1170,108 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
     String title;
     String subtitle;
     IconData icon;
+    bool showResetButton = false;
 
     switch (provider.selectedCategory) {
       case EventCategory.upcoming:
-        title = 'Chưa có sự kiện sắp diễn ra';
-        subtitle = 'Tạo sự kiện mới hoặc chờ lời mời từ bạn bè';
+        title = AppLocalizations.of(context)!.noUpcomingEvents;
+        subtitle = AppLocalizations.of(context)!.createNewEventOrWait;
         icon = Icons.event_note_outlined;
         break;
       case EventCategory.hosting:
-        title = 'Chưa có sự kiện nào bạn tổ chức';
-        subtitle = 'Bắt đầu tạo sự kiện đầu tiên của bạn';
+        title = AppLocalizations.of(context)!.noHostingEvents;
+        subtitle = AppLocalizations.of(context)!.startCreatingFirstEvent;
         icon = Icons.star_outline;
         break;
       case EventCategory.invited:
         if (provider.inviteStatusFilter == InviteStatusFilter.all) {
-          title = 'Chưa có lời mời nào';
-          subtitle =
-              'Bạn sẽ thấy các lời mời sự kiện ở đây khi có người mời bạn';
+          title = AppLocalizations.of(context)!.noInvitations;
+          subtitle = AppLocalizations.of(context)!.invitationsWillAppearHere;
           icon = Icons.mail_outline;
         } else {
           title =
               'Không có lời mời ${_getStatusText(_getStatusString(provider.inviteStatusFilter))}';
-          subtitle = 'Thử chọn trạng thái khác hoặc chờ lời mời mới';
+          subtitle = AppLocalizations.of(context)!.tryDifferentStatus;
           icon = Icons.filter_list;
+          showResetButton = true;
         }
         break;
       case EventCategory.past:
-        title = 'Chưa có sự kiện đã qua';
-        subtitle = 'Các sự kiện đã kết thúc sẽ hiển thị ở đây';
+        title = AppLocalizations.of(context)!.noPastEvents;
+        subtitle = AppLocalizations.of(context)!.pastEventsWillAppearHere;
         icon = Icons.history;
         break;
     }
 
-    return SizedBox(
-      height: 400, // Fixed height for empty state
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 60,
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
-                ),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                shape: BoxShape.circle,
               ),
-              const SizedBox(height: 24),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.center,
+              child: Icon(
+                icon,
+                size: 50,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.6),
               ),
-              const SizedBox(height: 12),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 16,
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
-              const SizedBox(height: 32),
-              if (provider.selectedCategory == EventCategory.upcoming ||
-                  provider.selectedCategory == EventCategory.hosting)
-                ElevatedButton.icon(
-                  onPressed: () => _navigateToCreateCard(context),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Tạo sự kiện mới'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            if (showResetButton)
+              ElevatedButton.icon(
+                onPressed: () =>
+                    provider.setInviteStatusFilter(InviteStatusFilter.all),
+                icon: const Icon(Icons.refresh, size: 18),
+                label: Text(AppLocalizations.of(context)!.viewAllInvitations),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
                   ),
                 ),
-            ],
-          ),
+              )
+            else if (provider.selectedCategory == EventCategory.upcoming ||
+                provider.selectedCategory == EventCategory.hosting)
+              ElevatedButton.icon(
+                onPressed: () => _navigateToCreateCard(context),
+                icon: const Icon(Icons.add, size: 18),
+                label: Text(AppLocalizations.of(context)!.createNewEvent),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -1217,34 +1280,34 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
   String _getStatusString(InviteStatusFilter filter) {
     switch (filter) {
       case InviteStatusFilter.pending:
-        return 'Đang chờ';
-      case InviteStatusFilter.accepted:
-        return 'Đã chấp nhận';
-      case InviteStatusFilter.declined:
-        return 'Đã từ chối';
+        return AppLocalizations.of(context)!.pending;
+      case InviteStatusFilter.going:
+        return AppLocalizations.of(context)!.going;
+      case InviteStatusFilter.notgoing:
+        return AppLocalizations.of(context)!.notGoing;
+      case InviteStatusFilter.maybe:
+        return AppLocalizations.of(context)!.maybe;
       case InviteStatusFilter.cancelled:
-        return 'Đã hủy';
-      case InviteStatusFilter.undecided:
-        return 'Chưa quyết định';
+        return AppLocalizations.of(context)!.cancelled;
       case InviteStatusFilter.all:
-        return 'Tất cả';
+        return AppLocalizations.of(context)!.all;
     }
   }
 
   String _getStatusText(String status) {
     switch (status) {
       case 'pending':
-        return 'Đang chờ';
-      case 'accepted':
-        return 'Đã chấp nhận';
-      case 'declined':
-        return 'Đã từ chối';
+        return AppLocalizations.of(context)!.pending;
+      case 'going':
+        return AppLocalizations.of(context)!.going;
+      case 'notgoing':
+        return AppLocalizations.of(context)!.notGoing;
+      case 'maybe':
+        return AppLocalizations.of(context)!.maybe;
       case 'cancelled':
-        return 'Đã hủy';
-      case 'undecided':
-        return 'Chưa quyết định';
+        return AppLocalizations.of(context)!.cancelled;
       default:
-        return 'Chưa xác định';
+        return AppLocalizations.of(context)!.undefined;
     }
   }
 
@@ -1261,7 +1324,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
       provider.refreshCards();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Thẻ đã được tạo thành công!'),
+          content: Text(AppLocalizations.of(context)!.cardCreatedSuccessfully),
           backgroundColor: Theme.of(context).colorScheme.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -1307,61 +1370,131 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
     switch (status) {
       case 'pending':
         return Colors.orange;
-      case 'accepted':
+      case 'going':
         return Colors.green;
-      case 'declined':
+      case 'notgoing':
         return Colors.red;
+      case 'maybe':
+        return Colors.blue;
       case 'cancelled':
         return Colors.grey;
-      case 'undecided':
-        return Colors.blue;
       default:
         return Colors.grey;
     }
   }
 
-  String _formatEventTime(CardModel card) {
+  String _formatEventTime(BuildContext context, CardModel card) {
     if (card.eventDateTime == null) {
       return ''; // Return empty string if no event date
     }
 
     try {
       final date = card.eventDateTime!;
-      final month = _getMonth(date.month);
-      final day = date.day;
-      return '$month $day';
+      final locale = Localizations.localeOf(context).languageCode;
+      String month = '';
+
+      switch (date.month) {
+        case 1:
+          month = locale == 'vi' ? 'tháng 1' : 'Jan';
+          break;
+        case 2:
+          month = locale == 'vi' ? 'tháng 2' : 'Feb';
+          break;
+        case 3:
+          month = locale == 'vi' ? 'tháng 3' : 'Mar';
+          break;
+        case 4:
+          month = locale == 'vi' ? 'tháng 4' : 'Apr';
+          break;
+        case 5:
+          month = locale == 'vi' ? 'tháng 5' : 'May';
+          break;
+        case 6:
+          month = locale == 'vi' ? 'tháng 6' : 'Jun';
+          break;
+        case 7:
+          month = locale == 'vi' ? 'tháng 7' : 'Jul';
+          break;
+        case 8:
+          month = locale == 'vi' ? 'tháng 8' : 'Aug';
+          break;
+        case 9:
+          month = locale == 'vi' ? 'tháng 9' : 'Sep';
+          break;
+        case 10:
+          month = locale == 'vi' ? 'tháng 10' : 'Oct';
+          break;
+        case 11:
+          month = locale == 'vi' ? 'tháng 11' : 'Nov';
+          break;
+        case 12:
+          month = locale == 'vi' ? 'tháng 12' : 'Dec';
+          break;
+        default:
+          month = '';
+      }
+
+      if (locale == 'vi') {
+        // Vietnamese format: "ngày 28 tháng 6"
+        return 'ngày ${date.day} $month';
+      } else {
+        // English format: "Jun 28"
+        return '$month ${date.day}';
+      }
     } catch (e) {
-      return ''; // Return empty string on error
+      return '';
     }
   }
 
-  String _getMonth(int month) {
-    const months = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month];
-  }
-
-  String _formatEventTimeCompact(CardModel card) {
+  String _formatEventTimeCompact(BuildContext context, CardModel card) {
     if (card.eventDateTime == null) {
       return ''; // Return empty string if no event date
     }
 
     try {
       final date = card.eventDateTime!;
-      final month = _getMonth(date.month);
+      final l10n = AppLocalizations.of(context)!;
+      String month = '';
+      switch (date.month) {
+        case 1:
+          month = l10n.month_jan;
+          break;
+        case 2:
+          month = l10n.month_feb;
+          break;
+        case 3:
+          month = l10n.month_mar;
+          break;
+        case 4:
+          month = l10n.month_apr;
+          break;
+        case 5:
+          month = l10n.month_may;
+          break;
+        case 6:
+          month = l10n.month_jun;
+          break;
+        case 7:
+          month = l10n.month_jul;
+          break;
+        case 8:
+          month = l10n.month_aug;
+          break;
+        case 9:
+          month = l10n.month_sep;
+          break;
+        case 10:
+          month = l10n.month_oct;
+          break;
+        case 11:
+          month = l10n.month_nov;
+          break;
+        case 12:
+          month = l10n.month_dec;
+          break;
+        default:
+          month = '';
+      }
       final day = date.day;
       return '$month $day';
     } catch (e) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:enva/viewmodels/card_creation_viewmodel.dart';
 import 'package:enva/widgets/minimalist_location_picker.dart';
+import 'package:enva/l10n/app_localizations.dart';
 import 'dart:io';
 import 'package:enva/models/card_model.dart';
 
@@ -107,7 +108,7 @@ class _MinimalistCardCreationViewState
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(32),
               ),
               child: Icon(
                 Icons.arrow_back_ios_new,
@@ -125,7 +126,9 @@ class _MinimalistCardCreationViewState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isEditMode ? 'Edit Event' : 'Create Event',
+                  isEditMode
+                      ? AppLocalizations.of(context)!.editEvent
+                      : AppLocalizations.of(context)!.createEvent,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
@@ -135,8 +138,8 @@ class _MinimalistCardCreationViewState
                 ),
                 Text(
                   isEditMode
-                      ? 'Update your event details'
-                      : 'Share your special moment',
+                      ? AppLocalizations.of(context)!.updateEventDetails
+                      : AppLocalizations.of(context)!.shareSpecialMoment,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -158,7 +161,7 @@ class _MinimalistCardCreationViewState
                 color: viewModel.isFormValid
                     ? Colors.blue.shade50
                     : Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(32),
                 border: Border.all(
                   color: viewModel.isFormValid
                       ? Colors.blue.shade200
@@ -200,7 +203,7 @@ class _MinimalistCardCreationViewState
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(32),
       ),
       child: Column(
         children: [
@@ -244,11 +247,12 @@ class _MinimalistCardCreationViewState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader('Basic Information', 'Tell us about your event'),
+          _buildSectionHeader(AppLocalizations.of(context)!.basicInformation,
+              AppLocalizations.of(context)!.tellUsAboutYourEvent),
           const SizedBox(height: 24),
           _buildMinimalistTextField(
-            label: 'Event Title',
-            hintText: 'What\'s the occasion?',
+            label: AppLocalizations.of(context)!.eventTitle,
+            hintText: AppLocalizations.of(context)!.eventTitleHint,
             value: viewModel.title,
             onChanged: viewModel.setTitle,
             icon: Icons.event_outlined,
@@ -256,8 +260,8 @@ class _MinimalistCardCreationViewState
           ),
           const SizedBox(height: 20),
           _buildMinimalistTextField(
-            label: 'Description',
-            hintText: 'Share more details about your event...',
+            label: AppLocalizations.of(context)!.eventDescription,
+            hintText: AppLocalizations.of(context)!.eventDescriptionHint,
             value: viewModel.description,
             onChanged: viewModel.setDescription,
             icon: Icons.description_outlined,
@@ -265,15 +269,18 @@ class _MinimalistCardCreationViewState
             controller: _descriptionController,
           ),
           const SizedBox(height: 32),
-          _buildSectionHeader('Location', 'Where will it happen?'),
+          _buildSectionHeader(AppLocalizations.of(context)!.eventLocation,
+              AppLocalizations.of(context)!.whereWillItHappen),
           const SizedBox(height: 24),
           _buildLocationSection(viewModel),
           const SizedBox(height: 32),
-          _buildSectionHeader('Event Time', 'When will it happen?'),
+          _buildSectionHeader(AppLocalizations.of(context)!.eventDateTime,
+              AppLocalizations.of(context)!.whenWillItHappen),
           const SizedBox(height: 24),
           _buildDateTimeSection(context, viewModel),
           const SizedBox(height: 32),
-          _buildSectionHeader('Media', 'Add photos to make it special'),
+          _buildSectionHeader(AppLocalizations.of(context)!.media,
+              AppLocalizations.of(context)!.addPhotosToMakeItSpecial),
           const SizedBox(height: 24),
           _buildMediaSection(context, viewModel),
           const SizedBox(height: 40),
@@ -347,39 +354,26 @@ class _MinimalistCardCreationViewState
           ],
         ),
         const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.grey.shade50,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: value.isNotEmpty
-                  ? Colors.blue.shade200
-                  : Colors.grey.shade200,
-              width: 1.5,
-            ),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey.shade900,
+            fontWeight: FontWeight.w400,
           ),
-          child: TextField(
-            controller: controller,
-            maxLines: maxLines,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade900,
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(
+              color: Colors.grey.shade500,
               fontWeight: FontWeight.w400,
             ),
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: TextStyle(
-                color: Colors.grey.shade500,
-                fontWeight: FontWeight.w400,
-              ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: maxLines > 1 ? 16 : 14,
-              ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: maxLines > 1 ? 16 : 14,
             ),
-            onChanged: onChanged,
           ),
+          onChanged: onChanged,
         ),
       ],
     );
@@ -389,7 +383,7 @@ class _MinimalistCardCreationViewState
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(32),
         border: Border.all(
           color: viewModel.hasLocation
               ? Colors.blue.shade200
@@ -414,7 +408,7 @@ class _MinimalistCardCreationViewState
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(32),
           border: Border.all(
             color: viewModel.hasEventDateTime
                 ? Colors.blue.shade200
@@ -448,8 +442,8 @@ class _MinimalistCardCreationViewState
                 children: [
                   Text(
                     viewModel.hasEventDateTime
-                        ? 'Event Date & Time'
-                        : 'Set Event Date & Time',
+                        ? AppLocalizations.of(context)!.eventDateTime
+                        : AppLocalizations.of(context)!.setEventDateTime,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -459,8 +453,8 @@ class _MinimalistCardCreationViewState
                   const SizedBox(height: 4),
                   Text(
                     viewModel.hasEventDateTime
-                        ? viewModel.formattedEventDateTime
-                        : 'Tap to select when your event will happen',
+                        ? viewModel.getFormattedEventDateTime(context)
+                        : AppLocalizations.of(context)!.tapToSelectDateTime,
                     style: TextStyle(
                       fontSize: 14,
                       color: viewModel.hasEventDateTime
@@ -567,8 +561,8 @@ class _MinimalistCardCreationViewState
     return Column(
       children: [
         _buildMediaCard(
-          title: 'Background',
-          subtitle: 'Main event image',
+          title: AppLocalizations.of(context)!.background,
+          subtitle: AppLocalizations.of(context)!.mainEventImage,
           icon: Icons.wallpaper_outlined,
           imageFile: viewModel.backgroundImageFile,
           currentImageUrl: viewModel.currentBackgroundImageUrl,
@@ -577,8 +571,8 @@ class _MinimalistCardCreationViewState
         ),
         const SizedBox(height: 16),
         _buildMediaCard(
-          title: 'Memory Photo',
-          subtitle: 'Special moment capture',
+          title: AppLocalizations.of(context)!.memoryPhoto,
+          subtitle: AppLocalizations.of(context)!.specialMomentCapture,
           icon: Icons.photo_outlined,
           imageFile: viewModel.cardImageFile,
           currentImageUrl: viewModel.currentCardImageUrl,
@@ -604,7 +598,7 @@ class _MinimalistCardCreationViewState
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(32),
         border: Border.all(
           color: hasImage ? Colors.blue.shade200 : Colors.grey.shade200,
           width: 1.5,
@@ -667,7 +661,7 @@ class _MinimalistCardCreationViewState
           if (hasImage) ...[
             ClipRRect(
               borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(16)),
+                  const BorderRadius.vertical(bottom: Radius.circular(32)),
               child: imageFile != null
                   ? Image.file(
                       imageFile,
@@ -720,7 +714,7 @@ class _MinimalistCardCreationViewState
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Tap to add',
+                        AppLocalizations.of(context)!.tapToAdd,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade600,
@@ -744,7 +738,7 @@ class _MinimalistCardCreationViewState
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.red.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(32),
         border: Border.all(
           color: Colors.red.shade200,
           width: 1,
@@ -807,7 +801,7 @@ class _MinimalistCardCreationViewState
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(32),
                 ),
                 disabledBackgroundColor: Colors.grey.shade300,
                 disabledForegroundColor: Colors.grey.shade600,
@@ -822,7 +816,9 @@ class _MinimalistCardCreationViewState
                       ),
                     )
                   : Text(
-                      isEditMode ? 'Update Event' : 'Create Event',
+                      isEditMode
+                          ? AppLocalizations.of(context)!.updateEvent
+                          : AppLocalizations.of(context)!.createEvent,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -836,8 +832,8 @@ class _MinimalistCardCreationViewState
             viewModel.isCreatingCard
                 ? viewModel.progressMessage
                 : isEditMode
-                    ? 'Your event will be updated with the new details'
-                    : 'Your event will be shared with invited guests',
+                    ? AppLocalizations.of(context)!.eventWillBeUpdated
+                    : AppLocalizations.of(context)!.eventWillBeShared,
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey.shade600,
@@ -897,8 +893,11 @@ class _MinimalistCardCreationViewState
           : 'Event Description',
       ownerId: 'preview_owner',
       imageUrl: '',
-      backgroundImageUrl:
-          viewModel.backgroundImageFile != null ? 'preview' : 'default',
+      backgroundImageUrl: viewModel.backgroundImageFile != null
+          ? 'preview'
+          : (viewModel.currentBackgroundImageUrl.isNotEmpty
+              ? viewModel.currentBackgroundImageUrl
+              : 'default'),
       location: viewModel.location.isNotEmpty ? viewModel.location : 'Location',
       latitude: viewModel.selectedLocation?.latitude,
       longitude: viewModel.selectedLocation?.longitude,
@@ -967,7 +966,7 @@ class _PreviewCardModal extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Preview Card',
+                        AppLocalizations.of(context)!.previewCard,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
@@ -976,7 +975,7 @@ class _PreviewCardModal extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'See how your event will look',
+                        AppLocalizations.of(context)!.seeHowYourEventWillLook,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,
@@ -1177,6 +1176,7 @@ class _PreviewCardModal extends StatelessWidget {
   }
 
   Widget _buildCardBackground() {
+    // Check if there's a new background image file
     if (backgroundImageFile != null) {
       return Image.file(
         backgroundImageFile!,
@@ -1184,6 +1184,27 @@ class _PreviewCardModal extends StatelessWidget {
       );
     }
 
+    // Check if there's a current background image URL (for editing mode)
+    if (card.backgroundImageUrl.isNotEmpty &&
+        card.backgroundImageUrl != 'default') {
+      return Image.network(
+        card.backgroundImageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildDefaultBackground();
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildDefaultBackground();
+        },
+      );
+    }
+
+    // Fallback to default background
+    return _buildDefaultBackground();
+  }
+
+  Widget _buildDefaultBackground() {
     // Placeholder background with gradient
     final gradients = [
       LinearGradient(

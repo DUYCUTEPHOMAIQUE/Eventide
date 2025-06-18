@@ -4,17 +4,11 @@ import '../models/invite_model.dart';
 import '../services/card_service.dart';
 import '../services/invite_service.dart';
 import '../services/supabase_services.dart';
+import 'package:enva/l10n/app_localizations.dart';
 
 enum ViewMode { carousel, grid }
 
-enum InviteStatusFilter {
-  all,
-  pending,
-  accepted,
-  declined,
-  cancelled,
-  undecided
-}
+enum InviteStatusFilter { all, pending, going, notgoing, maybe, cancelled }
 
 enum EventCategory { upcoming, hosting, invited, past }
 
@@ -50,16 +44,16 @@ class HomeScreenProvider extends ChangeNotifier {
   AnimationController? get contentAnimation => _contentAnimation;
 
   // Get category title
-  String getCategoryTitle() {
+  String getCategoryTitle(BuildContext context) {
     switch (_selectedCategory) {
       case EventCategory.upcoming:
-        return 'Upcoming';
+        return AppLocalizations.of(context)!.upcoming;
       case EventCategory.hosting:
-        return 'Hosting';
+        return AppLocalizations.of(context)!.hosting;
       case EventCategory.invited:
-        return 'Invited';
+        return AppLocalizations.of(context)!.invited;
       case EventCategory.past:
-        return 'Past';
+        return AppLocalizations.of(context)!.past;
     }
   }
 
@@ -132,14 +126,14 @@ class HomeScreenProvider extends ChangeNotifier {
     switch (filter) {
       case InviteStatusFilter.pending:
         return 'pending';
-      case InviteStatusFilter.accepted:
-        return 'accepted';
-      case InviteStatusFilter.declined:
-        return 'declined';
+      case InviteStatusFilter.going:
+        return 'going';
+      case InviteStatusFilter.notgoing:
+        return 'notgoing';
+      case InviteStatusFilter.maybe:
+        return 'maybe';
       case InviteStatusFilter.cancelled:
         return 'cancelled';
-      case InviteStatusFilter.undecided:
-        return 'undecided';
       case InviteStatusFilter.all:
         return 'all';
     }
@@ -149,14 +143,22 @@ class HomeScreenProvider extends ChangeNotifier {
   void setEventCategory(EventCategory category) {
     if (_selectedCategory != category) {
       _selectedCategory = category;
+      // Dispose and recreate page controller when switching categories
+      _pageController?.dispose();
+      _pageController = null;
       notifyListeners();
     }
   }
 
   // Set invite status filter
   void setInviteStatusFilter(InviteStatusFilter filter) {
-    _inviteStatusFilter = filter;
-    notifyListeners();
+    if (_inviteStatusFilter != filter) {
+      _inviteStatusFilter = filter;
+      // Dispose and recreate page controller when changing filter
+      _pageController?.dispose();
+      _pageController = null;
+      notifyListeners();
+    }
   }
 
   // Initialize animations
@@ -187,7 +189,9 @@ class HomeScreenProvider extends ChangeNotifier {
 
   // Get page controller (non-nullable)
   PageController getPageController() {
-    _pageController ??= PageController();
+    // Always dispose old controller before creating new one
+    _pageController?.dispose();
+    _pageController = PageController();
     return _pageController!;
   }
 
@@ -233,10 +237,16 @@ class HomeScreenProvider extends ChangeNotifier {
       // Combine and remove duplicates
       final allCardsMap = <String, CardModel>{};
 
+      // Add owned cards with participants reloaded to get only accepted participants
       for (var card in ownedCards) {
+        // Reload participants using getAcceptedParticipants to get only people with status 'going'
+        final participants =
+            await _inviteService.getAcceptedParticipants(card.id);
+        card.participants = participants;
         allCardsMap[card.id] = card;
       }
 
+      // Add received invite cards (already have participants loaded)
       for (var card in receivedInviteCards) {
         allCardsMap[card.id] = card;
       }
@@ -302,6 +312,9 @@ class HomeScreenProvider extends ChangeNotifier {
 
   // Refresh cards
   Future<void> refreshCards() async {
+    // Dispose page controller before refreshing to avoid conflicts
+    _pageController?.dispose();
+    _pageController = null;
     await loadCards();
   }
 
@@ -366,10 +379,20 @@ class HomeScreenProvider extends ChangeNotifier {
   }
 
   // Format event info for display
-  String formatEventInfo(CardModel card) {
+  String formatEventInfo(BuildContext context, CardModel card) {
     try {
       final date = DateTime.parse(card.created_at);
-      final formattedDate = '${_getMonth(date.month)} ${date.day}';
+      final locale = Localizations.localeOf(context).languageCode;
+      String formattedDate;
+
+      if (locale == 'vi') {
+        // Vietnamese format: "ngày 28 tháng 6"
+        formattedDate = 'ngày ${date.day} ${_getMonth(context, date.month)}';
+      } else {
+        // English format: "Jun 28"
+        formattedDate = '${_getMonth(context, date.month)} ${date.day}';
+      }
+
       return card.location.isNotEmpty
           ? '$formattedDate • ${card.location}'
           : formattedDate;
@@ -378,10 +401,20 @@ class HomeScreenProvider extends ChangeNotifier {
     }
   }
 
-  String formatEventInfoCompact(CardModel card) {
+  String formatEventInfoCompact(BuildContext context, CardModel card) {
     try {
       final date = DateTime.parse(card.created_at);
-      final formattedDate = '${_getMonth(date.month)} ${date.day}';
+      final locale = Localizations.localeOf(context).languageCode;
+      String formattedDate;
+
+      if (locale == 'vi') {
+        // Vietnamese format: "ngày 28 tháng 6"
+        formattedDate = 'ngày ${date.day} ${_getMonth(context, date.month)}';
+      } else {
+        // English format: "Jun 28"
+        formattedDate = '${_getMonth(context, date.month)} ${date.day}';
+      }
+
       return card.location.isNotEmpty
           ? '$formattedDate • ${card.location}'
           : formattedDate;
@@ -390,22 +423,35 @@ class HomeScreenProvider extends ChangeNotifier {
     }
   }
 
-  String _getMonth(int month) {
-    const months = [
-      '',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return months[month];
+  String _getMonth(BuildContext context, int month) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (month) {
+      case 1:
+        return l10n.month_jan;
+      case 2:
+        return l10n.month_feb;
+      case 3:
+        return l10n.month_mar;
+      case 4:
+        return l10n.month_apr;
+      case 5:
+        return l10n.month_may;
+      case 6:
+        return l10n.month_jun;
+      case 7:
+        return l10n.month_jul;
+      case 8:
+        return l10n.month_aug;
+      case 9:
+        return l10n.month_sep;
+      case 10:
+        return l10n.month_oct;
+      case 11:
+        return l10n.month_nov;
+      case 12:
+        return l10n.month_dec;
+      default:
+        return '';
+    }
   }
 }

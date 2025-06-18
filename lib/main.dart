@@ -1,14 +1,16 @@
 import 'package:enva/blocs/blocs.dart';
-import 'package:enva/models/models.dart';
 import 'package:enva/screens/screens.dart';
 import 'package:enva/theme/minimalist_theme.dart';
+import 'package:enva/services/language_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:enva/l10n/app_localizations.dart';
 import 'firebase_options.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'services/auth_listener_service.dart';
 import 'services/fcm_service.dart';
 
@@ -23,9 +25,6 @@ Future main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await Hive.initFlutter();
-  Hive.registerAdapter(CardModelAdapter());
-  await Hive.openBox<CardModel>('cards');
 
   // Initialize AuthListenerService to handle automatic profile creation
   AuthListenerService.initialize();
@@ -57,14 +56,26 @@ class EnvaApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => AuthBloc()),
         BlocProvider(create: (_) => ThemeCubit()..loadThemePreference()),
+        ChangeNotifierProvider(create: (_) => LanguageService()),
       ],
       child: Builder(
         builder: (context) {
           final themeMode = context.watch<ThemeCubit>().state;
+          final languageService = context.watch<LanguageService>();
 
           return MaterialApp(
             title: 'Enva',
             debugShowCheckedModeBanner: false,
+
+            // Localization configuration - will be enabled after flutter pub get
+            locale: languageService.currentLocale,
+            supportedLocales: LanguageService.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
 
             theme: MinimalistTheme.lightTheme,
             darkTheme: MinimalistTheme.darkTheme,

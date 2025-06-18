@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'full_screen_map_picker.dart';
+import 'package:enva/l10n/app_localizations.dart';
 
 class MinimalistLocationPicker extends StatefulWidget {
   final String location;
@@ -87,7 +88,7 @@ class _MinimalistLocationPickerState extends State<MinimalistLocationPicker> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Event Location',
+                AppLocalizations.of(context)!.eventLocation,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -102,13 +103,14 @@ class _MinimalistLocationPickerState extends State<MinimalistLocationPicker> {
           // Location input field
           TextField(
             controller: _locationController,
+            maxLines: 1,
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey.shade900,
               fontWeight: FontWeight.w400,
             ),
             decoration: InputDecoration(
-              hintText: 'Enter address or venue name',
+              hintText: AppLocalizations.of(context)!.eventLocationHint,
               hintStyle: TextStyle(
                 color: Colors.grey.shade500,
                 fontWeight: FontWeight.w400,
@@ -128,7 +130,7 @@ class _MinimalistLocationPickerState extends State<MinimalistLocationPicker> {
               Expanded(
                 child: _buildActionButton(
                   icon: Icons.my_location_outlined,
-                  label: 'Current',
+                  label: AppLocalizations.of(context)!.currentLocationButton,
                   onTap: widget.onGetCurrentLocation,
                 ),
               ),
@@ -139,7 +141,7 @@ class _MinimalistLocationPickerState extends State<MinimalistLocationPicker> {
               Expanded(
                 child: _buildActionButton(
                   icon: Icons.map_outlined,
-                  label: 'Browse Map',
+                  label: AppLocalizations.of(context)!.browseMapButton,
                   onTap: _openFullScreenMap,
                 ),
               ),
@@ -152,7 +154,9 @@ class _MinimalistLocationPickerState extends State<MinimalistLocationPicker> {
                   icon: _showPreview
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
-                  label: _showPreview ? 'Hide' : 'Preview',
+                  label: _showPreview
+                      ? AppLocalizations.of(context)!.hidePreviewButton
+                      : AppLocalizations.of(context)!.previewButton,
                   onTap: widget.selectedLocation != null
                       ? () => setState(() => _showPreview = !_showPreview)
                       : null,
@@ -278,6 +282,8 @@ class _MinimalistLocationPickerState extends State<MinimalistLocationPicker> {
             const SizedBox(height: 4),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
                 color: isEnabled ? Colors.grey.shade700 : Colors.grey.shade400,

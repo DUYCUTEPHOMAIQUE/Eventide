@@ -1,72 +1,199 @@
 {
-  "appTitle": "Invites",
+  "@@locale": "en",
+  
+  "appTitle": "Eventide",
   "@appTitle": {
     "description": "The title of the application"
   },
   
-  "birthdayParty": "Birthday Party",
-  "@birthdayParty": {
-    "description": "Title for birthday party invitation"
+  "createEvent": "Create Event",
+  "@createEvent": {
+    "description": "Title for event creation screen"
   },
   
-  "birthdayDate": "August 28 at 7:00 PM",
-  "@birthdayDate": {
-    "description": "Date for birthday party"
+  "editEvent": "Edit Event",
+  "@editEvent": {
+    "description": "Title for event editing screen"
   },
   
-  "birthdayLocation": "Central Park, New York",
-  "@birthdayLocation": {
-    "description": "Location for birthday party"
+  "updateEventDetails": "Update your event details",
+  "@updateEventDetails": {
+    "description": "Subtitle for edit event screen"
   },
   
-  "weddingCeremony": "Wedding Ceremony",
-  "@weddingCeremony": {
-    "description": "Title for wedding ceremony invitation"
+  "shareSpecialMoment": "Share your special moment",
+  "@shareSpecialMoment": {
+    "description": "Subtitle for create event screen"
   },
   
-  "weddingDate": "September 15 at 4:00 PM",
-  "@weddingDate": {
-    "description": "Date for wedding ceremony"
+  "eventTitle": "Event Title",
+  "@eventTitle": {
+    "description": "Label for event title field"
   },
   
-  "weddingLocation": "Grand Hotel & Resort",
-  "@weddingLocation": {
-    "description": "Location for wedding ceremony"
+  "eventTitleHint": "Enter your event title",
+  "@eventTitleHint": {
+    "description": "Hint text for event title field"
   },
   
-  "holidayParty": "Holiday Party",
-  "@holidayParty": {
-    "description": "Title for holiday party invitation"
+  "eventDescription": "Description",
+  "@eventDescription": {
+    "description": "Label for event description field"
   },
   
-  "holidayDate": "December 24 at 8:00 PM",
-  "@holidayDate": {
-    "description": "Date for holiday party"
+  "eventDescriptionHint": "Tell people about your event",
+  "@eventDescriptionHint": {
+    "description": "Hint text for event description field"
   },
   
-  "holidayLocation": "Winter Wonderland",
-  "@holidayLocation": {
-    "description": "Location for holiday party"
+  "eventLocation": "Location",
+  "@eventLocation": {
+    "description": "Label for event location field"
   },
   
-  "addNewInvitation": "Add New Invitation",
-  "@addNewInvitation": {
-    "description": "Button to add a new invitation"
+  "eventLocationHint": "Where will your event take place?",
+  "@eventLocationHint": {
+    "description": "Hint text for event location field"
   },
   
-  "viewInvitation": "View Invitation",
-  "@viewInvitation": {
-    "description": "Button to view invitation details"
+  "eventDateTime": "Date & Time",
+  "@eventDateTime": {
+    "description": "Label for event date and time field"
+  },
+  
+  "setEventDateTime": "Set Event Date & Time",
+  "@setEventDateTime": {
+    "description": "Label for setting event date and time"
+  },
+  
+  "tapToSelectDateTime": "Tap to select when your event will happen",
+  "@tapToSelectDateTime": {
+    "description": "Hint text for date time picker"
+  },
+  
+  "preview": "Preview",
+  "@preview": {
+    "description": "Preview button text"
+  },
+  
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+  
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button text"
+  },
+  
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  
+  "share": "Share",
+  "@share": {
+    "description": "Share button text"
+  },
+  
+  "back": "Back",
+  "@back": {
+    "description": "Back button text"
+  },
+  
+  "next": "Next",
+  "@next": {
+    "description": "Next button text"
+  },
+  
+  "done": "Done",
+  "@done": {
+    "description": "Done button text"
+  },
+  
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading text"
+  },
+  
+  "error": "Error",
+  "@error": {
+    "description": "Error text"
+  },
+  
+  "success": "Success",
+  "@success": {
+    "description": "Success text"
+  },
+  
+  "warning": "Warning",
+  "@warning": {
+    "description": "Warning text"
+  },
+  
+  "info": "Information",
+  "@info": {
+    "description": "Information text"
+  },
+  
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+  
+  "yes": "Yes",
+  "@yes": {
+    "description": "Yes button text"
+  },
+  
+  "no": "No",
+  "@no": {
+    "description": "No button text"
+  },
+  
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+  
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+  
+  "search": "Search",
+  "@search": {
+    "description": "Search placeholder text"
+  },
+  
+  "searchHint": "Search events...",
+  "@searchHint": {
+    "description": "Search hint text"
+  },
+  
+  "noResults": "No results found",
+  "@noResults": {
+    "description": "No search results text"
+  },
+  
+  "home": "Home",
+  "@home": {
+    "description": "Home tab label"
   },
   
   "profile": "Profile",
   "@profile": {
-    "description": "Profile section title"
+    "description": "Profile tab label"
   },
   
   "settings": "Settings",
   "@settings": {
-    "description": "Settings section title"
+    "description": "Settings tab label"
   },
   
   "language": "Language",
@@ -92,5 +219,1105 @@
   "lightMode": "Light Mode",
   "@lightMode": {
     "description": "Light mode option"
-  }
+  },
+  
+  "systemTheme": "System Theme",
+  "@systemTheme": {
+    "description": "System theme option text"
+  },
+  
+  "systemLanguage": "System Language",
+  "@systemLanguage": {
+    "description": "System language option text"
+  },
+  
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications setting label"
+  },
+  
+  "privacy": "Privacy",
+  "@privacy": {
+    "description": "Privacy setting label"
+  },
+  
+  "about": "About",
+  "@about": {
+    "description": "About section label"
+  },
+  
+  "help": "Help",
+  "@help": {
+    "description": "Help section label"
+  },
+  
+  "contact": "Contact",
+  "@contact": {
+    "description": "Contact section label"
+  },
+  
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  
+  "login": "Login",
+  "@login": {
+    "description": "Login button text"
+  },
+  
+  "signup": "Sign Up",
+  "@signup": {
+    "description": "Sign up button text"
+  },
+  
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm password field label"
+  },
+  
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+  
+  "dontHaveAccount": "Don't have an account?",
+  "@dontHaveAccount": {
+    "description": "Text for users without account"
+  },
+  
+  "alreadyHaveAccount": "Already have an account?",
+  "@alreadyHaveAccount": {
+    "description": "Text for users with existing account"
+  },
+  
+  "signInWithGoogle": "Sign in with Google",
+  "@signInWithGoogle": {
+    "description": "Google sign in button text"
+  },
+  
+  "signInWithFacebook": "Sign in with Facebook",
+  "@signInWithFacebook": {
+    "description": "Facebook sign in button text"
+  },
+  
+  "or": "or",
+  "@or": {
+    "description": "Or separator text"
+  },
+  
+  "welcome": "Welcome",
+  "@welcome": {
+    "description": "Welcome message"
+  },
+  
+  "welcomeMessage": "Welcome to Eventide",
+  "@welcomeMessage": {
+    "description": "Welcome message text"
+  },
+  
+  "welcomeSubtitle": "Create and share your events with friends and family",
+  "@welcomeSubtitle": {
+    "description": "Welcome subtitle text"
+  },
+  
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Get started button text"
+  },
+  
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button text"
+  },
+  
+  "continueButton": "Continue",
+  "@continueButton": {
+    "description": "Continue button text"
+  },
+  
+  "finish": "Finish",
+  "@finish": {
+    "description": "Finish button text"
+  },
+  
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+  
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button text"
+  },
+  
+  "clear": "Clear",
+  "@clear": {
+    "description": "Clear button text"
+  },
+  
+  "reset": "Reset",
+  "@reset": {
+    "description": "Reset button text"
+  },
+  
+  "apply": "Apply",
+  "@apply": {
+    "description": "Apply button text"
+  },
+  
+  "select": "Select",
+  "@select": {
+    "description": "Select button text"
+  },
+  
+  "choose": "Choose",
+  "@choose": {
+    "description": "Choose button text"
+  },
+  
+  "pick": "Pick",
+  "@pick": {
+    "description": "Pick button text"
+  },
+  
+  "add": "Add",
+  "@add": {
+    "description": "Add button text"
+  },
+  
+  "remove": "Remove",
+  "@remove": {
+    "description": "Remove button text"
+  },
+  
+  "create": "Create",
+  "@create": {
+    "description": "Create button text"
+  },
+  
+  "update": "Update",
+  "@update": {
+    "description": "Update button text"
+  },
+  
+  "change": "Change",
+  "@change": {
+    "description": "Change button text"
+  },
+  
+  "modify": "Modify",
+  "@modify": {
+    "description": "Modify button text"
+  },
+  
+  "copy": "Copy",
+  "@copy": {
+    "description": "Copy button text"
+  },
+  
+  "paste": "Paste",
+  "@paste": {
+    "description": "Paste button text"
+  },
+  
+  "cut": "Cut",
+  "@cut": {
+    "description": "Cut button text"
+  },
+  
+  "undo": "Undo",
+  "@undo": {
+    "description": "Undo button text"
+  },
+  
+  "redo": "Redo",
+  "@redo": {
+    "description": "Redo button text"
+  },
+  
+  "zoomIn": "Zoom In",
+  "@zoomIn": {
+    "description": "Zoom in button text"
+  },
+  
+  "zoomOut": "Zoom Out",
+  "@zoomOut": {
+    "description": "Zoom out button text"
+  },
+  
+  "fullscreen": "Fullscreen",
+  "@fullscreen": {
+    "description": "Fullscreen button text"
+  },
+  
+  "exitFullscreen": "Exit Fullscreen",
+  "@exitFullscreen": {
+    "description": "Exit fullscreen button text"
+  },
+  
+  "play": "Play",
+  "@play": {
+    "description": "Play button text"
+  },
+  
+  "pause": "Pause",
+  "@pause": {
+    "description": "Pause button text"
+  },
+  
+  "stop": "Stop",
+  "@stop": {
+    "description": "Stop button text"
+  },
+  
+  "previous": "Previous",
+  "@previous": {
+    "description": "Previous button text"
+  },
+  
+  "next": "Next",
+  "@next": {
+    "description": "Next button text"
+  },
+  
+  "first": "First",
+  "@first": {
+    "description": "First button text"
+  },
+  
+  "last": "Last",
+  "@last": {
+    "description": "Last button text"
+  },
+  
+  "more": "More",
+  "@more": {
+    "description": "More button text"
+  },
+  
+  "less": "Less",
+  "@less": {
+    "description": "Less button text"
+  },
+  
+  "show": "Show",
+  "@show": {
+    "description": "Show button text"
+  },
+  
+  "hide": "Hide",
+  "@hide": {
+    "description": "Hide button text"
+  },
+  
+  "expand": "Expand",
+  "@expand": {
+    "description": "Expand button text"
+  },
+  
+  "collapse": "Collapse",
+  "@collapse": {
+    "description": "Collapse button text"
+  },
+  
+  "open": "Open",
+  "@open": {
+    "description": "Open button text"
+  },
+  
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+  
+  "lock": "Lock",
+  "@lock": {
+    "description": "Lock button text"
+  },
+  
+  "unlock": "Unlock",
+  "@unlock": {
+    "description": "Unlock button text"
+  },
+  
+  "enable": "Enable",
+  "@enable": {
+    "description": "Enable button text"
+  },
+  
+  "disable": "Disable",
+  "@disable": {
+    "description": "Disable button text"
+  },
+  
+  "on": "On",
+  "@on": {
+    "description": "On state text"
+  },
+  
+  "off": "Off",
+  "@off": {
+    "description": "Off state text"
+  },
+  
+  "active": "Active",
+  "@active": {
+    "description": "Active state text"
+  },
+  
+  "inactive": "Inactive",
+  "@inactive": {
+    "description": "Inactive state text"
+  },
+  
+  "enabled": "Enabled",
+  "@enabled": {
+    "description": "Enabled state text"
+  },
+  
+  "disabled": "Disabled",
+  "@disabled": {
+    "description": "Disabled state text"
+  },
+  
+  "visible": "Visible",
+  "@visible": {
+    "description": "Visible state text"
+  },
+  
+  "hidden": "Hidden",
+  "@hidden": {
+    "description": "Hidden state text"
+  },
+  
+  "public": "Public",
+  "@public": {
+    "description": "Public state text"
+  },
+  
+  "private": "Private",
+  "@private": {
+    "description": "Private state text"
+  },
+  
+  "online": "Online",
+  "@online": {
+    "description": "Online state text"
+  },
+  
+  "offline": "Offline",
+  "@offline": {
+    "description": "Offline state text"
+  },
+  
+  "connected": "Connected",
+  "@connected": {
+    "description": "Connected state text"
+  },
+  
+  "disconnected": "Disconnected",
+  "@disconnected": {
+    "description": "Disconnected state text"
+  },
+  
+  "available": "Available",
+  "@available": {
+    "description": "Available state text"
+  },
+  
+  "unavailable": "Unavailable",
+  "@unavailable": {
+    "description": "Unavailable state text"
+  },
+  
+  "busy": "Busy",
+  "@busy": {
+    "description": "Busy state text"
+  },
+  
+  "idle": "Idle",
+  "@idle": {
+    "description": "Idle state text"
+  },
+  
+  "pending": "Pending",
+  "@pending": {
+    "description": "Pending state text"
+  },
+  
+  "processing": "Processing",
+  "@processing": {
+    "description": "Processing state text"
+  },
+  
+  "completed": "Completed",
+  "@completed": {
+    "description": "Completed state text"
+  },
+  
+  "failed": "Failed",
+  "@failed": {
+    "description": "Failed state text"
+  },
+  
+  "cancelled": "Cancelled",
+  "@cancelled": {
+    "description": "Cancelled state text"
+  },
+  
+  "scheduled": "Scheduled",
+  "@scheduled": {
+    "description": "Scheduled state text"
+  },
+  
+  "expired": "Expired",
+  "@expired": {
+    "description": "Expired state text"
+  },
+  
+  "draft": "Draft",
+  "@draft": {
+    "description": "Draft state text"
+  },
+  
+  "published": "Published",
+  "@published": {
+    "description": "Published state text"
+  },
+  
+  "archived": "Archived",
+  "@archived": {
+    "description": "Archived state text"
+  },
+  
+  "deleted": "Deleted",
+  "@deleted": {
+    "description": "Deleted state text"
+  },
+  
+  "restored": "Restored",
+  "@restored": {
+    "description": "Restored state text"
+  },
+  
+  "moved": "Moved",
+  "@moved": {
+    "description": "Moved state text"
+  },
+  
+  "copied": "Copied",
+  "@copied": {
+    "description": "Copied state text"
+  },
+  
+  "pasted": "Pasted",
+  "@pasted": {
+    "description": "Pasted state text"
+  },
+  
+  "cut": "Cut",
+  "@cut": {
+    "description": "Cut state text"
+  },
+  
+  "renamed": "Renamed",
+  "@renamed": {
+    "description": "Renamed state text"
+  },
+  
+  "created": "Created",
+  "@created": {
+    "description": "Created state text"
+  },
+  
+  "updated": "Updated",
+  "@updated": {
+    "description": "Updated state text"
+  },
+  
+  "modified": "Modified",
+  "@modified": {
+    "description": "Modified state text"
+  },
+  
+  "changed": "Changed",
+  "@changed": {
+    "description": "Changed state text"
+  },
+  
+  "added": "Added",
+  "@added": {
+    "description": "Added state text"
+  },
+  
+  "removed": "Removed",
+  "@removed": {
+    "description": "Removed state text"
+  },
+  
+  "installed": "Installed",
+  "@installed": {
+    "description": "Installed state text"
+  },
+  
+  "uninstalled": "Uninstalled",
+  "@uninstalled": {
+    "description": "Uninstalled state text"
+  },
+  
+  "downloaded": "Downloaded",
+  "@downloaded": {
+    "description": "Downloaded state text"
+  },
+  
+  "uploaded": "Uploaded",
+  "@uploaded": {
+    "description": "Uploaded state text"
+  },
+  
+  "synced": "Synced",
+  "@synced": {
+    "description": "Synced state text"
+  },
+  
+  "backedUp": "Backed Up",
+  "@backedUp": {
+    "description": "Backed up state text"
+  },
+  
+  "restored": "Restored",
+  "@restored": {
+    "description": "Restored state text"
+  },
+  
+  "imported": "Imported",
+  "@imported": {
+    "description": "Imported state text"
+  },
+  
+  "exported": "Exported",
+  "@exported": {
+    "description": "Exported state text"
+  },
+  
+  "saved": "Saved",
+  "@saved": {
+    "description": "Saved state text"
+  },
+  
+  "unsaved": "Unsaved",
+  "@unsaved": {
+    "description": "Unsaved state text"
+  },
+  
+  "dirty": "Dirty",
+  "@dirty": {
+    "description": "Dirty state text"
+  },
+  
+  "clean": "Clean",
+  "@clean": {
+    "description": "Clean state text"
+  },
+  
+  "valid": "Valid",
+  "@valid": {
+    "description": "Valid state text"
+  },
+  
+  "invalid": "Invalid",
+  "@invalid": {
+    "description": "Invalid state text"
+  },
+  
+  "correct": "Correct",
+  "@correct": {
+    "description": "Correct state text"
+  },
+  
+  "incorrect": "Incorrect",
+  "@incorrect": {
+    "description": "Incorrect state text"
+  },
+  
+  "right": "Right",
+  "@right": {
+    "description": "Right state text"
+  },
+  
+  "wrong": "Wrong",
+  "@wrong": {
+    "description": "Wrong state text"
+  },
+  
+  "trueValue": "True",
+  "@trueValue": {
+    "description": "True value text"
+  },
+  
+  "falseValue": "False",
+  "@falseValue": {
+    "description": "False value text"
+  },
+  
+  "yes": "Yes",
+  "@yes": {
+    "description": "Yes state text"
+  },
+  
+  "no": "No",
+  "@no": {
+    "description": "No state text"
+  },
+  
+  "maybe": "Maybe",
+  "@maybe": {
+    "description": "Maybe state text"
+  },
+  
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Unknown state text"
+  },
+  
+  "none": "None",
+  "@none": {
+    "description": "None state text"
+  },
+  
+  "all": "All",
+  "@all": {
+    "description": "All state text"
+  },
+  
+  "some": "Some",
+  "@some": {
+    "description": "Some state text"
+  },
+  
+  "few": "Few",
+  "@few": {
+    "description": "Few state text"
+  },
+  
+  "many": "Many",
+  "@many": {
+    "description": "Many state text"
+  },
+  
+  "several": "Several",
+  "@several": {
+    "description": "Several state text"
+  },
+  
+  "multiple": "Multiple",
+  "@multiple": {
+    "description": "Multiple state text"
+  },
+  
+  "single": "Single",
+  "@single": {
+    "description": "Single state text"
+  },
+  
+  "double": "Double",
+  "@double": {
+    "description": "Double state text"
+  },
+  
+  "triple": "Triple",
+  "@triple": {
+    "description": "Triple state text"
+  },
+  
+  "quadruple": "Quadruple",
+  "@quadruple": {
+    "description": "Quadruple state text"
+  },
+  
+  "quintuple": "Quintuple",
+  "@quintuple": {
+    "description": "Quintuple state text"
+  },
+  
+  "sextuple": "Sextuple",
+  "@sextuple": {
+    "description": "Sextuple state text"
+  },
+  
+  "septuple": "Septuple",
+  "@septuple": {
+    "description": "Septuple state text"
+  },
+  
+  "octuple": "Octuple",
+  "@octuple": {
+    "description": "Octuple state text"
+  },
+  
+  "nonuple": "Nonuple",
+  "@nonuple": {
+    "description": "Nonuple state text"
+  },
+  
+  "decuple": "Decuple",
+  "@decuple": {
+    "description": "Decuple state text"
+  },
+  
+  "personalInfo": "Personal Information",
+  "@personalInfo": {
+    "description": "Personal information section title"
+  },
+  
+  "manageAccountInfo": "Manage your account information",
+  "@manageAccountInfo": {
+    "description": "Personal information section description"
+  },
+  
+  "notProvided": "Not provided",
+  "@notProvided": {
+    "description": "Not provided text"
+  },
+  
+  "joinDate": "Join Date",
+  "@joinDate": {
+    "description": "Join date label"
+  },
+  
+  "notAvailable": "Not available",
+  "@notAvailable": {
+    "description": "Not available text"
+  },
+  
+  "invalidDate": "Invalid date",
+  "@invalidDate": {
+    "description": "Invalid date text"
+  },
+  
+  "statistics": "Statistics",
+  "@statistics": {
+    "description": "Statistics section title"
+  },
+  
+  "yourActivity": "Your activity",
+  "@yourActivity": {
+    "description": "Statistics section description"
+  },
+  
+  "eventsCreated": "Events Created",
+  "@eventsCreated": {
+    "description": "Events created stat label"
+  },
+  
+  "participated": "Participated",
+  "@participated": {
+    "description": "Participated stat label"
+  },
+  
+  "changeAppLanguage": "Change app language",
+  "@changeAppLanguage": {
+    "description": "Language section description"
+  },
+  
+  "editProfile": "Edit Profile",
+  "@editProfile": {
+    "description": "Edit profile button text"
+  },
+  
+  "signOut": "Sign Out",
+  "@signOut": {
+    "description": "Sign out button text"
+  },
+  
+  "confirmSignOut": "Confirm Sign Out",
+  "@confirmSignOut": {
+    "description": "Sign out confirmation dialog title"
+  },
+  
+  "confirmSignOutMessage": "Are you sure you want to sign out?",
+  "@confirmSignOutMessage": {
+    "description": "Sign out confirmation dialog message"
+  },
+  
+  "editProfileComingSoon": "Edit profile feature coming soon!",
+  "@editProfileComingSoon": {
+    "description": "Edit profile coming soon message"
+  },
+  
+  "selectCategory": "Select Category",
+  "@selectCategory": {
+    "description": "Select category dialog title"
+  },
+  
+  "upcoming": "Upcoming",
+  "@upcoming": {
+    "description": "Upcoming events category"
+  },
+  
+  "upcomingEvents": "Upcoming Events",
+  "@upcomingEvents": {
+    "description": "Upcoming events description"
+  },
+  
+  "hosting": "Hosting",
+  "@hosting": {
+    "description": "Hosting events category"
+  },
+  
+  "eventsYouHost": "Events you host",
+  "@eventsYouHost": {
+    "description": "Events you host description"
+  },
+  
+  "invited": "Invited",
+  "@invited": {
+    "description": "Invited events category"
+  },
+  
+  "invitationsToYou": "Invitations to you",
+  "@invitationsToYou": {
+    "description": "Invitations to you description"
+  },
+  
+  "past": "Past",
+  "@past": {
+    "description": "Past events category"
+  },
+  
+  "pastEvents": "Past events",
+  "@pastEvents": {
+    "description": "Past events description"
+  },
+  
+  "all": "All",
+  "@all": {
+    "description": "All status filter"
+  },
+  
+  "pending": "Pending",
+  "@pending": {
+    "description": "Pending status"
+  },
+  
+  "going": "Going",
+  "@going": {
+    "description": "Going status"
+  },
+  
+  "notGoing": "Not Going",
+  "@notGoing": {
+    "description": "Not going status"
+  },
+  
+  "maybe": "Maybe",
+  "@maybe": {
+    "description": "Maybe status"
+  },
+  
+  "cancelled": "Cancelled",
+  "@cancelled": {
+    "description": "Cancelled status"
+  },
+  
+  "host": "Host",
+  "@host": {
+    "description": "Host label"
+  },
+  
+  "noUpcomingEvents": "No upcoming events",
+  "@noUpcomingEvents": {
+    "description": "No upcoming events message"
+  },
+  
+  "createNewEventOrWait": "Create a new event or wait for invitations from friends",
+  "@createNewEventOrWait": {
+    "description": "No upcoming events subtitle"
+  },
+  
+  "noHostingEvents": "No events you're hosting",
+  "@noHostingEvents": {
+    "description": "No hosting events message"
+  },
+  
+  "startCreatingFirstEvent": "Start creating your first event",
+  "@startCreatingFirstEvent": {
+    "description": "No hosting events subtitle"
+  },
+  
+  "noInvitations": "No invitations",
+  "@noInvitations": {
+    "description": "No invitations message"
+  },
+  
+  "invitationsWillAppearHere": "You'll see event invitations here when someone invites you",
+  "@invitationsWillAppearHere": {
+    "description": "No invitations subtitle"
+  },
+  
+  "tryDifferentStatus": "Try selecting a different status or wait for new invitations",
+  "@tryDifferentStatus": {
+    "description": "No invitations with filter subtitle"
+  },
+  
+  "noPastEvents": "No past events",
+  "@noPastEvents": {
+    "description": "No past events message"
+  },
+  
+  "pastEventsWillAppearHere": "Events that have ended will appear here",
+  "@pastEventsWillAppearHere": {
+    "description": "No past events subtitle"
+  },
+  
+  "viewAllInvitations": "View all invitations",
+  "@viewAllInvitations": {
+    "description": "View all invitations button"
+  },
+  
+  "createNewEvent": "Create new event",
+  "@createNewEvent": {
+    "description": "Create new event button"
+  },
+  
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Unknown status"
+  },
+  
+  "user": "User",
+  "@user": {
+    "description": "Default user name"
+  },
+  
+  "cardCreatedSuccessfully": "Card created successfully!",
+  "@cardCreatedSuccessfully": {
+    "description": "Card created successfully message"
+  },
+  
+  "undefined": "Undefined",
+  
+  "month_jan": "Jan",
+  "month_feb": "Feb",
+  "month_mar": "Mar",
+  "month_apr": "Apr",
+  "month_may": "May",
+  "month_jun": "Jun",
+  "month_jul": "Jul",
+  "month_aug": "Aug",
+  "month_sep": "Sep",
+  "month_oct": "Oct",
+  "month_nov": "Nov",
+  "month_dec": "Dec",
+  "respondToInvitation": "Respond to invitation",
+  "description": "Description",
+  "eventTime": "Event time",
+  "memoryPhoto": "Memory photo",
+  "location": "Location",
+  "invitedPeople": "Invited people",
+  "inviteMorePeople": "Invite more people",
+  "hostedBy": "Hosted by",
+  "hostedByYou": "Hosted by You",
+  "hostedByUnknown": "Hosted by Unknown",
+  "cannotLoadImage": "Cannot load image",
+  "noCoordinates": "No coordinates",
+  "directions": "Directions",
+  "share": "Share",
+  "googleMaps": "Google Maps",
+  "viewLocationOnGoogleMaps": "View location on Google Maps",
+  "appleMaps": "Apple Maps",
+  "copyCoordinates": "Copy coordinates",
+  "copyToClipboard": "Copy to clipboard",
+  "cannotOpenMapApp": "Cannot open map app",
+  "shareLocation": "Share location",
+  "invitedPeopleCount": "Invited people ({count})",
+  "noName": "No name",
+  "viewAll": "View all",
+  "noInvitedPeople": "No invited people",
+  "pleaseSelectAtLeastOnePerson": "Please select at least one person to invite",
+  "cannotUpdateStatus": "Cannot update status. Please try again.",
+  "searchError": "Search error",
+  "going": "Going",
+  "notGoing": "Not going",
+  "maybe": "Maybe",
+  "cancelled": "Cancelled",
+  "pending": "Pending",
+  "waitingForResponse": "Waiting for response",
+  "pleaseSelectAtLeastOneUserToInvite": "Please select at least one person to invite",
+  "pleaseLogin": "Please login",
+  "eventInfoMissing": "Event information missing",
+  "invitationSentSuccessfully": "Invitation sent successfully!",
+  "invitationSendFailure": "Failed to send invitation",
+  "invitationSendError": "Error sending invitation",
+  "unableToUpdateStatus": "Cannot update status. Please try again.",
+  "updateStatusError": "Error updating status",
+  "confirmedParticipation": "You have confirmed participation!",
+  "declinedParticipation": "You have declined participation.",
+  "maybeParticipation": "You have marked maybe for this event.",
+  "statusUpdatedSuccessfully": "Status updated successfully!",
+  "willParticipate": "Will participate",
+  "willNotParticipate": "Will not participate",
+  "maybeParticipate": "Maybe participate",
+  "daysAgo": "days ago",
+  "hoursAgo": "hours ago",
+  "justEnded": "Just ended",
+  "remainingDays": "Remaining days: {count}",
+  "remainingHours": "Remaining hours: {count}",
+  "startingSoon": "Starting soon",
+  "openMap": "Open map",
+  "openGoogleMapsWithDirections": "Open Google Maps with directions",
+  "openInAppleMaps": "Open in Apple Maps",
+  "coordinatesCopiedToClipboard": "Coordinates copied to clipboard",
+  "copyError": "Copy error",
+  "shareLocationWithCoordinates": "Share location: {lat}, {lng}",
+  "ok": "OK",
+  "eventDataUpdated": "Event data updated",
+  "updateDataError": "Error updating data",
+  "noUserFound": "No user found",
+  "selectedUsers": "Selected:",
+  "sendInvitation": "Send invitation",
+  "cannotInvite": "Cannot invite",
+  "hostByYou": "Hosted by You",
+  "hostBy": "Hosted by {name}",
+  "mapError": "Map error",
+  "searchByEmailOrName": "Search by email or name...",
+  "searchResults": "Search results ({count} users):",
+  
+  "whereWillItHappen": "Where will it happen?",
+  "setEventDateTime": "Set Event Date & Time",
+  "updateEvent": "Update Event",
+  "previewCard": "Preview Card",
+  "cardPreview": "Card Preview",
+  "eventDescription": "Event Description",
+  
+  "basicInformation": "Basic Information",
+  "tellUsAboutYourEvent": "Tell us about your event",
+  "whenWillItHappen": "When will it happen?",
+  "media": "Media",
+  "addPhotosToMakeItSpecial": "Add photos to make it special",
+  
+  "background": "Background",
+  "mainEventImage": "Main event image",
+  "specialMomentCapture": "Special moment capture",
+  "eventWillBeUpdated": "Your event will be updated with new information",
+  "eventWillBeShared": "Your event will be shared with guests",
+  "seeHowYourEventWillLook": "See how your event will look",  
+  "currentLocationButton": "Reccent",
+  "browseMapButton": "Map",
+  "hidePreviewButton": "Hide",
+  "previewButton": "Preview",
+  "tapToAdd": "Tap to Add",
+  "loadingData": "Loading..."
+
 }

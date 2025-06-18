@@ -1,27 +1,79 @@
 {
-  "appTitle": "Lời mời",
+  "@@locale": "vi",
   
-  "birthdayParty": "Tiệc sinh nhật",
+  "appTitle": "Eventide",
   
-  "birthdayDate": "28 tháng 8 lúc 7:00 PM",
+  "createEvent": "Tạo sự kiện",
   
-  "birthdayLocation": "Công viên Trung tâm, New York",
+  "editEvent": "Chỉnh sửa sự kiện",
   
-  "weddingCeremony": "Lễ cưới",
+  "updateEventDetails": "Cập nhật chi tiết sự kiện của bạn",
   
-  "weddingDate": "15 tháng 9 lúc 4:00 PM",
+  "shareSpecialMoment": "Chia sẻ khoảnh khắc đặc biệt của bạn",
   
-  "weddingLocation": "Khách sạn Grand & Resort",
+  "eventTitle": "Tiêu đề sự kiện",
   
-  "holidayParty": "Tiệc lễ hội",
+  "eventTitleHint": "Nhập tiêu đề sự kiện của bạn",
   
-  "holidayDate": "24 tháng 12 lúc 8:00 PM",
+  "eventDescription": "Mô tả",
   
-  "holidayLocation": "Xứ sở thần tiên mùa đông",
+  "eventDescriptionHint": "Kể cho mọi người về sự kiện của bạn",
   
-  "addNewInvitation": "Thêm lời mời mới",
+  "eventLocation": "Địa điểm",
   
-  "viewInvitation": "Xem lời mời",
+  "eventLocationHint": "Sự kiện sẽ diễn ra ở đâu?",
+  
+  "eventDateTime": "Ngày & Giờ",
+  
+  "setEventDateTime": "Đặt ngày và giờ sự kiện",
+  
+  "tapToSelectDateTime": "Nhấn để chọn thời gian sự kiện sẽ diễn ra",
+  
+  "preview": "Xem trước",
+  
+  "save": "Lưu",
+  
+  "cancel": "Hủy",
+  
+  "delete": "Xóa",
+  
+  "edit": "Chỉnh sửa",
+  
+  "share": "Chia sẻ",
+  
+  "back": "Quay lại",
+  
+  "next": "Tiếp theo",
+  
+  "done": "Xong",
+  
+  "loading": "Đang tải...",
+  
+  "error": "Lỗi",
+  
+  "success": "Thành công",
+  
+  "warning": "Cảnh báo",
+  
+  "info": "Thông tin",
+  
+  "confirm": "Xác nhận",
+  
+  "yes": "Có",
+  
+  "no": "Không",
+  
+  "ok": "OK",
+  
+  "close": "Đóng",
+  
+  "search": "Tìm kiếm",
+  
+  "searchHint": "Tìm kiếm sự kiện...",
+  
+  "noResults": "Không tìm thấy kết quả",
+  
+  "home": "Trang chủ",
   
   "profile": "Hồ sơ",
   
@@ -35,5 +87,664 @@
   
   "darkMode": "Chế độ tối",
   
-  "lightMode": "Chế độ sáng"
+  "lightMode": "Chế độ sáng",
+  
+  "systemTheme": "Chủ đề hệ thống",
+  "@systemTheme": {
+    "description": "System theme option text"
+  },
+  
+  "systemLanguage": "Ngôn ngữ hệ thống",
+  "@systemLanguage": {
+    "description": "System language option text"
+  },
+  
+  "notifications": "Thông báo",
+  
+  "privacy": "Quyền riêng tư",
+  
+  "about": "Giới thiệu",
+  
+  "help": "Trợ giúp",
+  
+  "contact": "Liên hệ",
+  
+  "logout": "Đăng xuất",
+  
+  "login": "Đăng nhập",
+  
+  "signup": "Đăng ký",
+  
+  "email": "Email",
+  
+  "password": "Mật khẩu",
+  
+  "confirmPassword": "Xác nhận mật khẩu",
+  
+  "forgotPassword": "Quên mật khẩu?",
+  
+  "dontHaveAccount": "Chưa có tài khoản?",
+  
+  "alreadyHaveAccount": "Đã có tài khoản?",
+  
+  "signInWithGoogle": "Đăng nhập bằng Google",
+  
+  "signInWithFacebook": "Đăng nhập bằng Facebook",
+  
+  "or": "hoặc",
+  
+  "welcome": "Chào mừng",
+  
+  "welcomeMessage": "Chào mừng đến với Eventide",
+  
+  "welcomeSubtitle": "Tạo và chia sẻ sự kiện với bạn bè và gia đình",
+  
+  "getStarted": "Bắt đầu",
+  
+  "skip": "Bỏ qua",
+  
+  "continueButton": "Tiếp tục",
+  
+  "@continueButton": {
+    "description": "Continue button text"
+  },
+  
+  "finish": "Hoàn thành",
+  
+  "retry": "Thử lại",
+  
+  "refresh": "Làm mới",
+  
+  "clear": "Xóa",
+  
+  "reset": "Đặt lại",
+  
+  "apply": "Áp dụng",
+  
+  "select": "Chọn",
+  
+  "choose": "Chọn",
+  
+  "pick": "Chọn",
+  
+  "add": "Thêm",
+  
+  "remove": "Xóa",
+  
+  "create": "Tạo",
+  
+  "update": "Cập nhật",
+  
+  "change": "Thay đổi",
+  
+  "modify": "Sửa đổi",
+  
+  "copy": "Sao chép",
+  
+  "paste": "Dán",
+  
+  "cut": "Cắt",
+  
+  "undo": "Hoàn tác",
+  
+  "redo": "Làm lại",
+  
+  "zoomIn": "Phóng to",
+  
+  "zoomOut": "Thu nhỏ",
+  
+  "fullscreen": "Toàn màn hình",
+  
+  "exitFullscreen": "Thoát toàn màn hình",
+  
+  "play": "Phát",
+  
+  "pause": "Tạm dừng",
+  
+  "stop": "Dừng",
+  
+  "previous": "Trước",
+  
+  "first": "Đầu",
+  
+  "last": "Cuối",
+  
+  "more": "Thêm",
+  
+  "less": "Ít hơn",
+  
+  "show": "Hiển thị",
+  
+  "hide": "Ẩn",
+  
+  "expand": "Mở rộng",
+  
+  "collapse": "Thu gọn",
+  
+  "open": "Mở",
+  
+  "lock": "Khóa",
+  
+  "unlock": "Mở khóa",
+  
+  "enable": "Bật",
+  
+  "disable": "Tắt",
+  
+  "on": "Bật",
+  
+  "off": "Tắt",
+  
+  "active": "Hoạt động",
+  
+  "inactive": "Không hoạt động",
+  
+  "enabled": "Đã bật",
+  
+  "disabled": "Đã tắt",
+  
+  "visible": "Hiển thị",
+  
+  "hidden": "Ẩn",
+  
+  "public": "Công khai",
+  
+  "private": "Riêng tư",
+  
+  "online": "Trực tuyến",
+  
+  "offline": "Ngoại tuyến",
+  
+  "connected": "Đã kết nối",
+  
+  "disconnected": "Đã ngắt kết nối",
+  
+  "available": "Có sẵn",
+  
+  "unavailable": "Không có sẵn",
+  
+  "busy": "Bận",
+  
+  "idle": "Rảnh",
+  
+  "pending": "Đang chờ",
+  
+  "processing": "Đang xử lý",
+  
+  "completed": "Hoàn thành",
+  
+  "failed": "Thất bại",
+  
+  "cancelled": "Đã hủy",
+  
+  "scheduled": "Đã lên lịch",
+  
+  "expired": "Hết hạn",
+  
+  "draft": "Bản nháp",
+  
+  "published": "Đã xuất bản",
+  
+  "archived": "Đã lưu trữ",
+  
+  "deleted": "Đã xóa",
+  
+  "restored": "Đã khôi phục",
+  
+  "moved": "Đã di chuyển",
+  
+  "copied": "Đã sao chép",
+  
+  "pasted": "Đã dán",
+  
+  "renamed": "Đã đổi tên",
+  
+  "created": "Đã tạo",
+  
+  "updated": "Đã cập nhật",
+  
+  "modified": "Đã sửa đổi",
+  
+  "changed": "Đã thay đổi",
+  
+  "added": "Đã thêm",
+  
+  "removed": "Đã xóa",
+  
+  "installed": "Đã cài đặt",
+  
+  "uninstalled": "Đã gỡ cài đặt",
+  
+  "downloaded": "Đã tải xuống",
+  
+  "uploaded": "Đã tải lên",
+  
+  "synced": "Đã đồng bộ",
+  
+  "backedUp": "Đã sao lưu",
+  
+  "imported": "Đã nhập",
+  
+  "exported": "Đã xuất",
+  
+  "saved": "Đã lưu",
+  
+  "unsaved": "Chưa lưu",
+  
+  "dirty": "Bẩn",
+  
+  "clean": "Sạch",
+  
+  "valid": "Hợp lệ",
+  
+  "invalid": "Không hợp lệ",
+  
+  "correct": "Đúng",
+  
+  "incorrect": "Sai",
+  
+  "right": "Đúng",
+  
+  "wrong": "Sai",
+  
+  "trueValue": "Đúng",
+  
+  "@trueValue": {
+    "description": "True value text"
+  },
+  
+  "falseValue": "Sai",
+  
+  "@falseValue": {
+    "description": "False value text"
+  },
+  
+  "maybe": "Có thể",
+  
+  "unknown": "Không xác định",
+  
+  "none": "Không có",
+  
+  "all": "Tất cả",
+  
+  "some": "Một số",
+  
+  "few": "Ít",
+  
+  "many": "Nhiều",
+  
+  "several": "Một vài",
+  
+  "multiple": "Nhiều",
+  
+  "single": "Đơn",
+  
+  "double": "Gấp đôi",
+  
+  "triple": "Gấp ba",
+  
+  "quadruple": "Gấp bốn",
+  
+  "quintuple": "Gấp năm",
+  
+  "sextuple": "Gấp sáu",
+  
+  "septuple": "Gấp bảy",
+  
+  "octuple": "Gấp tám",
+  
+  "nonuple": "Gấp chín",
+  
+  "decuple": "Gấp mười",
+  
+  "personalInfo": "Thông tin cá nhân",
+  "@personalInfo": {
+    "description": "Personal information section title"
+  },
+  
+  "manageAccountInfo": "Quản lý thông tin tài khoản",
+  "@manageAccountInfo": {
+    "description": "Personal information section description"
+  },
+  
+  "notProvided": "Chưa cung cấp",
+  "@notProvided": {
+    "description": "Not provided text"
+  },
+  
+  "joinDate": "Ngày tham gia",
+  "@joinDate": {
+    "description": "Join date label"
+  },
+  
+  "notAvailable": "Không có sẵn",
+  "@notAvailable": {
+    "description": "Not available text"
+  },
+  
+  "invalidDate": "Ngày không hợp lệ",
+  "@invalidDate": {
+    "description": "Invalid date text"
+  },
+  
+  "statistics": "Thống kê",
+  "@statistics": {
+    "description": "Statistics section title"
+  },
+  
+  "yourActivity": "Hoạt động của bạn",
+  "@yourActivity": {
+    "description": "Statistics section description"
+  },
+  
+  "eventsCreated": "Sự kiện đã tạo",
+  "@eventsCreated": {
+    "description": "Events created stat label"
+  },
+  
+  "participated": "Đã tham gia",
+  "@participated": {
+    "description": "Participated stat label"
+  },
+  
+  "changeAppLanguage": "Thay đổi ngôn ngữ ứng dụng",
+  "@changeAppLanguage": {
+    "description": "Language section description"
+  },
+  
+  "editProfile": "Chỉnh sửa hồ sơ",
+  "@editProfile": {
+    "description": "Edit profile button text"
+  },
+  
+  "signOut": "Đăng xuất",
+  "@signOut": {
+    "description": "Sign out button text"
+  },
+  
+  "confirmSignOut": "Đăng xuất",
+  "@confirmSignOut": {
+    "description": "Sign out confirmation dialog title"
+  },
+  
+  "confirmSignOutMessage": "Bạn có chắc chắn muốn đăng xuất?",
+  "@confirmSignOutMessage": {
+    "description": "Sign out confirmation dialog message"
+  },
+  
+  "editProfileComingSoon": "Tính năng chỉnh sửa hồ sơ sẽ sớm ra mắt!",
+  "@editProfileComingSoon": {
+    "description": "Edit profile coming soon message"
+  },
+  
+  "@language": {
+    "description": "Language section title"
+  },
+  
+  "@select": {
+    "description": "Select button text"
+  },
+  
+  "selectCategory": "Chọn danh mục",
+  "@selectCategory": {
+    "description": "Select category dialog title"
+  },
+  
+  "upcoming": "Sắp diễn ra",
+  "@upcoming": {
+    "description": "Upcoming events category"
+  },
+  
+  "upcomingEvents": "Sự kiện sắp diễn ra",
+  "@upcomingEvents": {
+    "description": "Upcoming events description"
+  },
+  
+  "hosting": "Tổ chức",
+  "@hosting": {
+    "description": "Hosting events category"
+  },
+  
+  "eventsYouHost": "Sự kiện bạn tổ chức",
+  "@eventsYouHost": {
+    "description": "Events you host description"
+  },
+  
+  "invited": "Lời mời",
+  "@invited": {
+    "description": "Invited events category"
+  },
+  
+  "invitationsToYou": "Lời mời đến bạn",
+  "@invitationsToYou": {
+    "description": "Invitations to you description"
+  },
+  
+  "past": "Đã qua",
+  "@past": {
+    "description": "Past events category"
+  },
+  
+  "pastEvents": "Sự kiện đã qua",
+  "@pastEvents": {
+    "description": "Past events description"
+  },
+  
+  "all": "Tất cả",
+  "@all": {
+    "description": "All status filter"
+  },
+  
+  "pending": "Đang chờ",
+  "@pending": {
+    "description": "Pending status"
+  },
+  
+  "going": "Sẽ tham gia",
+  "@going": {
+    "description": "Going status"
+  },
+  
+  "notGoing": "Không tham gia",
+  "@notGoing": {
+    "description": "Not going status"
+  },
+  
+  "maybe": "Có thể tham gia",
+  "@maybe": {
+    "description": "Maybe status"
+  },
+  
+  "cancelled": "Đã hủy",
+  "@cancelled": {
+    "description": "Cancelled status"
+  },
+  
+  "host": "Chủ nhà",
+  "@host": {
+    "description": "Host label"
+  },
+  
+  "noUpcomingEvents": "Chưa có sự kiện sắp diễn ra",
+  "@noUpcomingEvents": {
+    "description": "No upcoming events message"
+  },
+  
+  "createNewEventOrWait": "Tạo sự kiện mới hoặc chờ lời mời từ bạn bè",
+  "@createNewEventOrWait": {
+    "description": "No upcoming events subtitle"
+  },
+  
+  "noHostingEvents": "Chưa có sự kiện nào bạn tổ chức",
+  "@noHostingEvents": {
+    "description": "No hosting events message"
+  },
+  
+  "startCreatingFirstEvent": "Bắt đầu tạo sự kiện đầu tiên của bạn",
+  "@startCreatingFirstEvent": {
+    "description": "No hosting events subtitle"
+  },
+  
+  "noInvitations": "Chưa có lời mời nào",
+  "@noInvitations": {
+    "description": "No invitations message"
+  },
+  
+  "invitationsWillAppearHere": "Bạn sẽ thấy các lời mời sự kiện ở đây khi có người mời bạn",
+  "@invitationsWillAppearHere": {
+    "description": "No invitations subtitle"
+  },
+  
+  "tryDifferentStatus": "Thử chọn trạng thái khác hoặc chờ lời mời mới",
+  "@tryDifferentStatus": {
+    "description": "No invitations with filter subtitle"
+  },
+  
+  "noPastEvents": "Chưa có sự kiện đã qua",
+  "@noPastEvents": {
+    "description": "No past events message"
+  },
+  
+  "pastEventsWillAppearHere": "Các sự kiện đã kết thúc sẽ hiển thị ở đây",
+  "@pastEventsWillAppearHere": {
+    "description": "No past events subtitle"
+  },
+  
+  "viewAllInvitations": "Xem tất cả lời mời",
+  "@viewAllInvitations": {
+    "description": "View all invitations button"
+  },
+  
+  "createNewEvent": "Tạo sự kiện mới",
+  "@createNewEvent": {
+    "description": "Create new event button"
+  },
+  
+  "unknown": "Chưa xác định",
+  "@unknown": {
+    "description": "Unknown status"
+  },
+  
+  "user": "Người dùng",
+  "@user": {
+    "description": "Default user name"
+  },
+  
+  "cardCreatedSuccessfully": "Thẻ đã được tạo thành công!",
+  "viewAllInvitations": "Xem tất cả lời mời",
+  "undefined": "Chưa xác định",
+  "month_jan": "tháng 1",
+  "month_feb": "tháng 2",
+  "month_mar": "tháng 3",
+  "month_apr": "tháng 4",
+  "month_may": "tháng 5",
+  "month_jun": "tháng 6",
+  "month_jul": "tháng 7",
+  "month_aug": "tháng 8",
+  "month_sep": "tháng 9",
+  "month_oct": "tháng 10",
+  "month_nov": "tháng 11",
+  "month_dec": "tháng 12",
+  "respondToInvitation": "Phản hồi lời mời",
+  "description": "Mô tả",
+  "eventTime": "Thời gian sự kiện",
+  "memoryPhoto": "Ảnh kỷ niệm",
+  "location": "Địa điểm",
+  "invitedPeople": "Người đã mời",
+  "inviteMorePeople": "Mời thêm người",
+  "hostedBy": "Chủ trì bởi",
+  "hostedByYou": "Chủ trì bởi Bạn",
+  "hostedByUnknown": "Chủ trì bởi Ẩn danh",
+  "cannotLoadImage": "Không thể tải ảnh",
+  "noCoordinates": "Không có tọa độ",
+  "directions": "Chỉ đường",
+  "share": "Chia sẻ",
+  "googleMaps": "Google Maps",
+  "viewLocationOnGoogleMaps": "Xem vị trí trên Google Maps",
+  "appleMaps": "Apple Maps",
+  "copyCoordinates": "Sao chép tọa độ",
+  "copyToClipboard": "Sao chép vào clipboard",
+  "cannotOpenMapApp": "Không thể mở ứng dụng bản đồ",
+  "shareLocation": "Chia sẻ vị trí",
+  "invitedPeopleCount": "Người đã mời ({count})",
+  "noName": "Không có tên",
+  "viewAll": "Xem tất cả",
+  "noInvitedPeople": "Chưa có người được mời",
+  "pleaseSelectAtLeastOnePerson": "Vui lòng chọn ít nhất một người để mời",
+  "cannotUpdateStatus": "Không thể cập nhật trạng thái. Vui lòng thử lại.",
+  "searchError": "Lỗi tìm kiếm",
+  "going": "Sẽ tham gia",
+  "notGoing": "Không tham gia",
+  "maybe": "Có thể tham gia",
+  "cancelled": "Đã hủy",
+  "pending": "Đang chờ",
+  "waitingForResponse": "Chờ phản hồi",
+  "pleaseSelectAtLeastOneUserToInvite": "Vui lòng chọn ít nhất một người để mời",
+  "pleaseLogin": "Vui lòng đăng nhập",
+  "eventInfoMissing": "Thiếu thông tin sự kiện",
+  "invitationSentSuccessfully": "Đã gửi lời mời thành công!",
+  "invitationSendFailure": "Gửi lời mời thất bại",
+  "invitationSendError": "Lỗi khi gửi lời mời",
+  "unableToUpdateStatus": "Không thể cập nhật trạng thái. Vui lòng thử lại.",
+  "updateStatusError": "Lỗi cập nhật trạng thái",
+  "confirmedParticipation": "Bạn đã xác nhận tham gia sự kiện!",
+  "declinedParticipation": "Bạn đã từ chối tham gia sự kiện.",
+  "maybeParticipation": "Bạn đã đánh dấu có thể tham gia sự kiện.",
+  "statusUpdatedSuccessfully": "Đã cập nhật trạng thái thành công!",
+  "willParticipate": "Sẽ tham gia",
+  "willNotParticipate": "Không tham gia",
+  "maybeParticipate": "Có thể tham gia",
+  "daysAgo": "ngày trước",
+  "hoursAgo": "giờ trước",
+  "justEnded": "Vừa kết thúc",
+  "remainingDays": "Còn {count} ngày",
+  "remainingHours": "Còn {count} giờ",
+  "startingSoon": "Sắp bắt đầu",
+  "openMap": "Mở bản đồ",
+  "openGoogleMapsWithDirections": "Mở Google Maps với chỉ đường",
+  "openInAppleMaps": "Mở trong Apple Maps",
+  "coordinatesCopiedToClipboard": "Đã sao chép tọa độ vào clipboard",
+  "copyError": "Lỗi sao chép",
+  "shareLocationWithCoordinates": "Chia sẻ vị trí: {lat}, {lng}",
+  "ok": "OK",
+  "eventDataUpdated": "Dữ liệu sự kiện đã được cập nhật",
+  "updateDataError": "Lỗi cập nhật dữ liệu",
+  "noUserFound": "Không tìm thấy người dùng nào",
+  "selectedUsers": "Đã chọn:",
+  "sendInvitation": "Gửi lời mời",
+  "cannotInvite": "Không thể mời",
+  "hostByYou": "Chủ trì bởi Bạn",
+  "hostBy": "Chủ trì bởi {name}",
+  "mapError": "Lỗi bản đồ",
+  "searchByEmailOrName": "Tìm kiếm theo email hoặc tên...",
+  "searchResults": "Kết quả tìm kiếm ({count} người dùng):",
+  
+  "whereWillItHappen": "Sẽ diễn ra ở đâu?",
+  "setEventDateTime": "Đặt ngày giờ sự kiện",
+  "updateEvent": "Cập nhật sự kiện",
+  "previewCard": "Xem trước thẻ",
+  "cardPreview": "Xem trước thẻ",
+  "eventDescription": "Mô tả sự kiện",
+  
+  "basicInformation": "Thông tin cơ bản",
+  "tellUsAboutYourEvent": "Hãy cho chúng tôi biết về sự kiện của bạn",
+  "whenWillItHappen": "Khi nào sẽ diễn ra?",
+  "media": "Phương tiện",
+  "addPhotosToMakeItSpecial": "Thêm ảnh để làm cho nó đặc biệt",
+  
+  "background": "Hình nền",
+  "mainEventImage": "Ảnh chính sự kiện",
+  "specialMomentCapture": "Chụp khoảnh khắc đặc biệt",
+  "eventWillBeUpdated": "Sự kiện của bạn sẽ được cập nhật với thông tin mới",
+  "eventWillBeShared": "Sự kiện của bạn sẽ được chia sẻ với khách mời",
+  "seeHowYourEventWillLook": "Xem trước sự kiện của bạn sẽ trông như thế nào",
+  "currentLocationButton": "Vị trí hiện tại",
+  "eventWillBeUpdated": "Sự kiện của bạn sẽ được cập nhật với thông tin mới",
+  "eventWillBeShared": "Sự kiện của bạn sẽ được chia sẻ với khách mời",
+  "seeHowYourEventWillLook": "Xem trước sự kiện của bạn sẽ trông như thế nào",
+  "browseMapButton": "Bản đồ",
+  "hidePreviewButton": "Ẩn",
+  "previewButton": "Xem trước",
+  "tapToAdd": "Nhấn để chọn",
+  "loadingData": "Đang tải ..."
 }

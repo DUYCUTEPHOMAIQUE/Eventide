@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 enum RSVPStatus { pending, going, notGoing, maybe }
 
@@ -28,14 +29,14 @@ class RSVPSelector extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildOption(context, RSVPStatus.going, Icons.check_circle, 'Going',
-              Colors.green),
+          _buildOption(context, RSVPStatus.going, Icons.check_circle,
+              AppLocalizations.of(context)!.going, Colors.green),
           _verticalDivider(),
-          _buildOption(context, RSVPStatus.notGoing, Icons.cancel, 'Not Going',
-              Colors.red),
+          _buildOption(context, RSVPStatus.notGoing, Icons.cancel,
+              AppLocalizations.of(context)!.notGoing, Colors.red),
           _verticalDivider(),
-          _buildOption(context, RSVPStatus.maybe, Icons.help_outline, 'Maybe',
-              Colors.grey),
+          _buildOption(context, RSVPStatus.maybe, Icons.help_outline,
+              AppLocalizations.of(context)!.maybe, Colors.grey),
         ],
       ),
     );
@@ -61,7 +62,7 @@ class RSVPSelector extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: isSelected ? color.withOpacity(0.12) : Colors.transparent,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(32),
             border: isSelected ? Border.all(color: color, width: 2) : null,
           ),
           child: Column(
@@ -87,6 +88,9 @@ class RSVPSelector extends StatelessWidget {
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                   fontSize: 14,
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                textAlign: TextAlign.center,
               ),
             ],
           ),

@@ -283,7 +283,7 @@ class CardService {
     }
   }
 
-  // Get cards where user is a participant
+  // Get cards user participates
   Future<List<CardModel>> getCardsUserParticipates(String userId) async {
     try {
       print('Getting cards user participates: $userId');
@@ -291,7 +291,7 @@ class CardService {
       final response = await _supabase.from('invites').select('''
             card_id,
             cards!inner(*)
-          ''').eq('receiver_id', userId).eq('status', 'accepted');
+          ''').eq('receiver_id', userId).eq('status', 'going');
 
       print('Raw participation response: $response');
 
@@ -378,7 +378,7 @@ class CardService {
   // Get accepted invitation cards for current user
   Future<List<CardModel>> getAcceptedInvitationCards() async {
     try {
-      print('Getting accepted invitation cards');
+      print('Getting going invitation cards');
 
       final currentUser = _supabase.auth.currentUser;
       if (currentUser == null) {
@@ -389,12 +389,12 @@ class CardService {
       final response = await _supabase.from('invites').select('''
             card_id,
             cards!inner(*)
-          ''').eq('receiver_id', currentUser.id).eq('status', 'accepted');
+          ''').eq('receiver_id', currentUser.id).eq('status', 'going');
 
-      print('Raw accepted invitations response: $response');
+      print('Raw going invitations response: $response');
 
       if (response == null) {
-        print('No accepted invitations found for user: ${currentUser.id}');
+        print('No going invitations found for user: ${currentUser.id}');
         return [];
       }
 
@@ -402,7 +402,7 @@ class CardService {
       for (var inviteData in response) {
         if (inviteData['cards'] != null) {
           final cardData = inviteData['cards'];
-          print('Processing accepted invitation card: ${cardData['id']}');
+          print('Processing going invitation card: ${cardData['id']}');
 
           final participants =
               await _inviteService.getAcceptedParticipants(cardData['id']);
@@ -412,14 +412,14 @@ class CardService {
 
           cards.add(card);
           print(
-              'Added accepted invitation card with ${participants.length} participants');
+              'Added going invitation card with ${participants.length} participants');
         }
       }
 
-      print('Total accepted invitation cards: ${cards.length}');
+      print('Total going invitation cards: ${cards.length}');
       return cards;
     } catch (e) {
-      print('Error getting accepted invitation cards: $e');
+      print('Error getting going invitation cards: $e');
       return [];
     }
   }
@@ -427,7 +427,7 @@ class CardService {
   // Get declined invitation cards for current user
   Future<List<CardModel>> getDeclinedInvitationCards() async {
     try {
-      print('Getting declined invitation cards');
+      print('Getting not going invitation cards');
 
       final currentUser = _supabase.auth.currentUser;
       if (currentUser == null) {
@@ -438,12 +438,12 @@ class CardService {
       final response = await _supabase.from('invites').select('''
             card_id,
             cards!inner(*)
-          ''').eq('receiver_id', currentUser.id).eq('status', 'declined');
+          ''').eq('receiver_id', currentUser.id).eq('status', 'notgoing');
 
-      print('Raw declined invitations response: $response');
+      print('Raw not going invitations response: $response');
 
       if (response == null) {
-        print('No declined invitations found for user: ${currentUser.id}');
+        print('No not going invitations found for user: ${currentUser.id}');
         return [];
       }
 
@@ -451,7 +451,7 @@ class CardService {
       for (var inviteData in response) {
         if (inviteData['cards'] != null) {
           final cardData = inviteData['cards'];
-          print('Processing declined invitation card: ${cardData['id']}');
+          print('Processing not going invitation card: ${cardData['id']}');
 
           final participants =
               await _inviteService.getAcceptedParticipants(cardData['id']);
@@ -461,14 +461,14 @@ class CardService {
 
           cards.add(card);
           print(
-              'Added declined invitation card with ${participants.length} participants');
+              'Added not going invitation card with ${participants.length} participants');
         }
       }
 
-      print('Total declined invitation cards: ${cards.length}');
+      print('Total not going invitation cards: ${cards.length}');
       return cards;
     } catch (e) {
-      print('Error getting declined invitation cards: $e');
+      print('Error getting not going invitation cards: $e');
       return [];
     }
   }
