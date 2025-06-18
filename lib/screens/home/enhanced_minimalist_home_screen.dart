@@ -1,5 +1,7 @@
 import 'package:enva/screens/card/minimalist_card_creation_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:enva/screens/profile/profile_screen.dart';
 import 'package:enva/viewmodels/home_screen_provider.dart';
@@ -45,20 +47,73 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
   Widget build(BuildContext context) {
     return Consumer<HomeScreenProvider>(
       builder: (context, provider, child) {
+        final currentCards = provider.getFilteredCards();
+        final currentCard = currentCards.isNotEmpty ? currentCards.first : null;
+
         return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          body: SafeArea(
-            child: Container(
-              height: MediaQuery.of(context).size.height,
-              child: Column(
-                children: [
-                  _buildHeader(context, provider),
-                  Expanded(
-                    child: _buildContent(context, provider),
+          backgroundColor: Colors.transparent, // Make scaffold transparent
+          body: Stack(
+            children: [
+              // Blurred background
+              if (currentCard != null &&
+                  currentCard.backgroundImageUrl.isNotEmpty &&
+                  currentCard.backgroundImageUrl != 'default')
+                Positioned.fill(
+                  child: ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    child: Image.network(
+                      currentCard.backgroundImageUrl,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
+                    ),
                   ),
-                ],
+                )
+              else
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Theme.of(context).colorScheme.surface,
+                          Theme.of(context)
+                              .colorScheme
+                              .surface
+                              .withOpacity(0.8),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Semi-transparent overlay
+              Positioned.fill(
+                child: Container(
+                  color: Colors.white
+                      .withOpacity(0.85), // Semi-transparent white overlay
+                ),
               ),
-            ),
+
+              // Main content
+              SafeArea(
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
+                    children: [
+                      _buildHeader(context, provider),
+                      Expanded(
+                        child: _buildContent(context, provider),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -67,8 +122,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
 
   Widget _buildHeader(BuildContext context, HomeScreenProvider provider) {
     return Container(
-      height: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      height: 100,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
@@ -90,15 +145,15 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
                   Text(
                     provider.getCategoryTitle(),
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 6),
                   Icon(
                     Icons.keyboard_arrow_down,
-                    size: 20,
+                    size: 24,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ],
@@ -110,26 +165,39 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
           Row(
             children: [
               // Add button
-              IconButton(
-                onPressed: () => _navigateToCreateCard(context),
-                icon: Icon(
-                  Icons.add,
-                  size: 24,
-                  color: Theme.of(context).colorScheme.onSurface,
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[600], // Gray background
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey[600]!.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  padding: const EdgeInsets.all(8),
+                child: IconButton(
+                  onPressed: () => _navigateToCreateCard(context),
+                  icon: Icon(
+                    Icons.add,
+                    size: 28,
+                    color: Colors.white, // White icon on gray background
+                  ),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    padding: const EdgeInsets.all(10),
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
 
               // User avatar
               GestureDetector(
                 onTap: () => _navigateToProfile(context),
                 child: Container(
-                  width: 40,
-                  height: 40,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
@@ -200,7 +268,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
           initials,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -478,34 +546,52 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
     }
 
     return SizedBox(
-      height: cardHeight, // Dynamic height based on screen size
+      height: cardHeight,
       child: PageView.builder(
         controller: pageController,
         itemCount: cards.length,
-        padEnds: false, // Allow seeing parts of adjacent cards
-        clipBehavior: Clip.none, // Don't clip adjacent cards
+        padEnds: false,
+        clipBehavior: Clip.none,
         onPageChanged: (index) {
-          // Trigger animation when page changes
           if (mounted) {
             setState(() {});
           }
         },
         itemBuilder: (context, index) {
-          // Calculate if this card is in the center
-          final currentPage = pageController.page ?? 0;
-          final isCenter = (currentPage - index).abs() < 0.5;
+          return AnimatedBuilder(
+            animation: pageController,
+            builder: (context, child) {
+              double scale = 1.0;
+              double opacity = 1.0;
 
-          return AnimatedScale(
-            scale: isCenter ? 1.05 : 0.95,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: Container(
-              margin: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 16), // Reduced horizontal margin
-              width: cardWidth, // Dynamic width
-              height: cardHeight, // Dynamic height
-              child: _buildInviteCard(cards[index]),
-            ),
+              if (pageController.position.haveDimensions) {
+                double value = pageController.page! - index;
+
+                // Calculate scale based on distance from center
+                scale = (1 - (value.abs() * 0.15)).clamp(0.85, 1.1);
+
+                // Calculate opacity for better visual hierarchy
+                opacity = (1 - (value.abs() * 0.3)).clamp(0.6, 1.0);
+              }
+
+              return Center(
+                child: Transform.scale(
+                  scale: scale,
+                  child: Opacity(
+                    opacity: opacity,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 8, // Simple margin for peek effect
+                        vertical: 16,
+                      ),
+                      width: cardWidth,
+                      height: cardHeight,
+                      child: _buildInviteCard(cards[index]),
+                    ),
+                  ),
+                ),
+              );
+            },
           );
         },
       ),

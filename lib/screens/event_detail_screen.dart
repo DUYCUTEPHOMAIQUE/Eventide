@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:latlong2/latlong.dart' as latlong;
+import 'dart:ui' as ui;
 import '../models/card_model.dart';
 import '../models/user_model.dart';
 import '../models/invite_model.dart';
@@ -483,8 +484,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      image: card.backgroundImageUrl.isNotEmpty &&
-                              card.backgroundImageUrl != 'default'
+                      image: _shouldShowBackgroundImage(card)
                           ? DecorationImage(
                               image: NetworkImage(card.backgroundImageUrl),
                               fit: BoxFit.cover,
@@ -493,14 +493,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               },
                             )
                           : null,
-                      color: card.backgroundImageUrl.isEmpty ||
-                              card.backgroundImageUrl == 'default'
+                      color: !_shouldShowBackgroundImage(card)
                           ? Theme.of(context)
                               .colorScheme
                               .primary
                               .withOpacity(0.1)
                           : null,
                     ),
+                    child: !_shouldShowBackgroundImage(card)
+                        ? _buildDefaultBackgroundContent()
+                        : null,
                   ),
                 ),
 
@@ -702,9 +704,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   ? FlutterMap(
                                       mapController: MapController(),
                                       options: MapOptions(
-                                        initialCenter: LatLng(
-                                          card.latitude!,
-                                          card.longitude!,
+                                        initialCenter: latlong.LatLng(
+                                          card.latitude ?? 0.0,
+                                          card.longitude ?? 0.0,
                                         ),
                                         initialZoom: 15.0,
                                         interactionOptions:
@@ -724,7 +726,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                         MarkerLayer(
                                           markers: [
                                             Marker(
-                                              point: LatLng(card.latitude!,
+                                              point: latlong.LatLng(
+                                                  card.latitude!,
                                                   card.longitude!),
                                               width: 40,
                                               height: 40,
@@ -1541,5 +1544,171 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         ],
       ],
     );
+  }
+
+  bool _shouldShowBackgroundImage(CardModel card) {
+    return card.backgroundImageUrl.isNotEmpty &&
+        card.backgroundImageUrl != 'default';
+  }
+
+  Widget _buildDefaultBackgroundContent() {
+    return _buildPlaceholderBackground(widget.card.id);
+  }
+
+  Widget _buildPlaceholderBackground([String? cardId]) {
+    // Tạo gradient ngẫu nhiên từ danh sách gradient đẹp
+    final gradients = [
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFF667eea),
+          const Color(0xFF764ba2),
+        ],
+      ),
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFf093fb),
+          const Color(0xFFf5576c),
+        ],
+      ),
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFF4facfe),
+          const Color(0xFF00f2fe),
+        ],
+      ),
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFF43e97b),
+          const Color(0xFF38f9d7),
+        ],
+      ),
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFfa709a),
+          const Color(0xFFfee140),
+        ],
+      ),
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFa8edea),
+          const Color(0xFFfed6e3),
+        ],
+      ),
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFff9a9e),
+          const Color(0xFFfecfef),
+        ],
+      ),
+      LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFffecd2),
+          const Color(0xFFfcb69f),
+        ],
+      ),
+    ];
+
+    // Chọn gradient ổn định dựa trên card ID hoặc timestamp
+    int index = 0;
+    if (cardId != null) {
+      index = cardId.hashCode.abs() % gradients.length;
+    } else {
+      index = DateTime.now().millisecondsSinceEpoch % gradients.length;
+    }
+    final selectedGradient = gradients[index];
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: selectedGradient,
+        ),
+        child: Stack(
+          children: [
+            // Background pattern
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _PlaceholderPatternPainter(),
+              ),
+            ),
+            // Center icon
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.celebration,
+                  size: 60,
+                  color: Colors.white.withOpacity(0.8),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlaceholderPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Vẽ các hình tròn nhỏ tạo pattern
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.08)
+      ..style = PaintingStyle.fill;
+
+    // Vẽ các hình tròn nhỏ
+    for (int i = 0; i < 20; i++) {
+      final x = (i * 47) % size.width;
+      final y = (i * 73) % size.height;
+      final radius = 2.0 + (i % 3) * 1.0;
+
+      canvas.drawCircle(Offset(x, y), radius, paint);
+    }
+
+    // Vẽ đường cong mềm mại ở dưới
+    final curvePaint = Paint()
+      ..color = Colors.white.withOpacity(0.06)
+      ..style = PaintingStyle.fill;
+
+    final path = ui.Path();
+    path.moveTo(0, size.height);
+    path.quadraticBezierTo(size.width * 0.25, size.height - 30,
+        size.width * 0.5, size.height - 15);
+    path.quadraticBezierTo(
+        size.width * 0.75, size.height, size.width, size.height - 25);
+    path.lineTo(size.width, size.height);
+    path.close();
+
+    canvas.drawPath(path, curvePaint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
   }
 }
