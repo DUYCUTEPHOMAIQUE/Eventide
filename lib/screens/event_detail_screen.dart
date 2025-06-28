@@ -12,6 +12,9 @@ import '../services/map_service.dart';
 import '../screens/card/minimalist_card_creation_screen.dart';
 import '../widgets/rsvp_selector.dart';
 import '../l10n/app_localizations.dart';
+import 'dart:async';
+import 'package:enva/services/notification_service.dart';
+import 'package:enva/services/auth_service.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final CardModel card;
@@ -36,11 +39,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   bool _isSendingInvites = false;
   bool _isRefreshing = false;
   bool _isUpdatingRSVP = false;
+  bool _hasChanges = false;
   CardModel? _currentCard;
   InviteModel? _currentUserInvite;
   UserModel? _ownerProfile;
   Map<String, String> _participantStatuses =
       {}; // Store status for each participant
+  bool _isRemindLoading = false;
+  int _remindCooldown = 0;
+  Timer? _remindTimer;
+  bool _remindSent = false;
 
   @override
   void initState() {
@@ -471,7 +479,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () =>
+              Navigator.pop(context, _hasChanges ? {'edited': true} : null),
           icon: Icon(Icons.arrow_back,
               color: Theme.of(context).colorScheme.onSurface),
         ),
@@ -499,19 +508,104 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 ),
               ),
             ),
-          if (isOwner)
-            IconButton(
-              onPressed: _isRefreshing
-                  ? null
-                  : () => _navigateToEditCard(context, card),
+          if (isOwner && !_isRefreshing)
+            PopupMenuButton<String>(
               icon: Icon(
-                Icons.edit_outlined,
-                color: _isRefreshing
-                    ? Colors.grey
-                    : Theme.of(context).colorScheme.onSurface,
+                Icons.more_vert,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 24,
               ),
+              onSelected: (value) {
+                switch (value) {
+                  case 'edit':
+                    _navigateToEditCard(context, card);
+                    break;
+                  case 'delete':
+                    _showDeleteConfirmation(context, card);
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem<String>(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.edit_outlined,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        AppLocalizations.of(context)!.editEvent,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete_outline,
+                        size: 20,
+                        color: Colors.red.shade600,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        AppLocalizations.of(context)!.deleteEvent,
+                        style: TextStyle(
+                          color: Colors.red.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          IconButton(
+            icon: _isRemindLoading || _remindCooldown > 0
+                ? Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Icon(Icons.notifications_active,
+                          color: Colors.grey.shade400),
+                      if (_remindSent)
+                        Icon(Icons.check_circle, color: Colors.green, size: 18),
+                      if (_remindCooldown > 0)
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '$_remindCooldown',
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey.shade600,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                    ],
+                  )
+                : Icon(Icons.notifications_active,
+                    color: Colors.amber.shade700),
+            tooltip: _remindSent
+                ? AppLocalizations.of(context)!.markAsRead
+                : AppLocalizations.of(context)!.remindNotificationBody(''),
+            onPressed: (_isRemindLoading || _remindCooldown > 0)
+                ? null
+                : _handleRemindAll,
+          ),
         ],
       ),
       body: Stack(
@@ -1330,8 +1424,87 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       // Refresh card data if update was successful
       if (result == true) {
         await _refreshCardData(card.id);
+        // Mark that we need to refresh home screen too
+        setState(() {
+          _hasChanges = true;
+        });
       }
     });
+  }
+
+  void _showDeleteConfirmation(BuildContext context, CardModel card) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          AppLocalizations.of(context)!.confirmDeleteEvent,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.red.shade600,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context)!
+                  .confirmDeleteEventMessage(card.title),
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              AppLocalizations.of(context)!.deleteEventWarning,
+              style: TextStyle(
+                color: Colors.red.shade600,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Close dialog
+              Navigator.pop(context);
+
+              // Navigate back to home immediately
+              Navigator.pop(context, {'deleting': card.title});
+
+              // Delete card in background (fire and forget)
+              _cardService.deleteCard(card.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              AppLocalizations.of(context)!.delete,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _refreshCardData(String cardId) async {
@@ -1848,6 +2021,53 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleRemindAll() async {
+    setState(() {
+      _isRemindLoading = true;
+      _remindCooldown = 60;
+      _remindSent = false;
+    });
+    // Lấy tên người gửi từ AuthService
+    final senderName = AuthService().getUserDisplayName() ??
+        AuthService().currentUser?.email ??
+        'Bạn';
+    final senderId = AuthService().currentUser?.id;
+    // Lấy danh sách userId người tham gia, trừ sender
+    final card = _currentCard ?? widget.card;
+    final participantIds = card.participants
+        .map((p) => p.id)
+        .where((id) => id != senderId)
+        .toList();
+    final notificationService = NotificationService();
+    final body =
+        AppLocalizations.of(context)!.remindNotificationBody(senderName);
+    for (final userId in participantIds) {
+      await notificationService.sendNotificationToUser(
+        userId: userId,
+        title: '',
+        body: body,
+      );
+    }
+    setState(() {
+      _remindSent = true;
+      _isRemindLoading = false;
+    });
+    // Bắt đầu cooldown 60s
+    _remindTimer?.cancel();
+    _remindTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remindCooldown <= 1) {
+        timer.cancel();
+        setState(() {
+          _remindSent = false;
+          _isRemindLoading = false;
+          _remindCooldown = 0;
+        });
+      } else {
+        setState(() => _remindCooldown--);
+      }
+    });
   }
 }
 

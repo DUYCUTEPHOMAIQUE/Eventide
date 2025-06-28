@@ -60,9 +60,9 @@ class FCMService {
         });
 
         // Handle foreground messages
-        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
           print('Received foreground message: ${message.notification?.title}');
-          _handleForegroundMessage(message);
+          await _handleForegroundMessage(message);
         });
 
         // Handle background messages
@@ -192,14 +192,14 @@ class FCMService {
   }
 
   // Handle foreground messages
-  void _handleForegroundMessage(RemoteMessage message) {
+  Future<void> _handleForegroundMessage(RemoteMessage message) async {
     print('Handling foreground message');
     print('Title: ${message.notification?.title}');
     print('Body: ${message.notification?.body}');
     print('Data: ${message.data}');
 
-    // Show local notification using LocalNotificationService
-    LocalNotificationService.handleForegroundMessage(message);
+    // Use local notification service to handle the message
+    await LocalNotificationService.handleForegroundMessage(message);
   }
 
   // Handle notification tap

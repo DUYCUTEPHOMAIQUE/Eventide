@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// **'System Language'**
   String get systemLanguage;
 
-  /// Notifications setting label
+  /// Notifications screen title
   ///
   /// In en, this message translates to:
   /// **'Notifications'**
@@ -437,10 +437,10 @@ abstract class AppLocalizations {
   /// **'Confirm Password'**
   String get confirmPassword;
 
-  /// Forgot password link text
+  /// Forgot password button text
   ///
   /// In en, this message translates to:
-  /// **'Forgot Password?'**
+  /// **'Forgot password?'**
   String get forgotPassword;
 
   /// Text for users without account
@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// **'Sign in with Facebook'**
   String get signInWithFacebook;
 
-  /// Or separator text
+  /// Or divider text
   ///
   /// In en, this message translates to:
   /// **'or'**
@@ -479,16 +479,16 @@ abstract class AppLocalizations {
   /// **'Welcome'**
   String get welcome;
 
-  /// Welcome message text
+  /// Welcome message on auth screen
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Eventide'**
+  /// **'Welcome'**
   String get welcomeMessage;
 
-  /// Welcome subtitle text
+  /// Welcome subtitle on auth screen
   ///
   /// In en, this message translates to:
-  /// **'Create and share your events with friends and family'**
+  /// **'Create and share beautiful invitations for your special events'**
   String get welcomeSubtitle;
 
   /// Get started button text
@@ -869,10 +869,10 @@ abstract class AppLocalizations {
   /// **'Pending'**
   String get pending;
 
-  /// Processing state text
+  /// Processing loading text
   ///
   /// In en, this message translates to:
-  /// **'Processing'**
+  /// **'Processing...'**
   String get processing;
 
   /// Completed state text
@@ -928,6 +928,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deleted'**
   String get deleted;
+
+  /// Delete event menu option
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Event'**
+  String get deleteEvent;
+
+  /// Delete confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Event?'**
+  String get confirmDeleteEvent;
+
+  /// Delete confirmation dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{eventTitle}\"?'**
+  String confirmDeleteEventMessage(String eventTitle);
+
+  /// Warning message in delete confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone.'**
+  String get deleteEventWarning;
+
+  /// Success message after deleting event
+  ///
+  /// In en, this message translates to:
+  /// **'Event \"{eventTitle}\" deleted successfully'**
+  String eventDeletedSuccessfully(String eventTitle);
+
+  /// Error message when deleting event fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting event'**
+  String get errorDeletingEvent;
+
+  /// Loading message when deleting event
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting event...'**
+  String get deletingEvent;
 
   /// Restored state text
   ///
@@ -2042,7 +2084,7 @@ abstract class AppLocalizations {
   /// No description provided for @currentLocationButton.
   ///
   /// In en, this message translates to:
-  /// **'Reccent'**
+  /// **'Current'**
   String get currentLocationButton;
 
   /// No description provided for @browseMapButton.
@@ -2074,6 +2116,612 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading...'**
   String get loadingData;
+
+  /// No description provided for @aiCardCreationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Card with AI'**
+  String get aiCardCreationTitle;
+
+  /// No description provided for @aiEventCreator.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Event Creator'**
+  String get aiEventCreator;
+
+  /// No description provided for @aiEventCreatorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe your event and AI will create a complete event card with image, title and suitable description.'**
+  String get aiEventCreatorDescription;
+
+  /// No description provided for @eventType.
+  ///
+  /// In en, this message translates to:
+  /// **'Event Type'**
+  String get eventType;
+
+  /// No description provided for @generateWithAI.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate with AI'**
+  String get generateWithAI;
+
+  /// No description provided for @generating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating...'**
+  String get generating;
+
+  /// No description provided for @aiGeneratingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is creating an event card for you...'**
+  String get aiGeneratingMessage;
+
+  /// No description provided for @generatedCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated Card'**
+  String get generatedCard;
+
+  /// No description provided for @regenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get regenerate;
+
+  /// No description provided for @useCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Card'**
+  String get useCard;
+
+  /// Sign in button text
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signIn;
+
+  /// Sign up button text
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
+  /// Create account button text
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// Email field hint
+  ///
+  /// In en, this message translates to:
+  /// **'example@email.com'**
+  String get emailHint;
+
+  /// Password field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get passwordHint;
+
+  /// Google sign in button text
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// Email verification screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Email Verification'**
+  String get emailVerification;
+
+  /// OTP screen subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code sent to your email'**
+  String get enterSixDigitCode;
+
+  /// OTP input label
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Code'**
+  String get verificationCode;
+
+  /// OTP input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code sent to your email'**
+  String get enterSixDigitCodeSent;
+
+  /// Verify button text
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
+
+  /// Resend countdown text
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds}s'**
+  String resendCodeIn(int seconds);
+
+  /// Resend code button text
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get resendCode;
+
+  /// Back to sign up button text
+  ///
+  /// In en, this message translates to:
+  /// **'Back to sign up'**
+  String get backToSignUp;
+
+  /// Confirm dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmAction;
+
+  /// Cancel sign up confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to go back? The registration process will be cancelled.'**
+  String get cancelSignUpConfirm;
+
+  /// New OTP sent success message
+  ///
+  /// In en, this message translates to:
+  /// **'New OTP code has been sent to your email'**
+  String get newOTPSent;
+
+  /// OTP validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter all 6 digits'**
+  String get enterAllDigits;
+
+  /// Complete profile screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Profile'**
+  String get completeProfile;
+
+  /// Complete profile subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Add information to complete your account'**
+  String get addInfoToComplete;
+
+  /// Avatar section label
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar'**
+  String get avatar;
+
+  /// Choose avatar button text
+  ///
+  /// In en, this message translates to:
+  /// **'Choose avatar'**
+  String get chooseAvatar;
+
+  /// Display name field label
+  ///
+  /// In en, this message translates to:
+  /// **'Display Name'**
+  String get displayName;
+
+  /// Display name field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your display name'**
+  String get enterDisplayName;
+
+  /// Complete button text
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
+
+  /// Camera option text
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// Gallery option text
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// Image upload success message
+  ///
+  /// In en, this message translates to:
+  /// **'Image uploaded successfully'**
+  String get imageUploadSuccess;
+
+  /// Image upload failed message
+  ///
+  /// In en, this message translates to:
+  /// **'Image upload failed'**
+  String get imageUploadFailed;
+
+  /// Image pick error message
+  ///
+  /// In en, this message translates to:
+  /// **'Image selection error: {error}'**
+  String imagePickError(String error);
+
+  /// Image upload error message
+  ///
+  /// In en, this message translates to:
+  /// **'Image upload error: {error}'**
+  String imageUploadError(String error);
+
+  /// Avatar validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose an avatar'**
+  String get pleaseChooseAvatar;
+
+  /// Display name validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter display name'**
+  String get enterDisplayNameValidation;
+
+  /// Display name min length validation
+  ///
+  /// In en, this message translates to:
+  /// **'Display name must be at least 2 characters'**
+  String get displayNameMinLength;
+
+  /// Profile complete success message
+  ///
+  /// In en, this message translates to:
+  /// **'Profile completed successfully!'**
+  String get profileCompleteSuccess;
+
+  /// Generic error message prefix
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String errorPrefix(String error);
+
+  /// Email validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter email'**
+  String get enterEmail;
+
+  /// Password validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter password'**
+  String get enterPassword;
+
+  /// Password min length validation
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordMinLength;
+
+  /// Password requirements validation
+  ///
+  /// In en, this message translates to:
+  /// **'Password requires: at least 1 uppercase, 1 lowercase and 1 number. Example: Password123'**
+  String get passwordRequirements;
+
+  /// Email already registered error
+  ///
+  /// In en, this message translates to:
+  /// **'Email already registered. Please sign in or use another email'**
+  String get emailAlreadyRegistered;
+
+  /// Email not registered error
+  ///
+  /// In en, this message translates to:
+  /// **'Email not registered. Please check again or sign up for a new account'**
+  String get emailNotRegistered;
+
+  /// Incorrect password error
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password. Please check again or use \"Forgot password\"'**
+  String get incorrectPassword;
+
+  /// Weak password error
+  ///
+  /// In en, this message translates to:
+  /// **'Password requires: at least 6 characters, including 1 uppercase, 1 lowercase and 1 number. Example: Password123'**
+  String get weakPassword;
+
+  /// Password too short error
+  ///
+  /// In en, this message translates to:
+  /// **'Password too short. Requires at least 6 characters'**
+  String get passwordTooShort;
+
+  /// Email not found error
+  ///
+  /// In en, this message translates to:
+  /// **'Email not registered. Please check again or sign up for a new account'**
+  String get emailNotFound;
+
+  /// Email already exists error
+  ///
+  /// In en, this message translates to:
+  /// **'Email already registered. Please sign in or use another email'**
+  String get emailAlreadyExists;
+
+  /// Email not confirmed error
+  ///
+  /// In en, this message translates to:
+  /// **'Email not verified. Please check your email and click the verification link'**
+  String get emailNotConfirmed;
+
+  /// Generic email error
+  ///
+  /// In en, this message translates to:
+  /// **'Email error. Please check again'**
+  String get emailError;
+
+  /// Network error message
+  ///
+  /// In en, this message translates to:
+  /// **'Network error. Please check your internet connection and try again'**
+  String get networkError;
+
+  /// Server error message
+  ///
+  /// In en, this message translates to:
+  /// **'System error. Please try again in a few minutes'**
+  String get serverError;
+
+  /// Authentication error message
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication error. Please sign in again'**
+  String get authError;
+
+  /// Invalid OTP error
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect OTP code. Please check the 6-digit code again'**
+  String get invalidOTP;
+
+  /// Expired OTP error
+  ///
+  /// In en, this message translates to:
+  /// **'OTP code has expired. Please click \"Resend code\" to get a new code'**
+  String get expiredOTP;
+
+  /// Generic OTP error
+  ///
+  /// In en, this message translates to:
+  /// **'OTP verification error. Please try again'**
+  String get otpError;
+
+  /// Google sign in cancelled error
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign in cancelled. Please try again'**
+  String get googleSignInCancelled;
+
+  /// Google sign in error
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign in error. Please try again or use email sign in'**
+  String get googleSignInError;
+
+  /// Generic error message
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}. Please try again'**
+  String genericError(String error);
+
+  /// Mark all notifications as read button
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get markAllRead;
+
+  /// No notifications state title
+  ///
+  /// In en, this message translates to:
+  /// **'No Notifications'**
+  String get noNotifications;
+
+  /// No notifications state description
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll see notifications here when you receive them'**
+  String get noNotificationsDescription;
+
+  /// Mark notification as read menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as read'**
+  String get markAsRead;
+
+  /// Time ago just now text
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get timeAgoJustNow;
+
+  /// Time ago minutes text
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min ago'**
+  String timeAgoMinutesAgo(int minutes);
+
+  /// Time ago hours text
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h ago'**
+  String timeAgoHoursAgo(int hours);
+
+  /// Time ago days text
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d ago'**
+  String timeAgoDaysAgo(int days);
+
+  /// New invitation notification title
+  ///
+  /// In en, this message translates to:
+  /// **'New Invitation'**
+  String get newInvitation;
+
+  /// Invitation notification body
+  ///
+  /// In en, this message translates to:
+  /// **'{senderName} invited you to join \"{eventTitle}\"'**
+  String invitationNotification(String senderName, String eventTitle);
+
+  /// No description provided for @upgradeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get upgradeTitle;
+
+  /// No description provided for @upgradeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock all features and unlimited usage.'**
+  String get upgradeSubtitle;
+
+  /// No description provided for @upgradeBenefits.
+  ///
+  /// In en, this message translates to:
+  /// **'• Unlimited event cards\n• Unlimited AI generations\n• Premium templates\n• Priority support'**
+  String get upgradeBenefits;
+
+  /// No description provided for @upgradeInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your premium code'**
+  String get upgradeInputHint;
+
+  /// No description provided for @upgradeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Now'**
+  String get upgradeButton;
+
+  /// No description provided for @upgradeCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get upgradeCancel;
+
+  /// No description provided for @upgradeSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Successful!'**
+  String get upgradeSuccessTitle;
+
+  /// No description provided for @upgradeSuccessDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You have unlocked all premium features. Enjoy!'**
+  String get upgradeSuccessDesc;
+
+  /// No description provided for @upgradeInputLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Code'**
+  String get upgradeInputLabel;
+
+  /// No description provided for @upgradeInputError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or used code.'**
+  String get upgradeInputError;
+
+  /// No description provided for @upgradeInputEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a code.'**
+  String get upgradeInputEmpty;
+
+  /// No description provided for @upgradeSuccessButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it!'**
+  String get upgradeSuccessButton;
+
+  /// No description provided for @profilePremiumDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You are enjoying all premium features!'**
+  String get profilePremiumDesc;
+
+  /// No description provided for @profileFreeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium for unlimited cards, AI, and more.'**
+  String get profileFreeDesc;
+
+  /// No description provided for @cardLimitReachedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Card Limit Reached'**
+  String get cardLimitReachedTitle;
+
+  /// No description provided for @limitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit Reached'**
+  String get limitReached;
+
+  /// No description provided for @limitReachedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached your monthly limit for {feature}.'**
+  String limitReachedMessage(Object feature);
+
+  /// No description provided for @premiumFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Feature'**
+  String get premiumFeature;
+
+  /// No description provided for @premiumFeatureMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{feature} is available with Premium subscription.'**
+  String premiumFeatureMessage(Object feature);
+
+  /// No description provided for @upgradeNowButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Now'**
+  String get upgradeNowButton;
+
+  /// No description provided for @upgradeDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Get unlimited access to {feature} and more!'**
+  String upgradeDialogMessage(Object feature);
+
+  /// No description provided for @maybeLaterButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get maybeLaterButton;
+
+  /// No description provided for @remindNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{senderName} reminded you to join an event'**
+  String remindNotificationBody(Object senderName);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -705,6 +705,44 @@
   "@deleted": {
     "description": "Deleted state text"
   },
+  "deleteEvent": "Delete Event",
+  "@deleteEvent": {
+    "description": "Delete event menu option"
+  },
+  "confirmDeleteEvent": "Delete Event?",
+  "@confirmDeleteEvent": {
+    "description": "Delete confirmation dialog title"
+  },
+  "confirmDeleteEventMessage": "Are you sure you want to delete \"{eventTitle}\"?",
+  "@confirmDeleteEventMessage": {
+    "description": "Delete confirmation dialog message",
+    "placeholders": {
+      "eventTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteEventWarning": "This action cannot be undone.",
+  "@deleteEventWarning": {
+    "description": "Warning message in delete confirmation"
+  },
+  "eventDeletedSuccessfully": "Event \"{eventTitle}\" deleted successfully",
+  "@eventDeletedSuccessfully": {
+    "description": "Success message after deleting event",
+    "placeholders": {
+      "eventTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeletingEvent": "Error deleting event",
+  "@errorDeletingEvent": {
+    "description": "Error message when deleting event fails"
+  },
+  "deletingEvent": "Deleting event...",
+  "@deletingEvent": {
+    "description": "Loading message when deleting event"
+  },
   
   "restored": "Restored",
   "@restored": {
@@ -1313,11 +1351,472 @@
   "eventWillBeUpdated": "Your event will be updated with new information",
   "eventWillBeShared": "Your event will be shared with guests",
   "seeHowYourEventWillLook": "See how your event will look",  
-  "currentLocationButton": "Reccent",
+  "currentLocationButton": "Current",
   "browseMapButton": "Map",
   "hidePreviewButton": "Hide",
   "previewButton": "Preview",
   "tapToAdd": "Tap to Add",
-  "loadingData": "Loading..."
-
+  "loadingData": "Loading...",
+  "aiCardCreationTitle": "Create Card with AI",
+  "aiEventCreator": "AI Event Creator",
+  "aiEventCreatorDescription": "Describe your event and AI will create a complete event card with image, title and suitable description.",
+  "eventType": "Event Type",
+  "generateWithAI": "Generate with AI",
+  "generating": "Generating...",
+  "aiGeneratingMessage": "AI is creating an event card for you...",
+  "generatedCard": "Generated Card",
+  "regenerate": "Regenerate",
+  "useCard": "Use Card",
+  
+  "welcomeMessage": "Welcome",
+  "@welcomeMessage": {
+    "description": "Welcome message on auth screen"
+  },
+  
+  "welcomeSubtitle": "Create and share beautiful invitations for your special events",
+  "@welcomeSubtitle": {
+    "description": "Welcome subtitle on auth screen"
+  },
+  
+  "signIn": "Sign In",
+  "@signIn": {
+    "description": "Sign in button text"
+  },
+  
+  "signUp": "Sign Up",
+  "@signUp": {
+    "description": "Sign up button text"
+  },
+  
+  "createAccount": "Create Account",
+  "@createAccount": {
+    "description": "Create account button text"
+  },
+  
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  
+  "emailHint": "example@email.com",
+  "@emailHint": {
+    "description": "Email field hint"
+  },
+  
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  
+  "passwordHint": "Enter password",
+  "@passwordHint": {
+    "description": "Password field hint"
+  },
+  
+  "or": "or",
+  "@or": {
+    "description": "Or divider text"
+  },
+  
+  "continueWithGoogle": "Continue with Google",
+  "@continueWithGoogle": {
+    "description": "Google sign in button text"
+  },
+  
+  "forgotPassword": "Forgot password?",
+  "@forgotPassword": {
+    "description": "Forgot password button text"
+  },
+  
+  "processing": "Processing...",
+  "@processing": {
+    "description": "Processing loading text"
+  },
+  
+  "emailVerification": "Email Verification",
+  "@emailVerification": {
+    "description": "Email verification screen title"
+  },
+  
+  "enterSixDigitCode": "Enter the 6-digit code sent to your email",
+  "@enterSixDigitCode": {
+    "description": "OTP screen subtitle"
+  },
+  
+  "verificationCode": "Verification Code",
+  "@verificationCode": {
+    "description": "OTP input label"
+  },
+  
+  "enterSixDigitCodeSent": "Enter the 6-digit code sent to your email",
+  "@enterSixDigitCodeSent": {
+    "description": "OTP input hint"
+  },
+  
+  "verify": "Verify",
+  "@verify": {
+    "description": "Verify button text"
+  },
+  
+  "resendCodeIn": "Resend code in {seconds}s",
+  "@resendCodeIn": {
+    "description": "Resend countdown text",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "resendCode": "Resend code",
+  "@resendCode": {
+    "description": "Resend code button text"
+  },
+  
+  "backToSignUp": "Back to sign up",
+  "@backToSignUp": {
+    "description": "Back to sign up button text"
+  },
+  
+  "confirmAction": "Confirm",
+  "@confirmAction": {
+    "description": "Confirm dialog title"
+  },
+  
+  "cancelSignUpConfirm": "Are you sure you want to go back? The registration process will be cancelled.",
+  "@cancelSignUpConfirm": {
+    "description": "Cancel sign up confirmation message"
+  },
+  
+  "newOTPSent": "New OTP code has been sent to your email",
+  "@newOTPSent": {
+    "description": "New OTP sent success message"
+  },
+  
+  "enterAllDigits": "Please enter all 6 digits",
+  "@enterAllDigits": {
+    "description": "OTP validation error"
+  },
+  
+  "completeProfile": "Complete Profile",
+  "@completeProfile": {
+    "description": "Complete profile screen title"
+  },
+  
+  "addInfoToComplete": "Add information to complete your account",
+  "@addInfoToComplete": {
+    "description": "Complete profile subtitle"
+  },
+  
+  "avatar": "Avatar",
+  "@avatar": {
+    "description": "Avatar section label"
+  },
+  
+  "chooseAvatar": "Choose avatar",
+  "@chooseAvatar": {
+    "description": "Choose avatar button text"
+  },
+  
+  "displayName": "Display Name",
+  "@displayName": {
+    "description": "Display name field label"
+  },
+  
+  "enterDisplayName": "Enter your display name",
+  "@enterDisplayName": {
+    "description": "Display name field hint"
+  },
+  
+  "complete": "Complete",
+  "@complete": {
+    "description": "Complete button text"
+  },
+  
+  "camera": "Camera",
+  "@camera": {
+    "description": "Camera option text"
+  },
+  
+  "gallery": "Gallery",
+  "@gallery": {
+    "description": "Gallery option text"
+  },
+  
+  "imageUploadSuccess": "Image uploaded successfully",
+  "@imageUploadSuccess": {
+    "description": "Image upload success message"
+  },
+  
+  "imageUploadFailed": "Image upload failed",
+  "@imageUploadFailed": {
+    "description": "Image upload failed message"
+  },
+  
+  "imagePickError": "Image selection error: {error}",
+  "@imagePickError": {
+    "description": "Image pick error message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "imageUploadError": "Image upload error: {error}",
+  "@imageUploadError": {
+    "description": "Image upload error message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "pleaseChooseAvatar": "Please choose an avatar",
+  "@pleaseChooseAvatar": {
+    "description": "Avatar validation error"
+  },
+  
+  "enterDisplayNameValidation": "Please enter display name",
+  "@enterDisplayNameValidation": {
+    "description": "Display name validation error"
+  },
+  
+  "displayNameMinLength": "Display name must be at least 2 characters",
+  "@displayNameMinLength": {
+    "description": "Display name min length validation"
+  },
+  
+  "profileCompleteSuccess": "Profile completed successfully!",
+  "@profileCompleteSuccess": {
+    "description": "Profile complete success message"
+  },
+  
+  "errorPrefix": "Error: {error}",
+  "@errorPrefix": {
+    "description": "Generic error message prefix",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "enterEmail": "Please enter email",
+  "@enterEmail": {
+    "description": "Email validation error"
+  },
+  
+  "enterPassword": "Please enter password",
+  "@enterPassword": {
+    "description": "Password validation error"
+  },
+  
+  "passwordMinLength": "Password must be at least 6 characters",
+  "@passwordMinLength": {
+    "description": "Password min length validation"
+  },
+  
+  "passwordRequirements": "Password requires: at least 1 uppercase, 1 lowercase and 1 number. Example: Password123",
+  "@passwordRequirements": {
+    "description": "Password requirements validation"
+  },
+  
+  "emailAlreadyRegistered": "Email already registered. Please sign in or use another email",
+  "@emailAlreadyRegistered": {
+    "description": "Email already registered error"
+  },
+  
+  "emailNotRegistered": "Email not registered. Please check again or sign up for a new account",
+  "@emailNotRegistered": {
+    "description": "Email not registered error"
+  },
+  
+  "incorrectPassword": "Incorrect password. Please check again or use \"Forgot password\"",
+  "@incorrectPassword": {
+    "description": "Incorrect password error"
+  },
+  
+  "weakPassword": "Password requires: at least 6 characters, including 1 uppercase, 1 lowercase and 1 number. Example: Password123",
+  "@weakPassword": {
+    "description": "Weak password error"
+  },
+  
+  "passwordTooShort": "Password too short. Requires at least 6 characters",
+  "@passwordTooShort": {
+    "description": "Password too short error"
+  },
+  
+  "emailNotFound": "Email not registered. Please check again or sign up for a new account",
+  "@emailNotFound": {
+    "description": "Email not found error"
+  },
+  
+  "emailAlreadyExists": "Email already registered. Please sign in or use another email",
+  "@emailAlreadyExists": {
+    "description": "Email already exists error"
+  },
+  
+  "emailNotConfirmed": "Email not verified. Please check your email and click the verification link",
+  "@emailNotConfirmed": {
+    "description": "Email not confirmed error"
+  },
+  
+  "emailError": "Email error. Please check again",
+  "@emailError": {
+    "description": "Generic email error"
+  },
+  
+  "networkError": "Network error. Please check your internet connection and try again",
+  "@networkError": {
+    "description": "Network error message"
+  },
+  
+  "serverError": "System error. Please try again in a few minutes",
+  "@serverError": {
+    "description": "Server error message"
+  },
+  
+  "authError": "Authentication error. Please sign in again",
+  "@authError": {
+    "description": "Authentication error message"
+  },
+  
+  "invalidOTP": "Incorrect OTP code. Please check the 6-digit code again",
+  "@invalidOTP": {
+    "description": "Invalid OTP error"
+  },
+  
+  "expiredOTP": "OTP code has expired. Please click \"Resend code\" to get a new code",
+  "@expiredOTP": {
+    "description": "Expired OTP error"
+  },
+  
+  "otpError": "OTP verification error. Please try again",
+  "@otpError": {
+    "description": "Generic OTP error"
+  },
+  
+  "googleSignInCancelled": "Google sign in cancelled. Please try again",
+  "@googleSignInCancelled": {
+    "description": "Google sign in cancelled error"
+  },
+  
+  "googleSignInError": "Google sign in error. Please try again or use email sign in",
+  "@googleSignInError": {
+    "description": "Google sign in error"
+  },
+  
+  "genericError": "Error: {error}. Please try again",
+  "@genericError": {
+    "description": "Generic error message",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications screen title"
+  },
+  
+  "markAllRead": "Mark all read",
+  "@markAllRead": {
+    "description": "Mark all notifications as read button"
+  },
+  
+  "noNotifications": "No Notifications",
+  "@noNotifications": {
+    "description": "No notifications state title"
+  },
+  
+  "noNotificationsDescription": "You'll see notifications here when you receive them",
+  "@noNotificationsDescription": {
+    "description": "No notifications state description"
+  },
+  
+  "markAsRead": "Mark as read",
+  "@markAsRead": {
+    "description": "Mark notification as read menu item"
+  },
+  
+  "timeAgoJustNow": "Just now",
+  "@timeAgoJustNow": {
+    "description": "Time ago just now text"
+  },
+  
+  "timeAgoMinutesAgo": "{minutes} min ago",
+  "@timeAgoMinutesAgo": {
+    "description": "Time ago minutes text",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "timeAgoHoursAgo": "{hours}h ago",
+  "@timeAgoHoursAgo": {
+    "description": "Time ago hours text",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "timeAgoDaysAgo": "{days}d ago",
+  "@timeAgoDaysAgo": {
+    "description": "Time ago days text",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "newInvitation": "New Invitation",
+  "@newInvitation": {
+    "description": "New invitation notification title"
+  },
+  
+  "invitationNotification": "{senderName} invited you to join \"{eventTitle}\"",
+  "@invitationNotification": {
+    "description": "Invitation notification body",
+    "placeholders": {
+      "senderName": {
+        "type": "String"
+      },
+      "eventTitle": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "upgradeTitle": "Upgrade to Premium",
+  "upgradeSubtitle": "Unlock all features and unlimited usage.",
+  "upgradeBenefits": "• Unlimited event cards\n• Unlimited AI generations\n• Premium templates\n• Priority support",
+  "upgradeInputHint": "Enter your premium code",
+  "upgradeButton": "Upgrade Now",
+  "upgradeCancel": "Cancel",
+  "upgradeSuccessTitle": "Upgrade Successful!",
+  "upgradeSuccessDesc": "You have unlocked all premium features. Enjoy!",
+  "upgradeInputLabel": "Premium Code",
+  "upgradeInputError": "Invalid or used code.",
+  "upgradeInputEmpty": "Please enter a code.",
+  "upgradeSuccessButton": "Got it!",
+  "profilePremiumDesc": "You are enjoying all premium features!",
+  "profileFreeDesc": "Upgrade to Premium for unlimited cards, AI, and more.",
+  "cardLimitReachedTitle": "Card Limit Reached",
+  "limitReached": "Limit Reached",
+  "limitReachedMessage": "You have reached your monthly limit for {feature}.",
+  "premiumFeature": "Premium Feature",
+  "premiumFeatureMessage": "{feature} is available with Premium subscription.",
+  "upgradeNowButton": "Upgrade Now",
+  "upgradeDialogMessage": "Get unlimited access to {feature} and more!",
+  "maybeLaterButton": "Maybe Later",
+  "remindNotificationBody": "{senderName} reminded you to join an event"
 }

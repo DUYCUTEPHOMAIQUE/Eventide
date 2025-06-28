@@ -16,6 +16,11 @@ class NotificationService {
       dotenv.env['FIREBASE_SERVICE_ACCOUNT_JSON'];
   static String? get _projectId => dotenv.env['FIREBASE_PROJECT_ID'];
 
+  // TODO: Để đa ngôn ngữ, nên truyền title/body từ UI/service gọi hàm này
+  static const String kInviteTitle = 'Lời mời mới';
+  static String kInviteBody(String senderName, String cardTitle) =>
+      '$senderName đã mời bạn tham gia "$cardTitle"';
+
   // Gửi notification cho một user
   Future<bool> sendNotificationToUser({
     required String userId,
@@ -220,8 +225,8 @@ class NotificationService {
 
       return await sendNotificationToUser(
         userId: receiverId,
-        title: 'Lời mời mới',
-        body: '$senderName đã mời bạn tham gia "$cardTitle"',
+        title: kInviteTitle,
+        body: kInviteBody(senderName, cardTitle),
         data: {
           'type': 'invite',
           'card_id': cardId,
@@ -252,8 +257,8 @@ class NotificationService {
 
       return await sendNotificationToUsers(
         userIds: receiverIds,
-        title: 'Lời mời mới',
-        body: '$senderName đã mời bạn tham gia "$cardTitle"',
+        title: kInviteTitle,
+        body: kInviteBody(senderName, cardTitle),
         data: {
           'type': 'invite',
           'card_id': cardId,

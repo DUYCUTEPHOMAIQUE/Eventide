@@ -180,7 +180,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmPassword => 'Confirm Password';
 
   @override
-  String get forgotPassword => 'Forgot Password?';
+  String get forgotPassword => 'Forgot password?';
 
   @override
   String get dontHaveAccount => 'Don\'t have an account?';
@@ -201,10 +201,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome => 'Welcome';
 
   @override
-  String get welcomeMessage => 'Welcome to Eventide';
+  String get welcomeMessage => 'Welcome';
 
   @override
-  String get welcomeSubtitle => 'Create and share your events with friends and family';
+  String get welcomeSubtitle =>
+      'Create and share beautiful invitations for your special events';
 
   @override
   String get getStarted => 'Get Started';
@@ -396,7 +397,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pending => 'Pending';
 
   @override
-  String get processing => 'Processing';
+  String get processing => 'Processing...';
 
   @override
   String get completed => 'Completed';
@@ -424,6 +425,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleted => 'Deleted';
+
+  @override
+  String get deleteEvent => 'Delete Event';
+
+  @override
+  String get confirmDeleteEvent => 'Delete Event?';
+
+  @override
+  String confirmDeleteEventMessage(String eventTitle) {
+    return 'Are you sure you want to delete \"$eventTitle\"?';
+  }
+
+  @override
+  String get deleteEventWarning => 'This action cannot be undone.';
+
+  @override
+  String eventDeletedSuccessfully(String eventTitle) {
+    return 'Event \"$eventTitle\" deleted successfully';
+  }
+
+  @override
+  String get errorDeletingEvent => 'Error deleting event';
+
+  @override
+  String get deletingEvent => 'Deleting event...';
 
   @override
   String get restored => 'Restored';
@@ -663,7 +689,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noUpcomingEvents => 'No upcoming events';
 
   @override
-  String get createNewEventOrWait => 'Create a new event or wait for invitations from friends';
+  String get createNewEventOrWait =>
+      'Create a new event or wait for invitations from friends';
 
   @override
   String get noHostingEvents => 'No events you\'re hosting';
@@ -675,16 +702,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noInvitations => 'No invitations';
 
   @override
-  String get invitationsWillAppearHere => 'You\'ll see event invitations here when someone invites you';
+  String get invitationsWillAppearHere =>
+      'You\'ll see event invitations here when someone invites you';
 
   @override
-  String get tryDifferentStatus => 'Try selecting a different status or wait for new invitations';
+  String get tryDifferentStatus =>
+      'Try selecting a different status or wait for new invitations';
 
   @override
   String get noPastEvents => 'No past events';
 
   @override
-  String get pastEventsWillAppearHere => 'Events that have ended will appear here';
+  String get pastEventsWillAppearHere =>
+      'Events that have ended will appear here';
 
   @override
   String get viewAllInvitations => 'View all invitations';
@@ -812,7 +842,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noInvitedPeople => 'No invited people';
 
   @override
-  String get pleaseSelectAtLeastOnePerson => 'Please select at least one person to invite';
+  String get pleaseSelectAtLeastOnePerson =>
+      'Please select at least one person to invite';
 
   @override
   String get cannotUpdateStatus => 'Cannot update status. Please try again.';
@@ -824,7 +855,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get waitingForResponse => 'Waiting for response';
 
   @override
-  String get pleaseSelectAtLeastOneUserToInvite => 'Please select at least one person to invite';
+  String get pleaseSelectAtLeastOneUserToInvite =>
+      'Please select at least one person to invite';
 
   @override
   String get pleaseLogin => 'Please login';
@@ -984,7 +1016,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get specialMomentCapture => 'Special moment capture';
 
   @override
-  String get eventWillBeUpdated => 'Your event will be updated with new information';
+  String get eventWillBeUpdated =>
+      'Your event will be updated with new information';
 
   @override
   String get eventWillBeShared => 'Your event will be shared with guests';
@@ -993,7 +1026,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get seeHowYourEventWillLook => 'See how your event will look';
 
   @override
-  String get currentLocationButton => 'Reccent';
+  String get currentLocationButton => 'Current';
 
   @override
   String get browseMapButton => 'Map';
@@ -1009,4 +1042,355 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loadingData => 'Loading...';
+
+  @override
+  String get aiCardCreationTitle => 'Create Card with AI';
+
+  @override
+  String get aiEventCreator => 'AI Event Creator';
+
+  @override
+  String get aiEventCreatorDescription =>
+      'Describe your event and AI will create a complete event card with image, title and suitable description.';
+
+  @override
+  String get eventType => 'Event Type';
+
+  @override
+  String get generateWithAI => 'Generate with AI';
+
+  @override
+  String get generating => 'Generating...';
+
+  @override
+  String get aiGeneratingMessage => 'AI is creating an event card for you...';
+
+  @override
+  String get generatedCard => 'Generated Card';
+
+  @override
+  String get regenerate => 'Regenerate';
+
+  @override
+  String get useCard => 'Use Card';
+
+  @override
+  String get signIn => 'Sign In';
+
+  @override
+  String get signUp => 'Sign Up';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get emailHint => 'example@email.com';
+
+  @override
+  String get passwordHint => 'Enter password';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get emailVerification => 'Email Verification';
+
+  @override
+  String get enterSixDigitCode => 'Enter the 6-digit code sent to your email';
+
+  @override
+  String get verificationCode => 'Verification Code';
+
+  @override
+  String get enterSixDigitCodeSent =>
+      'Enter the 6-digit code sent to your email';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String resendCodeIn(int seconds) {
+    return 'Resend code in ${seconds}s';
+  }
+
+  @override
+  String get resendCode => 'Resend code';
+
+  @override
+  String get backToSignUp => 'Back to sign up';
+
+  @override
+  String get confirmAction => 'Confirm';
+
+  @override
+  String get cancelSignUpConfirm =>
+      'Are you sure you want to go back? The registration process will be cancelled.';
+
+  @override
+  String get newOTPSent => 'New OTP code has been sent to your email';
+
+  @override
+  String get enterAllDigits => 'Please enter all 6 digits';
+
+  @override
+  String get completeProfile => 'Complete Profile';
+
+  @override
+  String get addInfoToComplete => 'Add information to complete your account';
+
+  @override
+  String get avatar => 'Avatar';
+
+  @override
+  String get chooseAvatar => 'Choose avatar';
+
+  @override
+  String get displayName => 'Display Name';
+
+  @override
+  String get enterDisplayName => 'Enter your display name';
+
+  @override
+  String get complete => 'Complete';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get imageUploadSuccess => 'Image uploaded successfully';
+
+  @override
+  String get imageUploadFailed => 'Image upload failed';
+
+  @override
+  String imagePickError(String error) {
+    return 'Image selection error: $error';
+  }
+
+  @override
+  String imageUploadError(String error) {
+    return 'Image upload error: $error';
+  }
+
+  @override
+  String get pleaseChooseAvatar => 'Please choose an avatar';
+
+  @override
+  String get enterDisplayNameValidation => 'Please enter display name';
+
+  @override
+  String get displayNameMinLength =>
+      'Display name must be at least 2 characters';
+
+  @override
+  String get profileCompleteSuccess => 'Profile completed successfully!';
+
+  @override
+  String errorPrefix(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get enterEmail => 'Please enter email';
+
+  @override
+  String get enterPassword => 'Please enter password';
+
+  @override
+  String get passwordMinLength => 'Password must be at least 6 characters';
+
+  @override
+  String get passwordRequirements =>
+      'Password requires: at least 1 uppercase, 1 lowercase and 1 number. Example: Password123';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'Email already registered. Please sign in or use another email';
+
+  @override
+  String get emailNotRegistered =>
+      'Email not registered. Please check again or sign up for a new account';
+
+  @override
+  String get incorrectPassword =>
+      'Incorrect password. Please check again or use \"Forgot password\"';
+
+  @override
+  String get weakPassword =>
+      'Password requires: at least 6 characters, including 1 uppercase, 1 lowercase and 1 number. Example: Password123';
+
+  @override
+  String get passwordTooShort =>
+      'Password too short. Requires at least 6 characters';
+
+  @override
+  String get emailNotFound =>
+      'Email not registered. Please check again or sign up for a new account';
+
+  @override
+  String get emailAlreadyExists =>
+      'Email already registered. Please sign in or use another email';
+
+  @override
+  String get emailNotConfirmed =>
+      'Email not verified. Please check your email and click the verification link';
+
+  @override
+  String get emailError => 'Email error. Please check again';
+
+  @override
+  String get networkError =>
+      'Network error. Please check your internet connection and try again';
+
+  @override
+  String get serverError => 'System error. Please try again in a few minutes';
+
+  @override
+  String get authError => 'Authentication error. Please sign in again';
+
+  @override
+  String get invalidOTP =>
+      'Incorrect OTP code. Please check the 6-digit code again';
+
+  @override
+  String get expiredOTP =>
+      'OTP code has expired. Please click \"Resend code\" to get a new code';
+
+  @override
+  String get otpError => 'OTP verification error. Please try again';
+
+  @override
+  String get googleSignInCancelled =>
+      'Google sign in cancelled. Please try again';
+
+  @override
+  String get googleSignInError =>
+      'Google sign in error. Please try again or use email sign in';
+
+  @override
+  String genericError(String error) {
+    return 'Error: $error. Please try again';
+  }
+
+  @override
+  String get markAllRead => 'Mark all read';
+
+  @override
+  String get noNotifications => 'No Notifications';
+
+  @override
+  String get noNotificationsDescription =>
+      'You\'ll see notifications here when you receive them';
+
+  @override
+  String get markAsRead => 'Mark as read';
+
+  @override
+  String get timeAgoJustNow => 'Just now';
+
+  @override
+  String timeAgoMinutesAgo(int minutes) {
+    return '$minutes min ago';
+  }
+
+  @override
+  String timeAgoHoursAgo(int hours) {
+    return '${hours}h ago';
+  }
+
+  @override
+  String timeAgoDaysAgo(int days) {
+    return '${days}d ago';
+  }
+
+  @override
+  String get newInvitation => 'New Invitation';
+
+  @override
+  String invitationNotification(String senderName, String eventTitle) {
+    return '$senderName invited you to join \"$eventTitle\"';
+  }
+
+  @override
+  String get upgradeTitle => 'Upgrade to Premium';
+
+  @override
+  String get upgradeSubtitle => 'Unlock all features and unlimited usage.';
+
+  @override
+  String get upgradeBenefits =>
+      '• Unlimited event cards\n• Unlimited AI generations\n• Premium templates\n• Priority support';
+
+  @override
+  String get upgradeInputHint => 'Enter your premium code';
+
+  @override
+  String get upgradeButton => 'Upgrade Now';
+
+  @override
+  String get upgradeCancel => 'Cancel';
+
+  @override
+  String get upgradeSuccessTitle => 'Upgrade Successful!';
+
+  @override
+  String get upgradeSuccessDesc =>
+      'You have unlocked all premium features. Enjoy!';
+
+  @override
+  String get upgradeInputLabel => 'Premium Code';
+
+  @override
+  String get upgradeInputError => 'Invalid or used code.';
+
+  @override
+  String get upgradeInputEmpty => 'Please enter a code.';
+
+  @override
+  String get upgradeSuccessButton => 'Got it!';
+
+  @override
+  String get profilePremiumDesc => 'You are enjoying all premium features!';
+
+  @override
+  String get profileFreeDesc =>
+      'Upgrade to Premium for unlimited cards, AI, and more.';
+
+  @override
+  String get cardLimitReachedTitle => 'Card Limit Reached';
+
+  @override
+  String get limitReached => 'Limit Reached';
+
+  @override
+  String limitReachedMessage(Object feature) {
+    return 'You have reached your monthly limit for $feature.';
+  }
+
+  @override
+  String get premiumFeature => 'Premium Feature';
+
+  @override
+  String premiumFeatureMessage(Object feature) {
+    return '$feature is available with Premium subscription.';
+  }
+
+  @override
+  String get upgradeNowButton => 'Upgrade Now';
+
+  @override
+  String upgradeDialogMessage(Object feature) {
+    return 'Get unlimited access to $feature and more!';
+  }
+
+  @override
+  String get maybeLaterButton => 'Maybe Later';
+
+  @override
+  String remindNotificationBody(Object senderName) {
+    return '$senderName reminded you to join an event';
+  }
 }

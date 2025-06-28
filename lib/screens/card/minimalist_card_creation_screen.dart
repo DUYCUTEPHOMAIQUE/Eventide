@@ -4,14 +4,19 @@ import 'package:enva/viewmodels/card_creation_viewmodel.dart';
 import 'package:enva/widgets/minimalist_location_picker.dart';
 import 'package:enva/l10n/app_localizations.dart';
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:enva/models/card_model.dart';
 
 class MinimalistCardCreationScreen extends StatelessWidget {
   final CardModel? cardToEdit;
+  final Map<String, dynamic>? initialData;
 
   const MinimalistCardCreationScreen({
     Key? key,
     this.cardToEdit,
+    this.initialData,
   }) : super(key: key);
 
   @override
@@ -24,6 +29,11 @@ class MinimalistCardCreationScreen extends StatelessWidget {
           // Use Future.microtask to ensure the viewModel is fully initialized
           Future.microtask(() {
             viewModel.loadCardForEditing(cardToEdit!);
+          });
+        } else if (initialData != null) {
+          // Load initial AI-generated data
+          Future.microtask(() async {
+            await viewModel.loadInitialData(initialData!);
           });
         }
         return viewModel;
@@ -565,6 +575,7 @@ class _MinimalistCardCreationViewState
           subtitle: AppLocalizations.of(context)!.mainEventImage,
           icon: Icons.wallpaper_outlined,
           imageFile: viewModel.backgroundImageFile,
+          imageBytes: viewModel.backgroundImageBytes,
           currentImageUrl: viewModel.currentBackgroundImageUrl,
           onAdd: () => viewModel.pickBackgroundImage(context),
           onRemove: viewModel.removeBackgroundImage,
@@ -575,6 +586,7 @@ class _MinimalistCardCreationViewState
           subtitle: AppLocalizations.of(context)!.specialMomentCapture,
           icon: Icons.photo_outlined,
           imageFile: viewModel.cardImageFile,
+          imageBytes: viewModel.cardImageBytes,
           currentImageUrl: viewModel.currentCardImageUrl,
           onAdd: () => viewModel.pickCardImage(context),
           onRemove: viewModel.removeCardImage,
@@ -587,12 +599,14 @@ class _MinimalistCardCreationViewState
     required String title,
     required String subtitle,
     required IconData icon,
-    required File? imageFile,
+    required XFile? imageFile,
+    required Uint8List? imageBytes,
     required String? currentImageUrl,
     required VoidCallback onAdd,
     required VoidCallback onRemove,
   }) {
     final hasImage = imageFile != null ||
+        imageBytes != null ||
         (currentImageUrl != null && currentImageUrl!.isNotEmpty);
 
     return Container(
@@ -662,33 +676,7 @@ class _MinimalistCardCreationViewState
             ClipRRect(
               borderRadius:
                   const BorderRadius.vertical(bottom: Radius.circular(32)),
-              child: imageFile != null
-                  ? Image.file(
-                      imageFile,
-                      height: 120,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.network(
-                      currentImageUrl!,
-                      height: 120,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 120,
-                          width: double.infinity,
-                          color: Colors.grey.shade200,
-                          child: Center(
-                            child: Icon(
-                              Icons.broken_image_outlined,
-                              color: Colors.grey.shade400,
-                              size: 32,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+              child: _buildImageWidget(imageFile, imageBytes, currentImageUrl),
             ),
           ] else ...[
             GestureDetector(
@@ -728,6 +716,77 @@ class _MinimalistCardCreationViewState
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildImageWidget(
+      XFile? imageFile, Uint8List? imageBytes, String? currentImageUrl) {
+    if (kIsWeb && imageBytes != null) {
+      // For web, use Image.memory with bytes
+      return Image.memory(
+        imageBytes,
+        height: 120,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImageErrorWidget();
+        },
+      );
+    } else if (!kIsWeb && imageFile != null) {
+      // For mobile, use Image.file
+      return Image.file(
+        File(imageFile.path),
+        height: 120,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImageErrorWidget();
+        },
+      );
+    } else if (currentImageUrl != null && currentImageUrl.isNotEmpty) {
+      // For existing images, use Image.network
+      return Image.network(
+        currentImageUrl,
+        height: 120,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImageErrorWidget();
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            height: 120,
+            width: double.infinity,
+            color: Colors.grey.shade200,
+            child: Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    return _buildImageErrorWidget();
+  }
+
+  Widget _buildImageErrorWidget() {
+    return Container(
+      height: 120,
+      width: double.infinity,
+      color: Colors.grey.shade200,
+      child: Center(
+        child: Icon(
+          Icons.broken_image_outlined,
+          color: Colors.grey.shade400,
+          size: 32,
+        ),
       ),
     );
   }
@@ -913,7 +972,9 @@ class _MinimalistCardCreationViewState
       builder: (context) => _PreviewCardModal(
         card: previewCard,
         backgroundImageFile: viewModel.backgroundImageFile,
+        backgroundImageBytes: viewModel.backgroundImageBytes,
         cardImageFile: viewModel.cardImageFile,
+        cardImageBytes: viewModel.cardImageBytes,
         onEdit: () {
           Navigator.pop(context);
         },
@@ -924,14 +985,18 @@ class _MinimalistCardCreationViewState
 
 class _PreviewCardModal extends StatelessWidget {
   final CardModel card;
-  final File? backgroundImageFile;
-  final File? cardImageFile;
+  final XFile? backgroundImageFile;
+  final Uint8List? backgroundImageBytes;
+  final XFile? cardImageFile;
+  final Uint8List? cardImageBytes;
   final VoidCallback onEdit;
 
   const _PreviewCardModal({
     required this.card,
     required this.backgroundImageFile,
+    required this.backgroundImageBytes,
     required this.cardImageFile,
+    required this.cardImageBytes,
     required this.onEdit,
   });
 
@@ -1178,10 +1243,25 @@ class _PreviewCardModal extends StatelessWidget {
   Widget _buildCardBackground() {
     // Check if there's a new background image file
     if (backgroundImageFile != null) {
-      return Image.file(
-        backgroundImageFile!,
-        fit: BoxFit.cover,
-      );
+      if (kIsWeb && backgroundImageBytes != null) {
+        // For web, use Image.memory with bytes
+        return Image.memory(
+          backgroundImageBytes!,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildDefaultBackground();
+          },
+        );
+      } else if (!kIsWeb) {
+        // For mobile, use Image.file
+        return Image.file(
+          File(backgroundImageFile!.path),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildDefaultBackground();
+          },
+        );
+      }
     }
 
     // Check if there's a current background image URL (for editing mode)

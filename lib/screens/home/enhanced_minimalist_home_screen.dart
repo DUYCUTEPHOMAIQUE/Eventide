@@ -11,6 +11,13 @@ import 'package:enva/widgets/participants_avatar_list.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:math';
 import 'package:enva/l10n/app_localizations.dart';
+import 'package:enva/screens/card/ai_card_creation_screen.dart';
+import 'package:enva/services/local_notification_storage_service.dart';
+import 'package:enva/screens/notifications/notifications_screen.dart';
+import 'package:enva/services/card_limit_service.dart';
+import 'package:enva/widgets/card_creation_gate.dart';
+import 'package:enva/widgets/card_creation_wrapper.dart';
+import 'dart:async';
 
 class EnhancedMinimalistHomeScreen extends StatelessWidget {
   const EnhancedMinimalistHomeScreen({super.key});
@@ -32,16 +39,47 @@ class _HomeScreenContent extends StatefulWidget {
 }
 
 class _HomeScreenContentState extends State<_HomeScreenContent>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
+  int _unreadNotificationCount = 0;
+
   @override
   void initState() {
     super.initState();
-    // Initialize animations after the first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addObserver(this);
+    _loadUnreadNotificationCount();
+
+    // Set up periodic refresh for notification count
+    Timer.periodic(Duration(seconds: 5), (timer) {
       if (mounted) {
-        context.read<HomeScreenProvider>().initializeAnimations(this);
+        _loadUnreadNotificationCount();
+      } else {
+        timer.cancel();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Refresh notification count when app is resumed
+      _loadUnreadNotificationCount();
+    }
+  }
+
+  Future<void> _loadUnreadNotificationCount() async {
+    final count = await LocalNotificationStorageService.getUnreadCount();
+    if (mounted) {
+      setState(() {
+        _unreadNotificationCount = count;
+      });
+    }
   }
 
   @override
@@ -159,6 +197,58 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
           // Right side: Action buttons
           Row(
             children: [
+              // AI button
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.purple.shade400,
+                      Colors.blue.shade500,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.purple.shade400.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  onPressed: () => _navigateToAICreateCard(context),
+                  icon: Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      Icon(
+                        Icons.auto_awesome,
+                        size: 24,
+                        color: Colors.white,
+                      ),
+                      Positioned(
+                        bottom: -8,
+                        child: Text(
+                          'AI',
+                          style: TextStyle(
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    padding: const EdgeInsets.all(10),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+
               // Add button
               Container(
                 decoration: BoxDecoration(
@@ -187,36 +277,84 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
               ),
               const SizedBox(width: 12),
 
-              // User avatar
-              GestureDetector(
-                onTap: () => _navigateToProfile(context),
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .outline
-                          .withOpacity(0.3),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .shadow
-                            .withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+              // User avatar with notification bell
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () => _navigateToProfile(context),
+                    child: ClipOval(
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        child: _buildUserAvatar(),
                       ),
-                    ],
+                    ),
                   ),
-                  child: ClipOval(
-                    child: _buildUserAvatar(),
+
+                  // Notification bell in top right corner
+                  Positioned(
+                    top: -2,
+                    right: -2,
+                    child: GestureDetector(
+                      onTap: () => _navigateToNotifications(context),
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.grey.shade200,
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Icon(
+                                Icons.notifications_outlined,
+                                size: 14,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            if (_unreadNotificationCount > 0)
+                              Positioned(
+                                top: 2,
+                                right: 2,
+                                child: Container(
+                                  width: _unreadNotificationCount > 9 ? 16 : 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade500,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      _unreadNotificationCount > 5
+                                          ? '5+'
+                                          : _unreadNotificationCount.toString(),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -1312,10 +1450,11 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
   }
 
   Future<void> _navigateToCreateCard(BuildContext context) async {
+    // Navigate immediately (optimistic UI)
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const MinimalistCardCreationScreen(),
+        builder: (context) => CardCreationScreenWrapper(),
       ),
     );
 
@@ -1336,6 +1475,15 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
     }
   }
 
+  Future<void> _navigateToAICreateCard(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AICardCreationScreen(),
+      ),
+    );
+  }
+
   Future<void> _navigateToProfile(BuildContext context) async {
     await Navigator.push(
       context,
@@ -1345,13 +1493,109 @@ class _HomeScreenContentState extends State<_HomeScreenContent>
     );
   }
 
-  Future<void> _navigateToEventDetail(CardModel card) async {
+  Future<void> _navigateToNotifications(BuildContext context) async {
     await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificationsScreen(),
+      ),
+    );
+    // Refresh notification count when returning from notifications screen
+    _loadUnreadNotificationCount();
+  }
+
+  Future<void> _navigateToEventDetail(CardModel card) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EventDetailScreen(card: card),
       ),
     );
+
+    // Only handle specific results, don't auto-refresh on normal navigation
+    if (mounted && result is Map<String, dynamic>) {
+      final provider = context.read<HomeScreenProvider>();
+
+      // Show message if card is being deleted
+      if (result['deleting'] != null) {
+        provider.refreshCards(); // Only refresh when actually deleting
+        final deletingTitle = result['deleting'] as String;
+
+        // Clear any existing snackbars first
+        ScaffoldMessenger.of(context).clearSnackBars();
+
+        // Show deleting message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Đang xóa "$deletingTitle"...',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.orange.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: EdgeInsets.all(16),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+
+        // Auto-refresh after 2 seconds to remove the deleted card
+        Future.delayed(Duration(seconds: 2), () {
+          if (mounted) {
+            final provider = context.read<HomeScreenProvider>();
+            provider.refreshCards();
+
+            // Show success message after refresh
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Đã xóa "$deletingTitle" thành công',
+                        style: TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.green.shade600,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: EdgeInsets.all(16),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
+      }
+
+      // Refresh if card was edited
+      else if (result['edited'] == true) {
+        provider.refreshCards(); // Refresh to show updated card data
+      }
+    }
   }
 
   bool _isCurrentUserHosting(CardModel card) {

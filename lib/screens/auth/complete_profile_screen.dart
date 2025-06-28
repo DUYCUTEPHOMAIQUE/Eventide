@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:enva/services/auth_service.dart';
 import 'package:enva/services/cloudinary_service.dart';
 import 'package:enva/screens/home/enhanced_minimalist_home_screen.dart';
+import 'package:enva/l10n/app_localizations.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({Key? key}) : super(key: key);
@@ -23,6 +26,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   bool _isUploadingAvatar = false;
   String? _selectedAvatarPath;
   String? _uploadedAvatarUrl;
+  Uint8List? _selectedImageBytes; // For web support
 
   @override
   void dispose() {
@@ -32,6 +36,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
@@ -45,22 +51,22 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: 40),
 
                 // Header
-                _buildHeader(),
+                _buildHeader(l10n),
 
                 const SizedBox(height: 48),
 
                 // Avatar Selection
-                _buildAvatarSelection(),
+                _buildAvatarSelection(l10n),
 
                 const SizedBox(height: 32),
 
                 // Display Name Field
-                _buildDisplayNameField(),
+                _buildDisplayNameField(l10n),
 
                 const SizedBox(height: 32),
 
                 // Complete Button
-                _buildCompleteButton(),
+                _buildCompleteButton(l10n),
               ],
             ),
           ),
@@ -69,12 +75,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Hoàn tất hồ sơ',
+          l10n.completeProfile,
           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: Theme.of(context).colorScheme.onBackground,
@@ -82,7 +88,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Thêm thông tin để hoàn tất tài khoản của bạn',
+          l10n.addInfoToComplete,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -91,12 +97,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildAvatarSelection() {
+  Widget _buildAvatarSelection(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Ảnh đại diện',
+          l10n.avatar,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onBackground,
@@ -107,7 +113,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         // Avatar Preview
         Center(
           child: GestureDetector(
-            onTap: _showAvatarOptions,
+            onTap: () => _showAvatarOptions(l10n),
             child: Container(
               width: 120,
               height: 120,
@@ -138,14 +144,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         // Upload Button
         Center(
           child: TextButton.icon(
-            onPressed: _showAvatarOptions,
+            onPressed: () => _showAvatarOptions(l10n),
             icon: Icon(
               Icons.camera_alt_outlined,
               color: Theme.of(context).colorScheme.primary,
               size: 20,
             ),
             label: Text(
-              'Chọn ảnh đại diện',
+              l10n.chooseAvatar,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.primary,
@@ -170,12 +176,22 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       );
     }
 
-    if (_selectedAvatarPath != null) {
-      return Image.file(
-        File(_selectedAvatarPath!),
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
-      );
+    if (_selectedAvatarPath != null || _selectedImageBytes != null) {
+      if (kIsWeb && _selectedImageBytes != null) {
+        // For web, use Image.memory with bytes
+        return Image.memory(
+          _selectedImageBytes!,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+        );
+      } else if (!kIsWeb && _selectedAvatarPath != null) {
+        // For mobile platforms, use Image.file
+        return Image.file(
+          File(_selectedAvatarPath!),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => _buildDefaultAvatar(),
+        );
+      }
     }
 
     return _buildDefaultAvatar();
@@ -192,12 +208,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildDisplayNameField() {
+  Widget _buildDisplayNameField(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Tên hiển thị',
+          l10n.displayName,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onBackground,
@@ -207,7 +223,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         TextFormField(
           controller: _displayNameController,
           decoration: InputDecoration(
-            hintText: 'Nhập tên hiển thị của bạn',
+            hintText: l10n.enterDisplayName,
             prefixIcon: Icon(
               Icons.person_outline,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -236,10 +252,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           ),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Vui lòng nhập tên hiển thị';
+              return l10n.enterDisplayNameValidation;
             }
             if (value.trim().length < 2) {
-              return 'Tên hiển thị phải có ít nhất 2 ký tự';
+              return l10n.displayNameMinLength;
             }
             return null;
           },
@@ -248,7 +264,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildCompleteButton() {
+  Widget _buildCompleteButton(AppLocalizations l10n) {
     return SizedBox(
       width: double.infinity,
       height: 56,
@@ -274,7 +290,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 ),
               )
             : Text(
-                'Hoàn tất',
+                l10n.complete,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.onPrimary,
@@ -284,7 +300,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  void _showAvatarOptions() {
+  void _showAvatarOptions(AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -309,7 +325,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Chọn ảnh đại diện',
+              l10n.chooseAvatar,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onBackground,
@@ -325,7 +341,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       _pickImageFromCamera();
                     },
                     icon: const Icon(Icons.camera_alt_outlined),
-                    label: const Text('Máy ảnh'),
+                    label: Text(l10n.camera),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -342,7 +358,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       _pickImageFromGallery();
                     },
                     icon: const Icon(Icons.photo_library_outlined),
-                    label: const Text('Thư viện'),
+                    label: Text(l10n.gallery),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -361,6 +377,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   Future<void> _pickImageFromCamera() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.camera,
@@ -370,16 +388,27 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       );
 
       if (image != null) {
-        setState(() {
-          _selectedAvatarPath = image.path;
-        });
+        if (kIsWeb) {
+          // For web, read bytes
+          final bytes = await image.readAsBytes();
+          setState(() {
+            _selectedImageBytes = bytes;
+            _selectedAvatarPath = null;
+          });
+        } else {
+          // For mobile, use path
+          setState(() {
+            _selectedAvatarPath = image.path;
+            _selectedImageBytes = null;
+          });
+        }
         await _uploadAvatar(image);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi chọn ảnh: $e'),
+            content: Text(l10n.imagePickError(e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -388,6 +417,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   Future<void> _pickImageFromGallery() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
@@ -397,16 +428,27 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       );
 
       if (image != null) {
-        setState(() {
-          _selectedAvatarPath = image.path;
-        });
+        if (kIsWeb) {
+          // For web, read bytes
+          final bytes = await image.readAsBytes();
+          setState(() {
+            _selectedImageBytes = bytes;
+            _selectedAvatarPath = null;
+          });
+        } else {
+          // For mobile, use path
+          setState(() {
+            _selectedAvatarPath = image.path;
+            _selectedImageBytes = null;
+          });
+        }
         await _uploadAvatar(image);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi chọn ảnh: $e'),
+            content: Text(l10n.imagePickError(e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -415,12 +457,25 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   Future<void> _uploadAvatar(XFile image) async {
+    final l10n = AppLocalizations.of(context)!;
+
     setState(() {
       _isUploadingAvatar = true;
     });
 
     try {
-      final avatarUrl = await _cloudinaryService.uploadImageFromXFile(image);
+      String? avatarUrl;
+
+      if (kIsWeb && _selectedImageBytes != null) {
+        // For web, upload using bytes
+        avatarUrl = await _cloudinaryService.uploadImageFromBytes(
+          _selectedImageBytes!,
+          'avatar_${DateTime.now().millisecondsSinceEpoch}.jpg',
+        );
+      } else {
+        // For mobile, use XFile
+        avatarUrl = await _cloudinaryService.uploadImageFromXFile(image);
+      }
 
       if (avatarUrl != null) {
         setState(() {
@@ -430,7 +485,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Tải ảnh lên thành công'),
+              content: Text(l10n.imageUploadSuccess),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
@@ -439,7 +494,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Tải ảnh lên thất bại'),
+              content: Text(l10n.imageUploadFailed),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
@@ -449,7 +504,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi tải ảnh: $e'),
+            content: Text(l10n.imageUploadError(e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -464,19 +519,22 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   Future<void> _handleCompleteProfile() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    if (_uploadedAvatarUrl == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Vui lòng chọn ảnh đại diện'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-      return;
-    }
+    // Avatar is optional - user can complete profile without avatar
+    // if (_uploadedAvatarUrl == null) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text(l10n.pleaseChooseAvatar),
+    //       backgroundColor: Theme.of(context).colorScheme.error,
+    //     ),
+    //   );
+    //   return;
+    // }
 
     setState(() {
       _isLoading = true;
@@ -485,13 +543,13 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     try {
       await _authService.completeProfile(
         displayName: _displayNameController.text.trim(),
-        avatarUrl: _uploadedAvatarUrl!,
+        avatarUrl: _uploadedAvatarUrl, // Can be null
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Hoàn tất hồ sơ thành công!'),
+            content: Text(l10n.profileCompleteSuccess),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
@@ -514,7 +572,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi: $e'),
+            content: Text(l10n.errorPrefix(e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

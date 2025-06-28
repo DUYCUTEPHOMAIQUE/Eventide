@@ -18,21 +18,60 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Eventide - Store your memories">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="enva">
+  <meta name="apple-mobile-web-app-title" content="Eventide">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="icons/Icon-192.png"/>
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/Icon-192.png"/>
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/Icon-512.png"/>
 
-  <title>enva</title>
+  <title>Eventide</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="desktop-blocker.css">
 </head>
 <body>
+  <!-- Desktop Blocker -->
+  <div id="desktopBlocker" class="desktop-blocker">
+    <div class="content">
+      <div class="mobile-icon">📱</div>
+      <h1>Mobile Only</h1>
+      <p>This app is designed specifically for mobile devices.</p>
+      
+      <div class="instruction-box">
+        <h3>💻 For Desktop Users</h3>
+        <p>To test this app on desktop, use browser developer tools:</p>
+        
+        <div class="step">
+          <span class="step-number">1.</span>
+          Press <strong>F12</strong> to open Developer Tools
+        </div>
+        
+        <div class="step">
+          <span class="step-number">2.</span>
+          Click the <strong>📱</strong> icon (Toggle device toolbar)
+        </div>
+        
+        <div class="step">
+          <span class="step-number">3.</span>
+          Select a mobile device from the dropdown
+        </div>
+        
+        <div class="step">
+          <span class="step-number">4.</span>
+          Refresh the page to see the mobile version
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="flutter_bootstrap.js" async></script>
+  <script src="desktop-blocker.js"></script>
 </body>
 </html>

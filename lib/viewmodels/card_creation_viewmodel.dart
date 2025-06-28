@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -22,9 +24,13 @@ class CardCreationViewModel extends ChangeNotifier {
   LatLng? _selectedLocation;
   DateTime? _eventDateTime;
 
-  // Image files (selected but not uploaded yet)
-  File? _backgroundImageFile;
-  File? _cardImageFile;
+  // Image files (selected but not uploaded yet) - using XFile for cross-platform
+  XFile? _backgroundImageFile;
+  XFile? _cardImageFile;
+
+  // Image bytes for web display
+  Uint8List? _backgroundImageBytes;
+  Uint8List? _cardImageBytes;
 
   // Current image URLs (for editing mode)
   String _currentBackgroundImageUrl = '';
@@ -43,8 +49,10 @@ class CardCreationViewModel extends ChangeNotifier {
   String get location => _location;
   LatLng? get selectedLocation => _selectedLocation;
   DateTime? get eventDateTime => _eventDateTime;
-  File? get backgroundImageFile => _backgroundImageFile;
-  File? get cardImageFile => _cardImageFile;
+  XFile? get backgroundImageFile => _backgroundImageFile;
+  XFile? get cardImageFile => _cardImageFile;
+  Uint8List? get backgroundImageBytes => _backgroundImageBytes;
+  Uint8List? get cardImageBytes => _cardImageBytes;
   String get currentBackgroundImageUrl => _currentBackgroundImageUrl;
   String get currentCardImageUrl => _currentCardImageUrl;
   bool get isCreatingCard => _isCreatingCard;
@@ -53,9 +61,13 @@ class CardCreationViewModel extends ChangeNotifier {
 
   // Computed properties
   bool get hasBackgroundImage =>
-      _backgroundImageFile != null || _currentBackgroundImageUrl.isNotEmpty;
+      _backgroundImageFile != null ||
+      _backgroundImageBytes != null ||
+      _currentBackgroundImageUrl.isNotEmpty;
   bool get hasCardImage =>
-      _cardImageFile != null || _currentCardImageUrl.isNotEmpty;
+      _cardImageFile != null ||
+      _cardImageBytes != null ||
+      _currentCardImageUrl.isNotEmpty;
   bool get hasLocation => _selectedLocation != null || _location.isNotEmpty;
   bool get hasEventDateTime => _eventDateTime != null;
   bool get isFormValid => _title.isNotEmpty && _description.isNotEmpty;
@@ -240,9 +252,19 @@ class CardCreationViewModel extends ChangeNotifier {
   void pickBackgroundImage(BuildContext context) {
     ImagePickerService.showImageSourceDialog(
       context,
-      onImageSelected: (File? imageFile) {
+      onImageSelected: (XFile? imageFile) async {
         if (imageFile != null) {
           _backgroundImageFile = imageFile;
+
+          // For web, also store bytes for display
+          if (kIsWeb) {
+            try {
+              _backgroundImageBytes = await imageFile.readAsBytes();
+            } catch (e) {
+              print('Error reading image bytes: $e');
+            }
+          }
+
           _clearError();
           notifyListeners();
         }
@@ -253,9 +275,19 @@ class CardCreationViewModel extends ChangeNotifier {
   void pickCardImage(BuildContext context) {
     ImagePickerService.showImageSourceDialog(
       context,
-      onImageSelected: (File? imageFile) {
+      onImageSelected: (XFile? imageFile) async {
         if (imageFile != null) {
           _cardImageFile = imageFile;
+
+          // For web, also store bytes for display
+          if (kIsWeb) {
+            try {
+              _cardImageBytes = await imageFile.readAsBytes();
+            } catch (e) {
+              print('Error reading image bytes: $e');
+            }
+          }
+
           _clearError();
           notifyListeners();
         }
@@ -266,6 +298,7 @@ class CardCreationViewModel extends ChangeNotifier {
   // Remove image methods
   void removeBackgroundImage() {
     _backgroundImageFile = null;
+    _backgroundImageBytes = null;
     _currentBackgroundImageUrl = '';
     _clearError();
     notifyListeners();
@@ -273,6 +306,7 @@ class CardCreationViewModel extends ChangeNotifier {
 
   void removeCardImage() {
     _cardImageFile = null;
+    _cardImageBytes = null;
     _currentCardImageUrl = '';
     _clearError();
     notifyListeners();
@@ -304,10 +338,19 @@ class CardCreationViewModel extends ChangeNotifier {
       // Step 1: Upload background image if provided, otherwise use current
       if (_backgroundImageFile != null) {
         _setProgress('Đang upload ảnh nền...');
-        backgroundImageUrl = await _cloudinaryService.uploadImageToCloudinary(
-          _backgroundImageFile!,
-          folder: 'card_backgrounds',
-        );
+
+        if (kIsWeb && _backgroundImageBytes != null) {
+          // For web, upload using bytes
+          backgroundImageUrl = await _cloudinaryService.uploadImageFromBytes(
+            _backgroundImageBytes!,
+            'background_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          );
+        } else {
+          // For mobile, use XFile
+          backgroundImageUrl = await _cloudinaryService.uploadImageFromXFile(
+            _backgroundImageFile!,
+          );
+        }
 
         if (backgroundImageUrl != null) {
           _setProgress('Đã upload ảnh nền thành công');
@@ -323,10 +366,19 @@ class CardCreationViewModel extends ChangeNotifier {
       // Step 2: Upload card image if provided, otherwise use current
       if (_cardImageFile != null) {
         _setProgress('Đang upload ảnh kỷ niệm...');
-        cardImageUrl = await _cloudinaryService.uploadImageToCloudinary(
-          _cardImageFile!,
-          folder: 'card_images',
-        );
+
+        if (kIsWeb && _cardImageBytes != null) {
+          // For web, upload using bytes
+          cardImageUrl = await _cloudinaryService.uploadImageFromBytes(
+            _cardImageBytes!,
+            'card_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          );
+        } else {
+          // For mobile, use XFile
+          cardImageUrl = await _cloudinaryService.uploadImageFromXFile(
+            _cardImageFile!,
+          );
+        }
 
         if (cardImageUrl != null) {
           _setProgress('Đã upload ảnh kỷ niệm thành công');
@@ -380,7 +432,9 @@ class CardCreationViewModel extends ChangeNotifier {
     _selectedLocation = null;
     _eventDateTime = null;
     _backgroundImageFile = null;
+    _backgroundImageBytes = null;
     _cardImageFile = null;
+    _cardImageBytes = null;
     _currentBackgroundImageUrl = '';
     _currentCardImageUrl = '';
     _errorMessage = null;
@@ -408,7 +462,50 @@ class CardCreationViewModel extends ChangeNotifier {
 
     // Reset new image files
     _backgroundImageFile = null;
+    _backgroundImageBytes = null;
     _cardImageFile = null;
+    _cardImageBytes = null;
+
+    _errorMessage = null;
+    _progressMessage = '';
+    notifyListeners();
+  }
+
+  // Load initial data from AI generation
+  Future<void> loadInitialData(Map<String, dynamic> data) async {
+    _title = data['title'] ?? '';
+    _description = data['description'] ?? '';
+    _location = data['location'] ?? '';
+
+    // Set background image file from AI if provided
+    if (data['backgroundImageFile'] != null) {
+      _backgroundImageFile = data['backgroundImageFile'] as XFile?;
+      print('backgroundImageFile: OK');
+    }
+
+    // Set background image bytes for web if provided directly
+    if (data['backgroundImageBytes'] != null) {
+      _backgroundImageBytes = data['backgroundImageBytes'] as Uint8List?;
+      print(
+          'backgroundImageBytes directly set: ${_backgroundImageBytes!.length}');
+    } else if (kIsWeb && _backgroundImageFile != null) {
+      // Fallback: load bytes from XFile for web
+      try {
+        _backgroundImageBytes = await _backgroundImageFile!.readAsBytes();
+        print(
+            'Background image bytes loaded from XFile: ${_backgroundImageBytes!.length}');
+      } catch (e) {
+        print('Error reading AI background image bytes: $e');
+      }
+    }
+
+    // Reset other fields for new creation
+    _selectedLocation = null;
+    _eventDateTime = null;
+    _currentBackgroundImageUrl = '';
+    _currentCardImageUrl = '';
+    _cardImageFile = null;
+    _cardImageBytes = null;
 
     _errorMessage = null;
     _progressMessage = '';
@@ -441,10 +538,19 @@ class CardCreationViewModel extends ChangeNotifier {
       // Step 1: Upload background image if provided, otherwise use current
       if (_backgroundImageFile != null) {
         _setProgress('Đang upload ảnh nền...');
-        backgroundImageUrl = await _cloudinaryService.uploadImageToCloudinary(
-          _backgroundImageFile!,
-          folder: 'card_backgrounds',
-        );
+
+        if (kIsWeb && _backgroundImageBytes != null) {
+          // For web, upload using bytes
+          backgroundImageUrl = await _cloudinaryService.uploadImageFromBytes(
+            _backgroundImageBytes!,
+            'background_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          );
+        } else {
+          // For mobile, use XFile
+          backgroundImageUrl = await _cloudinaryService.uploadImageFromXFile(
+            _backgroundImageFile!,
+          );
+        }
 
         if (backgroundImageUrl != null) {
           _setProgress('Đã upload ảnh nền thành công');
@@ -460,10 +566,19 @@ class CardCreationViewModel extends ChangeNotifier {
       // Step 2: Upload card image if provided, otherwise use current
       if (_cardImageFile != null) {
         _setProgress('Đang upload ảnh kỷ niệm...');
-        cardImageUrl = await _cloudinaryService.uploadImageToCloudinary(
-          _cardImageFile!,
-          folder: 'card_images',
-        );
+
+        if (kIsWeb && _cardImageBytes != null) {
+          // For web, upload using bytes
+          cardImageUrl = await _cloudinaryService.uploadImageFromBytes(
+            _cardImageBytes!,
+            'card_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          );
+        } else {
+          // For mobile, use XFile
+          cardImageUrl = await _cloudinaryService.uploadImageFromXFile(
+            _cardImageFile!,
+          );
+        }
 
         if (cardImageUrl != null) {
           _setProgress('Đã upload ảnh kỷ niệm thành công');

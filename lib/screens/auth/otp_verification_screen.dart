@@ -6,6 +6,7 @@ import 'package:enva/blocs/auth/auth_event.dart';
 import 'package:enva/blocs/auth/auth_state.dart';
 import 'package:enva/screens/auth/complete_profile_screen.dart';
 import 'package:enva/screens/auth/minimalist_dashboard_screen.dart';
+import 'package:enva/l10n/app_localizations.dart';
 import 'dart:async';
 
 class OTPVerificationScreen extends StatefulWidget {
@@ -80,6 +81,8 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthOTPVerified) {
@@ -95,7 +98,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
           // OTP đã được gửi lại thành công
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Mã OTP mới đã được gửi đến email của bạn'),
+              content: Text(l10n.newOTPSent),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
@@ -133,17 +136,16 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
           final shouldPop = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Xác nhận'),
-              content: const Text(
-                  'Bạn có chắc muốn quay lại? Quá trình đăng ký sẽ bị hủy.'),
+              title: Text(l10n.confirmAction),
+              content: Text(l10n.cancelSignUpConfirm),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Hủy'),
+                  child: Text(l10n.cancel),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Đồng ý'),
+                  child: Text(l10n.confirm),
                 ),
               ],
             ),
@@ -181,7 +183,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                   const SizedBox(height: 40),
 
                   // Header
-                  _buildHeader(),
+                  _buildHeader(l10n),
 
                   const SizedBox(height: 48),
 
@@ -191,22 +193,22 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                   const SizedBox(height: 32),
 
                   // OTP Input
-                  _buildOTPInput(),
+                  _buildOTPInput(l10n),
 
                   const SizedBox(height: 32),
 
                   // Verify Button
-                  _buildVerifyButton(),
+                  _buildVerifyButton(l10n),
 
                   const SizedBox(height: 24),
 
                   // Resend OTP
-                  _buildResendOTP(),
+                  _buildResendOTP(l10n),
 
                   const SizedBox(height: 24),
 
                   // Back to signup
-                  _buildBackToSignup(),
+                  _buildBackToSignup(l10n),
                 ],
               ),
             ),
@@ -216,7 +218,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -226,17 +228,16 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
             final shouldPop = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Xác nhận'),
-                content: const Text(
-                    'Bạn có chắc muốn quay lại? Quá trình đăng ký sẽ bị hủy.'),
+                title: Text(l10n.confirmAction),
+                content: Text(l10n.cancelSignUpConfirm),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('Hủy'),
+                    child: Text(l10n.cancel),
                   ),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(true),
-                    child: const Text('Đồng ý'),
+                    child: Text(l10n.confirm),
                   ),
                 ],
               ),
@@ -268,7 +269,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
         ),
         const SizedBox(height: 24),
         Text(
-          'Xác thực email',
+          l10n.emailVerification,
           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: Theme.of(context).colorScheme.onBackground,
@@ -276,7 +277,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Nhập mã 6 chữ số đã được gửi đến email của bạn',
+          l10n.enterSixDigitCode,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -318,12 +319,12 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     );
   }
 
-  Widget _buildOTPInput() {
+  Widget _buildOTPInput(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Mã xác thực',
+          l10n.verificationCode,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onBackground,
@@ -342,7 +343,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Nhập mã 6 chữ số đã được gửi đến email của bạn',
+          l10n.enterSixDigitCodeSent,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -412,7 +413,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     );
   }
 
-  Widget _buildVerifyButton() {
+  Widget _buildVerifyButton(AppLocalizations l10n) {
     return SizedBox(
       width: double.infinity,
       height: 56,
@@ -438,7 +439,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                 ),
               )
             : Text(
-                'Xác thực',
+                l10n.verify,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.onPrimary,
@@ -448,13 +449,13 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     );
   }
 
-  Widget _buildResendOTP() {
+  Widget _buildResendOTP(AppLocalizations l10n) {
     return Center(
       child: Column(
         children: [
           if (!_canResend) ...[
             Text(
-              'Gửi lại mã sau ${_resendCountdown}s',
+              l10n.resendCodeIn(_resendCountdown),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -474,7 +475,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                       ),
                     )
                   : Text(
-                      'Gửi lại mã',
+                      l10n.resendCode,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).colorScheme.primary,
@@ -487,7 +488,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     );
   }
 
-  Widget _buildBackToSignup() {
+  Widget _buildBackToSignup(AppLocalizations l10n) {
     return Center(
       child: TextButton(
         onPressed: () async {
@@ -495,17 +496,16 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
           final shouldPop = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Xác nhận'),
-              content: const Text(
-                  'Bạn có chắc muốn quay lại? Quá trình đăng ký sẽ bị hủy.'),
+              title: Text(l10n.confirmAction),
+              content: Text(l10n.cancelSignUpConfirm),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Hủy'),
+                  child: Text(l10n.cancel),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Đồng ý'),
+                  child: Text(l10n.confirm),
                 ),
               ],
             ),
@@ -530,7 +530,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
           }
         },
         child: Text(
-          'Quay lại đăng ký',
+          l10n.backToSignUp,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.primary,
@@ -545,12 +545,13 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   }
 
   Future<void> _handleVerifyOTP() async {
+    final l10n = AppLocalizations.of(context)!;
     final otpCode = _getOTPCode();
 
     if (otpCode.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Vui lòng nhập đầy đủ 6 chữ số'),
+          content: Text(l10n.enterAllDigits),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );

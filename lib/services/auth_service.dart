@@ -45,16 +45,21 @@ class AuthService {
   // Hoàn tất thông tin profile sau khi verify OTP
   Future<void> completeProfile({
     required String displayName,
-    required String avatarUrl,
+    String? avatarUrl,
   }) async {
     final user = currentUser;
     if (user != null) {
+      final userData = <String, dynamic>{
+        'display_name': displayName,
+      };
+
+      if (avatarUrl != null && avatarUrl.isNotEmpty) {
+        userData['avatar_url'] = avatarUrl;
+      }
+
       await _supabase.auth.updateUser(
         UserAttributes(
-          data: {
-            'display_name': displayName,
-            'avatar_url': avatarUrl,
-          },
+          data: userData,
         ),
       );
 
@@ -183,11 +188,8 @@ class AuthService {
     final user = currentUser;
     if (user != null) {
       final displayName = user.userMetadata?['display_name'] as String?;
-      final avatarUrl = user.userMetadata?['avatar_url'] as String?;
-      return displayName != null &&
-          displayName.isNotEmpty &&
-          avatarUrl != null &&
-          avatarUrl.isNotEmpty;
+      // Only require display name, avatar is optional
+      return displayName != null && displayName.isNotEmpty;
     }
     return false;
   }

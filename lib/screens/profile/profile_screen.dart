@@ -10,6 +10,9 @@ import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'dart:ui';
 import 'package:enva/widgets/language_selector.dart';
 import 'package:enva/l10n/app_localizations.dart';
+import 'package:enva/services/subscription_service.dart';
+import 'package:enva/models/subscription_model.dart';
+import 'package:enva/screens/upgrade/upgrade_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -156,6 +159,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 const SizedBox(height: 20),
                 _buildUserInfo(),
+                const SizedBox(height: 20),
+                _buildSubscriptionPlanSection(),
                 const SizedBox(height: 30),
                 _buildStatsSection(),
                 const SizedBox(height: 30),
@@ -712,6 +717,101 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSubscriptionPlanSection() {
+    return FutureBuilder<UserSubscription?>(
+      future: SubscriptionService.getCurrentSubscription(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator(strokeWidth: 2));
+        }
+        final subscription = snapshot.data;
+        final plan = subscription?.plan;
+        final isPremium = plan?.isPremium ?? false;
+        final planName = plan?.name ?? 'Free';
+        final planColor = isPremium ? Colors.amber : Colors.blueGrey;
+        final planDesc = isPremium
+            ? AppLocalizations.of(context)!.profilePremiumDesc
+            : AppLocalizations.of(context)!.profileFreeDesc;
+
+        return Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: planColor.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: planColor.withOpacity(0.2)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                isPremium ? Icons.workspace_premium : Icons.verified_user,
+                color: planColor,
+                size: 36,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          planName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: planColor,
+                          ),
+                        ),
+                        if (isPremium)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child:
+                                Icon(Icons.star, color: Colors.amber, size: 18),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      planDesc,
+                      style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                    ),
+                    if (!isPremium) ...[
+                      const SizedBox(height: 10),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final upgraded = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const UpgradeScreen()),
+                          );
+                          if (upgraded == true) {
+                            // TODO: Refresh profile info/state nếu cần
+                            setState(() {});
+                          }
+                        },
+                        icon: Icon(Icons.upgrade),
+                        label: Text(AppLocalizations.of(context)!.upgradeTitle),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

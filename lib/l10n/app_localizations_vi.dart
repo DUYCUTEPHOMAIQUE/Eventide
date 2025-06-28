@@ -33,7 +33,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get eventDescription => 'Mô tả sự kiện';
 
   @override
-  String get eventDescriptionHint => 'Kể cho mọi người về sự kiện của bạn';
+  String get eventDescriptionHint => 'Ví dụ: Sinh nhật lần thứ 25 của tôi, muốn tổ chức một bữa tiệc nhỏ với bạn bè tại nhà, chủ đề màu xanh dương...';
 
   @override
   String get eventLocation => 'Địa điểm';
@@ -201,10 +201,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get welcome => 'Chào mừng';
 
   @override
-  String get welcomeMessage => 'Chào mừng đến với Eventide';
+  String get welcomeMessage => 'Chào mừng bạn';
 
   @override
-  String get welcomeSubtitle => 'Tạo và chia sẻ sự kiện với bạn bè và gia đình';
+  String get welcomeSubtitle => 'Tạo và chia sẻ những thiệp mời đẹp mắt cho các sự kiện đặc biệt của bạn';
 
   @override
   String get getStarted => 'Bắt đầu';
@@ -396,7 +396,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get pending => 'Đang chờ';
 
   @override
-  String get processing => 'Đang xử lý';
+  String get processing => 'Đang xử lý...';
 
   @override
   String get completed => 'Hoàn thành';
@@ -424,6 +424,31 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get deleted => 'Đã xóa';
+
+  @override
+  String get deleteEvent => 'Xóa sự kiện';
+
+  @override
+  String get confirmDeleteEvent => 'Xóa sự kiện?';
+
+  @override
+  String confirmDeleteEventMessage(String eventTitle) {
+    return 'Bạn có chắc muốn xóa \"$eventTitle\"?';
+  }
+
+  @override
+  String get deleteEventWarning => 'Hành động này không thể hoàn tác.';
+
+  @override
+  String eventDeletedSuccessfully(String eventTitle) {
+    return 'Đã xóa sự kiện \"$eventTitle\" thành công';
+  }
+
+  @override
+  String get errorDeletingEvent => 'Lỗi khi xóa sự kiện';
+
+  @override
+  String get deletingEvent => 'Đang xóa sự kiện...';
 
   @override
   String get restored => 'Đã khôi phục';
@@ -1009,4 +1034,333 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get loadingData => 'Đang tải ...';
+
+  @override
+  String get aiCardCreationTitle => 'Tạo thẻ bằng AI';
+
+  @override
+  String get aiEventCreator => 'AI Event Creator';
+
+  @override
+  String get aiEventCreatorDescription => 'Mô tả sự kiện của bạn và AI sẽ tạo ra một thẻ sự kiện hoàn chỉnh với hình ảnh, tiêu đề và mô tả phù hợp.';
+
+  @override
+  String get eventType => 'Loại sự kiện';
+
+  @override
+  String get generateWithAI => 'Tạo thẻ bằng AI';
+
+  @override
+  String get generating => 'Đang tạo...';
+
+  @override
+  String get aiGeneratingMessage => 'AI đang tạo thẻ sự kiện cho bạn...';
+
+  @override
+  String get generatedCard => 'Thẻ đã tạo';
+
+  @override
+  String get regenerate => 'Tạo lại';
+
+  @override
+  String get useCard => 'Sử dụng';
+
+  @override
+  String get signIn => 'Đăng nhập';
+
+  @override
+  String get signUp => 'Đăng ký';
+
+  @override
+  String get createAccount => 'Tạo tài khoản';
+
+  @override
+  String get emailHint => 'example@email.com';
+
+  @override
+  String get passwordHint => 'Nhập mật khẩu';
+
+  @override
+  String get continueWithGoogle => 'Tiếp tục với Google';
+
+  @override
+  String get emailVerification => 'Xác thực email';
+
+  @override
+  String get enterSixDigitCode => 'Nhập mã 6 chữ số đã được gửi đến email của bạn';
+
+  @override
+  String get verificationCode => 'Mã xác thực';
+
+  @override
+  String get enterSixDigitCodeSent => 'Nhập mã 6 chữ số đã được gửi đến email của bạn';
+
+  @override
+  String get verify => 'Xác thực';
+
+  @override
+  String resendCodeIn(int seconds) {
+    return 'Gửi lại mã sau ${seconds}s';
+  }
+
+  @override
+  String get resendCode => 'Gửi lại mã';
+
+  @override
+  String get backToSignUp => 'Quay lại đăng ký';
+
+  @override
+  String get confirmAction => 'Xác nhận';
+
+  @override
+  String get cancelSignUpConfirm => 'Bạn có chắc muốn quay lại? Quá trình đăng ký sẽ bị hủy.';
+
+  @override
+  String get newOTPSent => 'Mã OTP mới đã được gửi đến email của bạn';
+
+  @override
+  String get enterAllDigits => 'Vui lòng nhập đầy đủ 6 chữ số';
+
+  @override
+  String get completeProfile => 'Hoàn tất hồ sơ';
+
+  @override
+  String get addInfoToComplete => 'Thêm thông tin để hoàn tất tài khoản của bạn';
+
+  @override
+  String get avatar => 'Ảnh đại diện';
+
+  @override
+  String get chooseAvatar => 'Chọn ảnh đại diện';
+
+  @override
+  String get displayName => 'Tên hiển thị';
+
+  @override
+  String get enterDisplayName => 'Nhập tên hiển thị của bạn';
+
+  @override
+  String get complete => 'Hoàn tất';
+
+  @override
+  String get camera => 'Máy ảnh';
+
+  @override
+  String get gallery => 'Thư viện';
+
+  @override
+  String get imageUploadSuccess => 'Tải ảnh lên thành công';
+
+  @override
+  String get imageUploadFailed => 'Tải ảnh lên thất bại';
+
+  @override
+  String imagePickError(String error) {
+    return 'Lỗi chọn ảnh: $error';
+  }
+
+  @override
+  String imageUploadError(String error) {
+    return 'Lỗi tải ảnh: $error';
+  }
+
+  @override
+  String get pleaseChooseAvatar => 'Vui lòng chọn ảnh đại diện';
+
+  @override
+  String get enterDisplayNameValidation => 'Vui lòng nhập tên hiển thị';
+
+  @override
+  String get displayNameMinLength => 'Tên hiển thị phải có ít nhất 2 ký tự';
+
+  @override
+  String get profileCompleteSuccess => 'Hoàn tất hồ sơ thành công!';
+
+  @override
+  String errorPrefix(String error) {
+    return 'Lỗi: $error';
+  }
+
+  @override
+  String get enterEmail => 'Vui lòng nhập email';
+
+  @override
+  String get enterPassword => 'Vui lòng nhập mật khẩu';
+
+  @override
+  String get passwordMinLength => 'Mật khẩu phải có ít nhất 6 ký tự';
+
+  @override
+  String get passwordRequirements => 'Mật khẩu yêu cầu: ít nhất 1 chữ hoa, 1 chữ thường và 1 số. Ví dụ: Password123';
+
+  @override
+  String get emailAlreadyRegistered => 'Email đã được đăng ký. Vui lòng đăng nhập hoặc sử dụng email khác';
+
+  @override
+  String get emailNotRegistered => 'Email chưa được đăng ký. Vui lòng kiểm tra lại hoặc chuyển sang đăng ký tài khoản mới';
+
+  @override
+  String get incorrectPassword => 'Mật khẩu không đúng. Vui lòng kiểm tra lại hoặc sử dụng \"Quên mật khẩu\"';
+
+  @override
+  String get weakPassword => 'Mật khẩu yêu cầu: ít nhất 6 ký tự, bao gồm 1 chữ hoa, 1 chữ thường và 1 số. Ví dụ: Password123';
+
+  @override
+  String get passwordTooShort => 'Mật khẩu quá ngắn. Yêu cầu ít nhất 6 ký tự';
+
+  @override
+  String get emailNotFound => 'Email chưa được đăng ký. Vui lòng kiểm tra lại hoặc chuyển sang đăng ký tài khoản mới';
+
+  @override
+  String get emailAlreadyExists => 'Email đã được đăng ký. Vui lòng đăng nhập hoặc sử dụng email khác';
+
+  @override
+  String get emailNotConfirmed => 'Email chưa được xác thực. Vui lòng kiểm tra email và nhấp vào link xác thực';
+
+  @override
+  String get emailError => 'Lỗi email. Vui lòng kiểm tra lại';
+
+  @override
+  String get networkError => 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet và thử lại';
+
+  @override
+  String get serverError => 'Lỗi hệ thống. Vui lòng thử lại sau vài phút';
+
+  @override
+  String get authError => 'Lỗi xác thực. Vui lòng đăng nhập lại';
+
+  @override
+  String get invalidOTP => 'Mã OTP không đúng. Vui lòng kiểm tra lại mã 6 chữ số';
+
+  @override
+  String get expiredOTP => 'Mã OTP đã hết hạn. Vui lòng nhấn \"Gửi lại mã\" để nhận mã mới';
+
+  @override
+  String get otpError => 'Lỗi xác thực OTP. Vui lòng thử lại';
+
+  @override
+  String get googleSignInCancelled => 'Đăng nhập Google bị hủy. Vui lòng thử lại';
+
+  @override
+  String get googleSignInError => 'Lỗi đăng nhập Google. Vui lòng thử lại hoặc sử dụng đăng nhập email';
+
+  @override
+  String genericError(String error) {
+    return 'Lỗi: $error. Vui lòng thử lại';
+  }
+
+  @override
+  String get markAllRead => 'Đánh dấu tất cả đã đọc';
+
+  @override
+  String get noNotifications => 'Không có thông báo';
+
+  @override
+  String get noNotificationsDescription => 'Bạn sẽ thấy thông báo ở đây khi nhận được';
+
+  @override
+  String get markAsRead => 'Đánh dấu đã đọc';
+
+  @override
+  String get timeAgoJustNow => 'Vừa xong';
+
+  @override
+  String timeAgoMinutesAgo(int minutes) {
+    return '$minutes phút trước';
+  }
+
+  @override
+  String timeAgoHoursAgo(int hours) {
+    return '$hours giờ trước';
+  }
+
+  @override
+  String timeAgoDaysAgo(int days) {
+    return '$days ngày trước';
+  }
+
+  @override
+  String get newInvitation => 'Lời mời mới';
+
+  @override
+  String invitationNotification(String senderName, String eventTitle) {
+    return '$senderName đã mời bạn tham gia \"$eventTitle\"';
+  }
+
+  @override
+  String get upgradeTitle => 'Nâng cấp Premium';
+
+  @override
+  String get upgradeSubtitle => 'Mở khoá toàn bộ tính năng và không giới hạn sử dụng.';
+
+  @override
+  String get upgradeBenefits => '• Tạo thiệp không giới hạn\n• Sử dụng AI không giới hạn\n• Mẫu cao cấp\n• Hỗ trợ ưu tiên';
+
+  @override
+  String get upgradeInputHint => 'Nhập mã premium';
+
+  @override
+  String get upgradeButton => 'Nâng cấp ngay';
+
+  @override
+  String get upgradeCancel => 'Huỷ';
+
+  @override
+  String get upgradeSuccessTitle => 'Nâng cấp thành công!';
+
+  @override
+  String get upgradeSuccessDesc => 'Bạn đã mở khoá toàn bộ tính năng cao cấp. Hãy trải nghiệm ngay!';
+
+  @override
+  String get upgradeInputLabel => 'Mã Premium';
+
+  @override
+  String get upgradeInputError => 'Mã không hợp lệ hoặc đã được sử dụng.';
+
+  @override
+  String get upgradeInputEmpty => 'Vui lòng nhập mã.';
+
+  @override
+  String get upgradeSuccessButton => 'Đã hiểu!';
+
+  @override
+  String get profilePremiumDesc => 'Bạn đang sử dụng toàn bộ tính năng cao cấp!';
+
+  @override
+  String get profileFreeDesc => 'Nâng cấp Premium để tạo thiệp, dùng AI, mẫu cao cấp không giới hạn.';
+
+  @override
+  String get cardLimitReachedTitle => 'Đã đạt giới hạn thiệp';
+
+  @override
+  String get limitReached => 'Đã đạt giới hạn';
+
+  @override
+  String limitReachedMessage(Object feature) {
+    return 'Bạn đã đạt giới hạn hàng tháng cho $feature.';
+  }
+
+  @override
+  String get premiumFeature => 'Tính năng Premium';
+
+  @override
+  String premiumFeatureMessage(Object feature) {
+    return '$feature chỉ khả dụng với gói Premium.';
+  }
+
+  @override
+  String get upgradeNowButton => 'Nâng cấp ngay';
+
+  @override
+  String upgradeDialogMessage(Object feature) {
+    return 'Mở khoá không giới hạn $feature và nhiều tính năng khác!';
+  }
+
+  @override
+  String get maybeLaterButton => 'Để sau';
+
+  @override
+  String remindNotificationBody(Object senderName) {
+    return '$senderName đã nhắc bạn tham gia 1 sự kiện';
+  }
 }

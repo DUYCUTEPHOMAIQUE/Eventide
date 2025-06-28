@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -6,7 +8,7 @@ class ImagePickerService {
   static final ImagePicker _picker = ImagePicker();
 
   /// Pick single image from gallery
-  static Future<File?> pickImageFromGallery() async {
+  static Future<XFile?> pickImageFromGallery() async {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -15,10 +17,7 @@ class ImagePickerService {
         maxHeight: 1080,
       );
 
-      if (image != null) {
-        return File(image.path);
-      }
-      return null;
+      return image;
     } catch (e) {
       print('Error picking image from gallery: $e');
       return null;
@@ -26,7 +25,7 @@ class ImagePickerService {
   }
 
   /// Pick single image from camera
-  static Future<File?> pickImageFromCamera() async {
+  static Future<XFile?> pickImageFromCamera() async {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.camera,
@@ -35,10 +34,7 @@ class ImagePickerService {
         maxHeight: 1080,
       );
 
-      if (image != null) {
-        return File(image.path);
-      }
-      return null;
+      return image;
     } catch (e) {
       print('Error picking image from camera: $e');
       return null;
@@ -48,7 +44,7 @@ class ImagePickerService {
   /// Show selection dialog for camera or gallery
   static void showImageSourceDialog(
     context, {
-    required Function(File?) onImageSelected,
+    required Function(XFile?) onImageSelected,
   }) {
     showModalBottomSheet(
       context: context,
@@ -101,7 +97,7 @@ class ImagePickerService {
   }
 
   /// Pick multiple images from gallery
-  static Future<List<File>> pickMultipleImages() async {
+  static Future<List<XFile>> pickMultipleImages() async {
     try {
       final List<XFile> images = await _picker.pickMultiImage(
         imageQuality: 85,
@@ -109,7 +105,7 @@ class ImagePickerService {
         maxHeight: 1080,
       );
 
-      return images.map((xFile) => File(xFile.path)).toList();
+      return images;
     } catch (e) {
       print('Error picking multiple images: $e');
       return [];
@@ -117,27 +113,35 @@ class ImagePickerService {
   }
 
   /// Check if file is valid image and within size limit
-  static bool isValidImage(File file, {int maxSizeInMB = 10}) {
+  static bool isValidImage(XFile file, {int maxSizeInMB = 10}) {
     try {
-      final fileSizeInBytes = file.lengthSync();
-      final fileSizeInMB = fileSizeInBytes / (1024 * 1024);
+      if (kIsWeb) {
+        // For web, we can't check file size easily, so we'll just check extension
+        final extension = file.name.toLowerCase().split('.').last;
+        final validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        return validExtensions.contains(extension);
+      } else {
+        // For mobile, check file size and extension
+        final fileSizeInBytes = File(file.path).lengthSync();
+        final fileSizeInMB = fileSizeInBytes / (1024 * 1024);
 
-      // Check file size
-      if (fileSizeInMB > maxSizeInMB) {
-        print('File size too large: ${fileSizeInMB.toStringAsFixed(2)}MB');
-        return false;
+        // Check file size
+        if (fileSizeInMB > maxSizeInMB) {
+          print('File size too large: ${fileSizeInMB.toStringAsFixed(2)}MB');
+          return false;
+        }
+
+        // Check file extension
+        final extension = file.path.toLowerCase().split('.').last;
+        final validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (!validExtensions.contains(extension)) {
+          print('Invalid file extension: $extension');
+          return false;
+        }
+
+        return true;
       }
-
-      // Check file extension
-      final extension = file.path.toLowerCase().split('.').last;
-      final validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
-      if (!validExtensions.contains(extension)) {
-        print('Invalid file extension: $extension');
-        return false;
-      }
-
-      return true;
     } catch (e) {
       print('Error validating image: $e');
       return false;

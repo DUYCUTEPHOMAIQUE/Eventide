@@ -7,6 +7,7 @@ import 'package:enva/widgets/theme_toggle_widget.dart';
 import 'package:enva/screens/auth/widgets/widgets.dart';
 import 'package:enva/screens/auth/otp_verification_screen.dart';
 import 'package:enva/screens/auth/complete_profile_screen.dart';
+import 'package:enva/l10n/app_localizations.dart';
 
 class MinimalistDashboardScreen extends StatefulWidget {
   const MinimalistDashboardScreen({Key? key}) : super(key: key);
@@ -31,6 +32,8 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       body: BlocConsumer<AuthBloc, AuthState>(
@@ -81,12 +84,12 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
                         const SizedBox(height: 20),
 
                         // Header Section
-                        _buildHeader(),
+                        _buildHeader(l10n),
 
                         const SizedBox(height: 60),
 
                         // Auth Form
-                        _buildAuthForm(state),
+                        _buildAuthForm(state, l10n),
 
                         const SizedBox(height: 40),
                       ],
@@ -95,7 +98,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
                 ),
 
                 // Loading Overlay
-                if (state is AuthLoading) _buildLoadingOverlay(),
+                if (state is AuthLoading) _buildLoadingOverlay(l10n),
               ],
             ),
           );
@@ -104,7 +107,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -126,7 +129,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
             ),
             const SizedBox(width: 12),
             Text(
-              'Eventide',
+              l10n.appTitle,
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onBackground,
@@ -139,7 +142,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
 
         // Welcome Message
         Text(
-          'Chào mừng bạn',
+          l10n.welcomeMessage,
           style: Theme.of(context).textTheme.displayLarge?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onBackground,
@@ -150,7 +153,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
         const SizedBox(height: 12),
 
         Text(
-          'Tạo và chia sẻ những thiệp mời đẹp mắt cho các sự kiện đặc biệt của bạn',
+          l10n.welcomeSubtitle,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 height: 1.5,
@@ -160,7 +163,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
     );
   }
 
-  Widget _buildAuthForm(AuthState state) {
+  Widget _buildAuthForm(AuthState state, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -173,33 +176,33 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Form Toggle
-          _buildFormToggle(),
+          _buildFormToggle(l10n),
 
           const SizedBox(height: 32),
 
           // Form Fields
-          _buildFormFields(),
+          _buildFormFields(l10n),
 
           const SizedBox(height: 32),
 
           // Action Buttons
-          _buildActionButtons(state),
+          _buildActionButtons(state, l10n),
 
           const SizedBox(height: 24),
 
           // Divider
-          _buildDivider(),
+          _buildDivider(l10n),
 
           const SizedBox(height: 24),
 
           // Google Sign In
-          _buildGoogleSignIn(state),
+          _buildGoogleSignIn(state, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildFormToggle() {
+  Widget _buildFormToggle(AppLocalizations l10n) {
     return Row(
       children: [
         Expanded(
@@ -215,7 +218,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
                     : null,
               ),
               child: Text(
-                'Đăng nhập',
+                l10n.signIn,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: !_isSignUp ? Colors.white : Colors.grey[600],
@@ -240,7 +243,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
                     : null,
               ),
               child: Text(
-                'Đăng ký',
+                l10n.signUp,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: _isSignUp ? Colors.white : Colors.grey[600],
@@ -255,14 +258,14 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
     );
   }
 
-  Widget _buildFormFields() {
+  Widget _buildFormFields(AppLocalizations l10n) {
     return Column(
       children: [
         // Email field
         _buildTextField(
           controller: _emailController,
-          label: 'Email',
-          hint: 'example@email.com',
+          label: l10n.email,
+          hint: l10n.emailHint,
           icon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
         ),
@@ -272,8 +275,8 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
         // Password field
         _buildTextField(
           controller: _passwordController,
-          label: 'Mật khẩu',
-          hint: 'Nhập mật khẩu',
+          label: l10n.password,
+          hint: l10n.passwordHint,
           icon: Icons.lock_outline,
           isPassword: true,
         ),
@@ -345,7 +348,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
     );
   }
 
-  Widget _buildActionButtons(AuthState state) {
+  Widget _buildActionButtons(AuthState state, AppLocalizations l10n) {
     return Column(
       children: [
         // Primary action button
@@ -365,7 +368,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
               minimumSize: const Size(double.infinity, 56),
             ),
             child: Text(
-              _isSignUp ? 'Tạo tài khoản' : 'Đăng nhập',
+              _isSignUp ? l10n.createAccount : l10n.signIn,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -382,7 +385,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
               // TODO: Handle forgot password
             },
             child: Text(
-              'Quên mật khẩu?',
+              l10n.forgotPassword,
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 14,
@@ -395,14 +398,14 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(AppLocalizations l10n) {
     return Row(
       children: [
         Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'hoặc',
+            l10n.or,
             style: TextStyle(
               color: Colors.grey[500],
               fontSize: 12,
@@ -415,7 +418,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
     );
   }
 
-  Widget _buildGoogleSignIn(AuthState state) {
+  Widget _buildGoogleSignIn(AuthState state, AppLocalizations l10n) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
@@ -438,7 +441,7 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
           ),
         ),
         label: Text(
-          'Tiếp tục với Google',
+          l10n.continueWithGoogle,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
@@ -464,21 +467,21 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
     );
   }
 
-  Widget _buildLoadingOverlay() {
+  Widget _buildLoadingOverlay(AppLocalizations l10n) {
     return Container(
       color: Colors.black.withOpacity(0.3),
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
+            const CircularProgressIndicator(
               color: Colors.white,
               strokeWidth: 2,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
-              'Đang xử lý...',
-              style: TextStyle(
+              l10n.processing,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -493,23 +496,26 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
   // Validation functions
   String? _validateEmail(String email) {
     if (email.isEmpty) {
-      return 'Vui lòng nhập email';
+      final l10n = AppLocalizations.of(context)!;
+      return l10n.enterEmail;
     }
 
     return null; // Hợp lệ
   }
 
   String? _validatePassword(String password) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (password.isEmpty) {
-      return 'Vui lòng nhập mật khẩu';
+      return l10n.enterPassword;
     }
     if (password.length < 6) {
-      return 'Mật khẩu phải có ít nhất 6 ký tự';
+      return l10n.passwordMinLength;
     }
     if (_isSignUp) {
       // Kiểm tra mật khẩu mạnh cho đăng ký
       if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(password)) {
-        return 'Mật khẩu yêu cầu: ít nhất 1 chữ hoa, 1 chữ thường và 1 số. Ví dụ: Password123';
+        return l10n.passwordRequirements;
       }
     }
     return null;
@@ -535,89 +541,90 @@ class _MinimalistDashboardScreenState extends State<MinimalistDashboardScreen> {
 
   // Chuyển đổi lỗi kỹ thuật thành thông báo thân thiện
   String _getFriendlyErrorMessage(String errorMessage) {
+    final l10n = AppLocalizations.of(context)!;
     final lowerError = errorMessage.toLowerCase();
 
     // Lỗi mật khẩu
     if (lowerError.contains('password') || lowerError.contains('mật khẩu')) {
       if (lowerError.contains('weak') || lowerError.contains('yếu')) {
-        return 'Mật khẩu yêu cầu: ít nhất 6 ký tự, bao gồm 1 chữ hoa, 1 chữ thường và 1 số. Ví dụ: Password123';
+        return l10n.weakPassword;
       }
       if (lowerError.contains('incorrect') || lowerError.contains('sai')) {
-        return 'Mật khẩu không đúng. Vui lòng kiểm tra lại hoặc sử dụng "Quên mật khẩu"';
+        return l10n.incorrectPassword;
       }
       if (lowerError.contains('too short') || lowerError.contains('ngắn')) {
-        return 'Mật khẩu quá ngắn. Yêu cầu ít nhất 6 ký tự';
+        return l10n.passwordTooShort;
       }
-      return 'Mật khẩu yêu cầu: ít nhất 6 ký tự, bao gồm 1 chữ hoa, 1 chữ thường và 1 số. Ví dụ: Password123';
+      return l10n.passwordRequirements;
     }
 
     // Lỗi email đã tồn tại (từ AuthBloc)
     if (lowerError.contains('đã được đăng ký')) {
-      return 'Email đã được đăng ký. Vui lòng đăng nhập hoặc sử dụng email khác';
+      return l10n.emailAlreadyRegistered;
     }
 
     // Lỗi email chưa đăng ký (từ AuthBloc)
     if (lowerError.contains('chưa được đăng ký')) {
-      return 'Email chưa được đăng ký. Vui lòng kiểm tra lại hoặc chuyển sang đăng ký tài khoản mới';
+      return l10n.emailNotRegistered;
     }
 
     // Lỗi email
     if (lowerError.contains('email')) {
       if (lowerError.contains('not found') ||
           lowerError.contains('không tìm thấy')) {
-        return 'Email chưa được đăng ký. Vui lòng kiểm tra lại hoặc chuyển sang đăng ký tài khoản mới';
+        return l10n.emailNotFound;
       }
       if (lowerError.contains('already exists') ||
           lowerError.contains('đã tồn tại')) {
-        return 'Email đã được đăng ký. Vui lòng đăng nhập hoặc sử dụng email khác';
+        return l10n.emailAlreadyExists;
       }
       if (lowerError.contains('not confirmed') ||
           lowerError.contains('chưa xác thực')) {
-        return 'Email chưa được xác thực. Vui lòng kiểm tra email và nhấp vào link xác thực';
+        return l10n.emailNotConfirmed;
       }
-      return 'Lỗi email. Vui lòng kiểm tra lại';
+      return l10n.emailError;
     }
 
     // Lỗi mạng
     if (lowerError.contains('network') ||
         lowerError.contains('connection') ||
         lowerError.contains('timeout')) {
-      return 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet và thử lại';
+      return l10n.networkError;
     }
 
     // Lỗi server
     if (lowerError.contains('server') ||
         lowerError.contains('500') ||
         lowerError.contains('503')) {
-      return 'Lỗi hệ thống. Vui lòng thử lại sau vài phút';
+      return l10n.serverError;
     }
 
     // Lỗi xác thực
     if (lowerError.contains('auth') || lowerError.contains('authentication')) {
-      return 'Lỗi xác thực. Vui lòng đăng nhập lại';
+      return l10n.authError;
     }
 
     // Lỗi OTP
     if (lowerError.contains('otp') || lowerError.contains('token')) {
       if (lowerError.contains('invalid') || lowerError.contains('không đúng')) {
-        return 'Mã OTP không đúng. Vui lòng kiểm tra lại mã 6 chữ số';
+        return l10n.invalidOTP;
       }
       if (lowerError.contains('expired') || lowerError.contains('hết hạn')) {
-        return 'Mã OTP đã hết hạn. Vui lòng nhấn "Gửi lại mã" để nhận mã mới';
+        return l10n.expiredOTP;
       }
-      return 'Lỗi xác thực OTP. Vui lòng thử lại';
+      return l10n.otpError;
     }
 
     // Lỗi Google Sign In
     if (lowerError.contains('google')) {
       if (lowerError.contains('cancelled')) {
-        return 'Đăng nhập Google bị hủy. Vui lòng thử lại';
+        return l10n.googleSignInCancelled;
       }
-      return 'Lỗi đăng nhập Google. Vui lòng thử lại hoặc sử dụng đăng nhập email';
+      return l10n.googleSignInError;
     }
 
     // Lỗi mặc định - hiển thị lỗi gốc nếu không nhận diện được
-    return 'Lỗi: $errorMessage. Vui lòng thử lại';
+    return l10n.genericError(errorMessage);
   }
 
   void _handlePrimaryAction() {

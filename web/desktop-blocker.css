@@ -1,0 +1,201 @@
+/* Desktop Blocker Styles - Simplified */
+.desktop-blocker {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: white;
+  text-align: center;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.desktop-blocker.show {
+  display: block;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.desktop-blocker .content {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.desktop-blocker h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 1rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.desktop-blocker p {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  margin-bottom: 1rem;
+  max-width: 600px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.mobile-icon {
+  font-size: clamp(3rem, 8vw, 5rem);
+  margin-bottom: 1.5rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.instruction-box {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+.instruction-box h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.instruction-box p {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.step {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  border-left: 3px solid #4CAF50;
+}
+
+.step-number {
+  font-weight: bold;
+  color: #4CAF50;
+  margin-right: 0.5rem;
+}
+
+/* Hide Flutter app when desktop blocker is shown */
+.desktop-blocker.show ~ * {
+  display: none !important;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .desktop-blocker {
+    display: none !important;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .desktop-blocker.show {
+    display: block !important;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .desktop-blocker h1 {
+    font-size: 2.5rem;
+  }
+  
+  .desktop-blocker p {
+    font-size: 1.1rem;
+  }
+  
+  .instruction-box {
+    max-width: 450px;
+  }
+}
+
+/* Large desktop styles */
+@media (min-width: 1025px) {
+  .desktop-blocker .content {
+    padding: 40px;
+  }
+  
+  .instruction-box {
+    max-width: 550px;
+  }
+}
+
+/* Small screen styles */
+@media (max-height: 600px) {
+  .desktop-blocker .content {
+    padding: 20px;
+    justify-content: flex-start;
+  }
+  
+  .mobile-icon {
+    font-size: clamp(2rem, 6vw, 3rem);
+    margin-bottom: 1rem;
+  }
+  
+  .desktop-blocker h1 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: 0.5rem;
+  }
+  
+  .instruction-box {
+    margin-top: 1rem;
+    padding: 1.5rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .desktop-blocker {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .desktop-blocker {
+    background: #000;
+  }
+  
+  .instruction-box {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+  }
+} 

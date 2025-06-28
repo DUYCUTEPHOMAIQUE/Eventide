@@ -49,6 +49,7 @@ dependencies:
   geocoding: ^3.0.0
   url_launcher: ^6.3.1
   googleapis_auth: ^1.4.1
+  firebase_remote_config: ^5.4.5
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +63,7 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - .env
+    - dotenv
     - assets/fonts/
     - assets/
   fonts:
