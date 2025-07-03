@@ -1,16 +1,25 @@
-# Gemini AI Integration for Eventide
+# Gemini AI Integration for Eventide (Enhanced)
 
 ## Tổng quan
 
-Eventide đã được tích hợp với Google Gemini AI để tạo thẻ sự kiện thông minh với cả text và hình ảnh. Tính năng này sử dụng Gemini 2.0 Flash Preview Image Generation API để tạo ra nội dung sự kiện chất lượng cao.
+Eventide đã được tích hợp với Google Gemini AI để tạo thẻ sự kiện thông minh với cả text và hình ảnh. Tính năng này sử dụng Gemini 2.0 Flash Preview Image Generation API để tạo ra nội dung sự kiện chất lượng cao với các cải tiến về bảo mật, hiệu suất và trải nghiệm người dùng.
 
 ## Tính năng
 
-### 1. Tạo thẻ sự kiện bằng AI
+### 1. Tạo thẻ sự kiện bằng AI (Nâng cao)
 - **Text Generation**: Tạo tiêu đề, mô tả và địa điểm phù hợp
 - **Image Generation**: Tạo hình ảnh minh họa cho sự kiện
 - **Đa ngôn ngữ**: Hỗ trợ tiếng Việt và tiếng Anh
 - **Prompt Engineering**: Tối ưu hóa prompt để có kết quả tốt nhất
+- **Caching**: Cache kết quả để giảm thời gian phản hồi
+- **Retry Logic**: Tự động thử lại khi gặp lỗi tạm thời
+- **Rate Limiting**: Ngăn chặn spam requests
+- **Error Handling**: Xử lý lỗi chi tiết với thông báo rõ ràng
+
+### 2. Cải tiến bảo mật
+- **Environment Variables**: API key được lưu trong biến môi trường
+- **Input Validation**: Kiểm tra dữ liệu đầu vào
+- **Request Validation**: Ngăn chặn requests không hợp lệ
 
 ### 2. Cách sử dụng
 
@@ -36,14 +45,25 @@ Eventide đã được tích hợp với Google Gemini AI để tạo thẻ sự
    - Nhấn "Sử dụng" để chuyển sang màn hình chỉnh sửa
    - Hoặc nhấn "Tạo lại" để tạo thẻ mới
 
-## Cấu trúc kỹ thuật
+## Cấu trúc kỹ thuật (Cập nhật)
+
+### Environment Variables Setup
+```bash
+# Copy template and configure
+cp dotenv.template dotenv
+
+# Edit dotenv file with your values:
+GEMINI_API_KEY=your_actual_api_key_here
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_key
+```
 
 ### API Endpoint
 ```
 https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent
 ```
 
-### Request Body
+### Enhanced Request Configuration
 ```json
 {
   "contents": [
@@ -56,6 +76,25 @@ https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview
   "generationConfig": {
     "responseModalities": ["TEXT", "IMAGE"]
   }
+}
+```
+
+### Response Caching và Rate Limiting
+- **Cache Size**: Tối đa 50 responses
+- **Request Timeout**: 30 giây
+- **Max Retries**: 3 lần với exponential backoff
+- **Rate Limiting**: Tối thiểu 5 giây giữa các requests
+
+### Error Types
+```dart
+enum GeminiErrorType {
+  networkError,      // Lỗi mạng
+  apiError,          // Lỗi API
+  rateLimited,       // Vượt quá giới hạn
+  serverError,       // Lỗi server
+  configuration,     // Lỗi cấu hình
+  invalidInput,      // Dữ liệu không hợp lệ
+  unknown,           // Lỗi không xác định
 }
 ```
 
@@ -82,66 +121,170 @@ https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview
 }
 ```
 
-## Files đã thêm/sửa đổi
+## Files đã thêm/sửa đổi (Cập nhật)
 
 ### Files mới
-- `lib/services/gemini_service.dart` - Service chính để gọi Gemini API
-- `GEMINI_AI_INTEGRATION.md` - Tài liệu này
+- `lib/services/gemini_service.dart` - Service chính với cải tiến bảo mật và hiệu suất
+- `test/services/gemini_service_test.dart` - Test suite cho Gemini service
+- `dotenv.template` - Template cho environment variables
+- `GEMINI_AI_INTEGRATION.md` - Tài liệu chi tiết (updated)
 
 ### Files đã cập nhật
 - `lib/services/services.dart` - Export Gemini service
-- `lib/screens/card/ai_card_creation_screen.dart` - Tích hợp AI thật sự
+- `lib/screens/card/ai_card_creation_screen.dart` - Enhanced error handling và UX
+- `pubspec.yaml` - Thêm test dependencies
+- `dotenv` - Environment variables configuration
 
-## Xử lý lỗi
+### Files cấu hình
+- `dotenv.template` - Template cho production setup
+- `dotenv` - Development configuration (demo keys)
 
-### Các loại lỗi thường gặp
-1. **API Error**: Lỗi từ Gemini API
-2. **Network Error**: Lỗi kết nối mạng
-3. **Parsing Error**: Lỗi xử lý response
+## Xử lý lỗi (Nâng cao)
 
-### Fallback Strategy
-- Nếu AI generation thất bại, hệ thống sẽ sử dụng nội dung mặc định
-- Hiển thị thông báo lỗi rõ ràng cho người dùng
-- Cung cấp tùy chọn "Thử lại"
+### Các loại lỗi và xử lý tự động
+1. **API Error (4xx)**: Lỗi từ Gemini API - không retry
+2. **Network Error**: Lỗi kết nối mạng - retry với backoff
+3. **Server Error (5xx)**: Lỗi server - retry với delay
+4. **Rate Limited (429)**: Vượt giới hạn - exponential backoff
+5. **Configuration Error**: API key không có - thông báo ngay
+6. **Input Validation**: Dữ liệu không hợp lệ - thông báo cụ thể
 
-## Tối ưu hóa
+### Enhanced Fallback Strategy
+- **Smart Fallback**: Nội dung fallback dựa trên loại lỗi
+- **User Feedback**: Thông báo lỗi chi tiết và hướng dẫn khắc phục
+- **Retry Options**: Nút "Thử lại" thông minh
+- **Graceful Degradation**: App vẫn hoạt động khi AI offline
+
+### Error Messages (Bilingual)
+```dart
+// Vietnamese
+'Không thể kết nối tới AI. Vui lòng kiểm tra kết nối mạng.'
+'Đã vượt quá giới hạn sử dụng AI. Vui lòng thử lại sau vài phút.'
+'Cấu hình AI chưa đúng. Vui lòng liên hệ quản trị viên.'
+
+// English  
+'Unable to connect to AI. Please check your network connection.'
+'AI usage limit exceeded. Please try again in a few minutes.'
+'AI configuration error. Please contact administrator.'
+```
+
+## Tối ưu hóa (Nâng cao)
+
+### Performance Improvements
+- **Response Caching**: Cache 50 responses gần nhất
+- **Request Debouncing**: Ngăn chặn multiple simultaneous requests
+- **Memory Management**: Tự động clear cache khi đầy
+- **Connection Monitoring**: Theo dõi trạng thái kết nối
+- **Analytics**: Track usage patterns và success rates
 
 ### Prompt Engineering
-- Sử dụng prompt có cấu trúc rõ ràng
-- Hướng dẫn AI về định dạng output mong muốn
-- Tối ưu hóa cho từng ngôn ngữ
+- **Structured Prompts**: Sử dụng prompt có cấu trúc rõ ràng
+- **Language Optimization**: Tối ưu hóa cho từng ngôn ngữ
+- **Output Format**: Hướng dẫn AI về định dạng mong muốn
+- **Context Enhancement**: Thêm context từ event type và tone
 
-### Performance
-- Cache response để giảm API calls
-- Xử lý async để không block UI
-- Error handling robust
+### Service Analytics
+```dart
+// Get real-time stats
+final stats = GeminiService.getServiceStats();
+print('Success Rate: ${stats['successRate']}%');
+print('Cache Hit Rate: ${stats['cachedResponses']}/${stats['totalRequests']}');
+```
 
-## Bảo mật
+### Memory Management
+```dart
+// Clear cache when needed
+GeminiService.clearCache();
+```
 
-### API Key
-- API key được hardcode trong service (chỉ dành cho demo)
-- Trong production, nên sử dụng environment variables
-- Không expose API key trong client code
+## Bảo mật (Cải tiến)
 
-### Rate Limiting
-- Gemini API có rate limits
-- Implement retry logic với exponential backoff
-- Monitor API usage
+### API Key Management
+- **Environment Variables**: API key được lưu trong `dotenv` file
+- **Template System**: `dotenv.template` cho setup production
+- **Validation**: Kiểm tra API key trước khi gọi API
+- **No Hardcoding**: Không còn hardcode API key trong source code
 
-## Tương lai
+### Production Security Checklist
+1. **Environment Setup**:
+   ```bash
+   # Copy template
+   cp dotenv.template .env
+   
+   # Set production values
+   GEMINI_API_KEY=your_production_key
+   ```
 
-### Tính năng có thể thêm
-1. **Multiple Image Generation**: Tạo nhiều hình ảnh để chọn
-2. **Style Transfer**: Áp dụng style khác nhau cho hình ảnh
-3. **Batch Processing**: Tạo nhiều thẻ cùng lúc
-4. **Custom Prompts**: Cho phép người dùng tùy chỉnh prompt
-5. **Image Editing**: Chỉnh sửa hình ảnh được tạo
+2. **API Key Protection**:
+   - Không commit `.env` files vào git
+   - Sử dụng secrets management trong CI/CD
+   - Rotate API keys định kỳ
 
-### Cải tiến kỹ thuật
-1. **Caching**: Cache kết quả AI để tái sử dụng
-2. **Offline Mode**: Lưu trữ local cho offline access
-3. **Analytics**: Track usage patterns
-4. **A/B Testing**: Test different prompt strategies
+3. **Input Validation**:
+   - Validate tất cả user inputs
+   - Sanitize prompts trước khi gửi
+   - Giới hạn độ dài input
+
+### Rate Limiting & Monitoring
+- **Request Throttling**: Tối thiểu 5s giữa requests
+- **Usage Analytics**: Track API usage patterns
+- **Error Monitoring**: Log và monitor error rates
+- **Abuse Prevention**: Ngăn chặn spam và abuse
+
+## Testing & Quality Assurance
+
+### Test Coverage
+- **Unit Tests**: Test service logic và error handling
+- **Integration Tests**: Test AI workflow end-to-end  
+- **Error Scenario Tests**: Test các loại lỗi khác nhau
+- **Performance Tests**: Test caching và retry logic
+
+### Running Tests
+```bash
+# Run all tests
+flutter test
+
+# Run specific test file
+flutter test test/services/gemini_service_test.dart
+
+# Run with coverage
+flutter test --coverage
+```
+
+### Quality Metrics
+- **Success Rate**: % requests thành công
+- **Response Time**: Thời gian phản hồi trung bình
+- **Cache Hit Rate**: % requests từ cache
+- **Error Distribution**: Phân bố các loại lỗi
+
+## Monitoring & Analytics
+
+### Real-time Monitoring
+```dart
+// Check service health
+final stats = GeminiService.getServiceStats();
+print('Service Stats: $stats');
+
+// Monitor in real-time
+print('Current cache size: ${stats['cacheSize']}');
+print('Success rate: ${stats['successRate']}%');
+```
+
+### Key Metrics to Track
+1. **Performance Metrics**:
+   - Average response time
+   - Cache hit ratio
+   - Request success rate
+
+2. **Usage Metrics**:
+   - Daily/weekly request counts
+   - Popular event types
+   - User engagement with AI features
+
+3. **Error Metrics**:
+   - Error rate by type
+   - Failed request patterns
+   - Recovery success rate
 
 ## Troubleshooting
 
