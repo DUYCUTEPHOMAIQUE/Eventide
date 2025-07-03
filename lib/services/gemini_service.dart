@@ -2,53 +2,181 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class GeminiService {
-  static const String _apiKey = 'AIzaSyBZI34fVdMwwaPA1tKdCDffr1JQIiC12GE';
+  static String get _apiKey => dotenv.env['GEMINI_API_KEY'] ?? '';
   static const String _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent';
-
-  /// Generate both text and image content using Gemini AI
-  static Future<GeminiResponse> generateContent(String prompt) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl?key=$_apiKey'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'contents': [
-            {
-              'parts': [
-                {'text': prompt}
-              ]
-            }
-          ],
-          'generationConfig': {
-            'responseModalities': ['TEXT', 'IMAGE']
-          }
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return GeminiResponse.fromJson(data);
-      } else {
-        print('API Error: ${response.statusCode} - ${response.body}');
-        throw Exception('Failed to generate content: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Gemini API Error: $e');
-      throw Exception('Error generating content: $e');
-    }
+  
+  // Rate limiting configuration
+  static const int _maxRetries = 3;
+  static const Duration _baseDelay = Duration(seconds: 1);
+  static const Duration _requestTimeout = Duration(seconds: 30);
+  
+  // Cache for responses to reduce API calls
+  static final Map<String, GeminiResponse> _responseCache = {};
+  static const int _cacheMaxSize = 50;
+  
+  // Analytics and monitoring
+  static int _totalRequests = 0;
+  static int _successfulRequests = 0;
+  static int _failedRequests = 0;
+  static int _cachedResponses = 0;
+  
+  /// Get service statistics for monitoring
+  static Map<String, dynamic> getServiceStats() {
+    return {
+      'totalRequests': _totalRequests,
+      'successfulRequests': _successfulRequests,
+      'failedRequests': _failedRequests,
+      'cachedResponses': _cachedResponses,
+      'cacheSize': _responseCache.length,
+      'successRate': _totalRequests > 0 ? (_successfulRequests / _totalRequests * 100).toStringAsFixed(2) : '0.00',
+    };
+  }
+  
+  /// Clear cache (useful for memory management)
+  static void clearCache() {
+    _responseCache.clear();
+    print('Gemini response cache cleared');
   }
 
-  /// Generate event card content based on event type and description
+  /// Generate both text and image content using Gemini AI with caching and retry logic
+  static Future<GeminiResponse> generateContent(String prompt) async {
+    _totalRequests++;
+    
+    // Validate API key
+    if (_apiKey.isEmpty) {
+      _failedRequests++;
+      throw GeminiException(
+        'Gemini API key not configured. Please check your environment variables.',
+        GeminiErrorType.configuration,
+      );
+    }
+    
+    // Check cache first
+    final cacheKey = _generateCacheKey(prompt);
+    if (_responseCache.containsKey(cacheKey)) {
+      _cachedResponses++;
+      print('Returning cached response for prompt');
+      return _responseCache[cacheKey]!;
+    }
+    
+    // Manage cache size
+    if (_responseCache.length >= _cacheMaxSize) {
+      _responseCache.clear();
+    }
+    
+    GeminiException? lastException;
+    
+    for (int attempt = 0; attempt < _maxRetries; attempt++) {
+      try {
+        final response = await http.post(
+          Uri.parse('$_baseUrl?key=$_apiKey'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'contents': [
+              {
+                'parts': [
+                  {'text': prompt}
+                ]
+              }
+            ],
+            'generationConfig': {
+              'responseModalities': ['TEXT', 'IMAGE']
+            }
+          }),
+        ).timeout(_requestTimeout);
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final geminiResponse = GeminiResponse.fromJson(data);
+          
+          // Cache successful response
+          _responseCache[cacheKey] = geminiResponse;
+          _successfulRequests++;
+          
+          print('Gemini API request successful (attempt ${attempt + 1})');
+          return geminiResponse;
+        } else if (response.statusCode == 429) {
+          // Rate limited - exponential backoff
+          lastException = GeminiException(
+            'Rate limit exceeded. Please try again later.',
+            GeminiErrorType.rateLimited,
+            statusCode: response.statusCode,
+          );
+          if (attempt < _maxRetries - 1) {
+            final delay = _baseDelay * (1 << attempt); // Exponential backoff
+            print('Rate limited, waiting ${delay.inSeconds} seconds before retry ${attempt + 1}');
+            await Future.delayed(delay);
+          }
+        } else if (response.statusCode >= 500) {
+          // Server error - retry
+          lastException = GeminiException(
+            'Server error occurred. Retrying...',
+            GeminiErrorType.serverError,
+            statusCode: response.statusCode,
+          );
+          if (attempt < _maxRetries - 1) {
+            await Future.delayed(_baseDelay * (attempt + 1));
+          }
+        } else {
+          // Client error - don't retry
+          _failedRequests++;
+          throw GeminiException(
+            'API request failed: ${response.statusCode} - ${response.body}',
+            GeminiErrorType.apiError,
+            statusCode: response.statusCode,
+          );
+        }
+      } catch (e) {
+        if (e is GeminiException) {
+          lastException = e;
+        } else {
+          lastException = GeminiException(
+            'Network error: $e',
+            GeminiErrorType.networkError,
+          );
+        }
+        
+        if (attempt < _maxRetries - 1) {
+          print('Attempt ${attempt + 1} failed, retrying: $e');
+          await Future.delayed(_baseDelay * (attempt + 1));
+        }
+      }
+    }
+    
+    _failedRequests++;
+    throw lastException ?? GeminiException(
+      'Failed to generate content after $_maxRetries attempts',
+      GeminiErrorType.unknown,
+    );
+  }
+  
+  /// Generate a cache key from the prompt
+  static String _generateCacheKey(String prompt) {
+    return prompt.hashCode.toString();
+  }
+
+  /// Generate event card content based on event type and description with enhanced error handling
   static Future<EventCardContent> generateEventCard({
     required String eventType,
     required String description,
     required String language, // 'en' or 'vi'
   }) async {
+    // Validate inputs
+    if (description.trim().isEmpty) {
+      throw GeminiException(
+        language == 'vi' 
+          ? 'Mô tả sự kiện không được để trống'
+          : 'Event description cannot be empty',
+        GeminiErrorType.invalidInput,
+      );
+    }
+    
     String prompt;
 
     if (language == 'vi') {
@@ -112,20 +240,53 @@ Location: [location]
                 : 'Location will be suggested'),
         imageData: imageData,
       );
+    } on GeminiException catch (e) {
+      print('Gemini API exception in generateEventCard: ${e.message}');
+      // Return fallback content with more specific error information
+      return _getFallbackEventCard(language, e);
     } catch (e) {
-      print('Error in generateEventCard: $e');
-      // Fallback to default content if AI generation fails
-      return EventCardContent(
-        title: language == 'vi' ? 'Sự kiện mới' : 'New Event',
-        description: language == 'vi'
-            ? 'Mô tả sự kiện sẽ được tạo tự động dựa trên thông tin bạn cung cấp.'
-            : 'Event description will be automatically generated based on your information.',
-        location: language == 'vi'
-            ? 'Địa điểm sẽ được đề xuất'
-            : 'Location will be suggested',
-        imageData: null,
-      );
+      print('Unexpected error in generateEventCard: $e');
+      // Return basic fallback content for unknown errors
+      return _getFallbackEventCard(language, null);
     }
+  }
+  
+  /// Get fallback event card content when AI generation fails
+  static EventCardContent _getFallbackEventCard(String language, GeminiException? exception) {
+    String title, description, location;
+    
+    if (language == 'vi') {
+      title = 'Sự kiện mới';
+      if (exception?.type == GeminiErrorType.networkError) {
+        description = 'Không thể kết nối tới AI. Vui lòng kiểm tra kết nối mạng và thử lại.';
+      } else if (exception?.type == GeminiErrorType.rateLimited) {
+        description = 'Đã vượt quá giới hạn sử dụng AI. Vui lòng thử lại sau vài phút.';
+      } else if (exception?.type == GeminiErrorType.configuration) {
+        description = 'Cấu hình AI chưa đúng. Vui lòng liên hệ quản trị viên.';
+      } else {
+        description = 'Mô tả sự kiện sẽ được tạo tự động dựa trên thông tin bạn cung cấp.';
+      }
+      location = 'Địa điểm sẽ được đề xuất';
+    } else {
+      title = 'New Event';
+      if (exception?.type == GeminiErrorType.networkError) {
+        description = 'Unable to connect to AI. Please check your network connection and try again.';
+      } else if (exception?.type == GeminiErrorType.rateLimited) {
+        description = 'AI usage limit exceeded. Please try again in a few minutes.';
+      } else if (exception?.type == GeminiErrorType.configuration) {
+        description = 'AI configuration error. Please contact administrator.';
+      } else {
+        description = 'Event description will be automatically generated based on your information.';
+      }
+      location = 'Location will be suggested';
+    }
+    
+    return EventCardContent(
+      title: title,
+      description: description,
+      location: location,
+      imageData: null,
+    );
   }
 
   /// Parse the AI-generated text to extract structured event data
@@ -257,4 +418,31 @@ class EventCardContent {
     required this.location,
     this.imageData,
   });
+}
+
+/// Custom exception class for Gemini API errors
+class GeminiException implements Exception {
+  final String message;
+  final GeminiErrorType type;
+  final int? statusCode;
+
+  GeminiException(
+    this.message,
+    this.type, {
+    this.statusCode,
+  });
+
+  @override
+  String toString() => 'GeminiException: $message (Type: $type, Status: $statusCode)';
+}
+
+/// Types of Gemini API errors
+enum GeminiErrorType {
+  networkError,
+  apiError,
+  rateLimited,
+  serverError,
+  configuration,
+  invalidInput,
+  unknown,
 }

@@ -27,6 +27,10 @@ class _AICardCreationScreenState extends State<AICardCreationScreen> {
   CardModel? _generatedCard;
   String _generatedPrompt = '';
   EventCardContent? _generatedContent;
+  
+  // Debouncing and request management
+  bool _requestInProgress = false;
+  DateTime? _lastRequestTime;
 
   // Predefined event types for better prompt engineering
   final List<String> _eventTypes = [
@@ -833,12 +837,39 @@ class _AICardCreationScreenState extends State<AICardCreationScreen> {
 
   Future<void> _generateCard() async {
     if (_promptController.text.trim().isEmpty) return;
+    
+    // Prevent multiple simultaneous requests
+    if (_requestInProgress) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đang xử lý yêu cầu trước đó...'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    
+    // Rate limiting - prevent too frequent requests
+    final now = DateTime.now();
+    if (_lastRequestTime != null && 
+        now.difference(_lastRequestTime!).inSeconds < 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng chờ vài giây trước khi tạo thẻ mới.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
 
     setState(() {
       _isGenerating = true;
+      _requestInProgress = true;
       _generatedCard = null;
       _generatedContent = null;
     });
+    
+    _lastRequestTime = now;
 
     try {
       // Generate card using Gemini AI service
@@ -851,6 +882,7 @@ class _AICardCreationScreenState extends State<AICardCreationScreen> {
       setState(() {
         _generatedCard = generatedCard;
         _isGenerating = false;
+        _requestInProgress = false;
       });
 
       // Show success message
@@ -866,18 +898,54 @@ class _AICardCreationScreenState extends State<AICardCreationScreen> {
     } catch (e) {
       setState(() {
         _isGenerating = false;
+        _requestInProgress = false;
       });
+
+      // Enhanced error handling with specific messages
+      String errorMessage;
+      String? actionLabel;
+      VoidCallback? actionCallback;
+      
+      if (e is GeminiException) {
+        switch (e.type) {
+          case GeminiErrorType.networkError:
+            errorMessage = 'Không thể kết nối đến AI. Vui lòng kiểm tra kết nối mạng.';
+            actionLabel = 'Thử lại';
+            actionCallback = () => _generateCard();
+            break;
+          case GeminiErrorType.rateLimited:
+            errorMessage = 'Đã vượt quá giới hạn sử dụng AI. Vui lòng thử lại sau vài phút.';
+            actionLabel = 'Đóng';
+            break;
+          case GeminiErrorType.configuration:
+            errorMessage = 'Cấu hình AI chưa đúng. Vui lòng liên hệ quản trị viên.';
+            actionLabel = 'Đóng';
+            break;
+          case GeminiErrorType.invalidInput:
+            errorMessage = e.message;
+            actionLabel = 'Sửa';
+            break;
+          default:
+            errorMessage = 'Có lỗi xảy ra khi tạo thẻ: ${e.message}';
+            actionLabel = 'Thử lại';
+            actionCallback = () => _generateCard();
+        }
+      } else {
+        errorMessage = 'Có lỗi không xác định xảy ra: $e';
+        actionLabel = 'Thử lại';
+        actionCallback = () => _generateCard();
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Có lỗi xảy ra khi tạo thẻ: $e'),
+          content: Text(errorMessage),
           backgroundColor: Colors.red.shade400,
           duration: const Duration(seconds: 4),
-          action: SnackBarAction(
-            label: 'Thử lại',
+          action: actionLabel != null ? SnackBarAction(
+            label: actionLabel,
             textColor: Colors.white,
-            onPressed: () => _generateCard(),
-          ),
+            onPressed: actionCallback ?? () {},
+          ) : null,
         ),
       );
     }
